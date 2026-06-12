@@ -547,8 +547,11 @@ export default function CinemaLoader({ children }: CinemaLoaderProps) {
       tl.call(() => { dust?.fadeOut(); }, [], 4.10);
       tl.to(`.${styles.dustCanvas}`, { opacity: 0, duration: 0.3 }, 4.15);
 
-      // Complete
-      tl.call(() => { setLoaderState('complete'); }, [], 4.70);
+      // Complete — notify navbar to begin assembly
+      tl.call(() => {
+        setLoaderState('complete');
+        window.dispatchEvent(new CustomEvent('cinema-loader-complete'));
+      }, [], 4.70);
     });
 
     // Skip handlers

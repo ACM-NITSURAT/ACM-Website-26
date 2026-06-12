@@ -1,0 +1,870 @@
+/* ============================================================
+   Navbar — Living Projection System
+   
+   "The projector is always running."
+   
+   A cinematic navigation that continuously guides the viewer.
+   The navbar is the visual representation of where the 
+   projector's attention currently is.
+   
+   Dual Beam System:
+   1. Active Beam — Always on, tracks current section
+   2. Hover Beam  — Secondary, dimmer, potential destination
+   
+   Performance: Only animates transform, opacity, filter.
+   ============================================================ */
+
+/* --- Header Shell --- */
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 100;
+  padding: 24px 0;
+  transition:
+    padding 0.5s cubic-bezier(0.25, 1, 0.5, 1),
+    background-color 0.5s cubic-bezier(0.25, 1, 0.5, 1),
+    backdrop-filter 0.5s cubic-bezier(0.25, 1, 0.5, 1),
+    border-color 0.5s ease;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.35) 0%, transparent 100%);
+  border-bottom: 1px solid transparent;
+}
+
+.header.scrolled {
+  padding: 12px 0;
+  background: rgba(6, 6, 10, 0.92);
+  backdrop-filter: blur(16px) saturate(150%);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+/* --- Inner Nav Container --- */
+.nav {
+  position: relative;
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0 48px;
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+/* ============================================================
+   FILM REGISTRATION MARKS
+   ============================================================ */
+.registrationMark {
+  position: absolute;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  transform: translateY(-50%) rotate(0deg);
+  opacity: 0.07;
+  pointer-events: none;
+  transition:
+    opacity 0.5s ease,
+    transform 0.5s cubic-bezier(0.25, 1, 0.5, 1),
+    left 0.5s cubic-bezier(0.25, 1, 0.5, 1),
+    right 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.registrationMark::before,
+.registrationMark::after {
+  content: '';
+  position: absolute;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.registrationMark::before {
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  transform: translateY(-50%);
+}
+
+.registrationMark::after {
+  left: 50%;
+  top: 0;
+  width: 1px;
+  height: 100%;
+  transform: translateX(-50%);
+}
+
+.registrationLeft { left: 16px; }
+.registrationRight { right: 16px; }
+
+.header.scrolled .registrationLeft {
+  transform: translateY(-50%) rotate(3deg);
+  left: 20px;
+}
+
+.header.scrolled .registrationRight {
+  transform: translateY(-50%) rotate(-3deg);
+  right: 20px;
+}
+
+/* ============================================================
+   BRAND BLOCK — "The Studio Mark"
+   ============================================================ */
+.brandBlock {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  position: relative;
+  z-index: 10;
+  transition: filter 0.4s ease;
+  flex-shrink: 0;
+}
+
+.brandBlock:hover {
+  filter: drop-shadow(0 0 16px rgba(255, 240, 200, 0.12));
+}
+
+.brandLogo {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  transition: width 0.5s cubic-bezier(0.25, 1, 0.5, 1),
+              height 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.header.scrolled .brandLogo {
+  width: 34px;
+  height: 34px;
+}
+
+.brandText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.brandName {
+  color: #ffffff;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  line-height: 1;
+}
+
+.brandSubtitle {
+  color: rgba(255, 255, 255, 0.35);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 8.5px;
+  font-weight: 400;
+  letter-spacing: 3.5px;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+/* ============================================================
+   DIVIDER
+   ============================================================ */
+.divider {
+  width: 1px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 0 32px;
+  flex-shrink: 0;
+  transition: height 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.header.scrolled .divider {
+  height: 22px;
+}
+
+/* ============================================================
+   NAVIGATION LINKS — Title Card Credits
+   ============================================================ */
+.navLinks {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  z-index: 10;
+  flex: 1;
+}
+
+.navItem {
+  position: relative;
+}
+
+.navLink {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  color: rgba(255, 255, 255, 0.42);
+  text-decoration: none;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  padding: 10px 18px;
+  transition: color 0.25s ease;
+}
+
+.navLink:hover {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.navLink.active {
+  color: rgba(255, 255, 255, 0.95);
+  text-shadow: 0 0 20px rgba(255, 240, 200, 0.2);
+}
+
+/* ============================================================
+   ACTIVE PROJECTION CONE — "The Projector's Current Focus"
+   Always on. Tracks current section. The beam physically sweeps
+   between links with cinematic easing.
+   
+   Beam properties adapt to scroll state:
+   - Hero: wider, softer, atmospheric (projector finding focus)
+   - Scrolled: narrower, sharper, precise (focus achieved)
+   
+   Properties driven by inline JS via CSS custom properties.
+   ============================================================ */
+.projectionCone {
+  position: absolute;
+  top: -24px;
+  left: 0;
+  width: 0;
+  height: calc(100% + 40px);
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(
+    ellipse 100% 100% at 50% 0%,
+    rgba(255, 245, 225, var(--beam-peak, 0.32)) 0%,
+    rgba(255, 240, 210, calc(var(--beam-peak, 0.32) * 0.55)) 35%,
+    rgba(255, 235, 200, calc(var(--beam-peak, 0.32) * 0.2)) 65%,
+    transparent 100%
+  );
+  filter: blur(var(--beam-blur, 12px));
+  mix-blend-mode: screen;
+  /* Cinematic sweep — the beam physically travels */
+  transition:
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    width 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.4s ease;
+}
+
+.header.scrolled .projectionCone {
+  top: -12px;
+}
+
+/* ============================================================
+   HOVER PROJECTION CONE — "Potential Destination"
+   Secondary, dimmer, faster. Shows where you COULD go.
+   Does NOT appear when hovering the active link.
+   ============================================================ */
+.hoverCone {
+  position: absolute;
+  top: -24px;
+  left: 0;
+  width: 0;
+  height: calc(100% + 40px);
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(
+    ellipse 100% 100% at 50% 0%,
+    rgba(255, 245, 225, 0.16) 0%,
+    rgba(255, 240, 210, 0.08) 40%,
+    transparent 70%
+  );
+  filter: blur(14px);
+  mix-blend-mode: screen;
+  opacity: 0;
+  transition:
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    width 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.15s ease;
+}
+
+.hoverCone.hoverVisible {
+  opacity: 1;
+}
+
+.hoverCone.hoverFadeOut {
+  opacity: 0;
+  transition:
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    width 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.35s ease;
+}
+
+.header.scrolled .hoverCone {
+  top: -12px;
+  filter: blur(8px);
+  background: radial-gradient(
+    ellipse 90% 100% at 50% 0%,
+    rgba(255, 245, 225, 0.20) 0%,
+    rgba(255, 240, 210, 0.10) 35%,
+    transparent 65%
+  );
+}
+
+/* ============================================================
+   ACTIVE DUST — Barely visible. Always in the active beam.
+   3 subtle particles. The user should NOT consciously notice.
+   ============================================================ */
+.activeDustField {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.navLink.active .activeDustField {
+  opacity: 1;
+}
+
+.activeDustMote {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 248, 230, 0.30);
+  will-change: transform;
+}
+
+.activeDustMote1 {
+  width: 1.5px;
+  height: 1.5px;
+  top: 40%;
+  left: 35%;
+  animation: activeDrift1 7s ease-in-out infinite;
+}
+
+.activeDustMote2 {
+  width: 1px;
+  height: 1px;
+  top: 55%;
+  left: 55%;
+  animation: activeDrift2 8s ease-in-out infinite;
+  animation-delay: -3s;
+}
+
+.activeDustMote3 {
+  width: 1.5px;
+  height: 1.5px;
+  top: 60%;
+  left: 40%;
+  animation: activeDrift3 6.5s ease-in-out infinite;
+  animation-delay: -5s;
+  opacity: 0.7;
+}
+
+@keyframes activeDrift1 {
+  0%   { transform: translate(0, 0); opacity: 0; }
+  20%  { opacity: 1; }
+  50%  { transform: translate(4px, -3px); }
+  80%  { opacity: 1; }
+  100% { transform: translate(7px, -5px); opacity: 0; }
+}
+
+@keyframes activeDrift2 {
+  0%   { transform: translate(0, 0); opacity: 0; }
+  25%  { opacity: 1; }
+  50%  { transform: translate(-3px, -2px); }
+  75%  { opacity: 1; }
+  100% { transform: translate(-6px, 1px); opacity: 0; }
+}
+
+@keyframes activeDrift3 {
+  0%   { transform: translate(0, 0) scale(1); opacity: 0; }
+  30%  { opacity: 0.7; }
+  50%  { transform: translate(2px, -4px) scale(0.8); }
+  70%  { opacity: 0.7; }
+  100% { transform: translate(-1px, -7px) scale(0.6); opacity: 0; }
+}
+
+/* ============================================================
+   HOVER DUST — More visible. "Light is revealing something."
+   5 particles, visible only on hover of NON-ACTIVE links.
+   Fade in and out with the hover beam.
+   ============================================================ */
+.hoverDustField {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.navLink:hover .hoverDustField {
+  opacity: 1;
+}
+
+/* Don't show hover dust on active link — active dust is enough */
+.navLink.active .hoverDustField {
+  opacity: 0;
+}
+
+.hoverDustMote {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 248, 230, 0.85);
+  box-shadow: 0 0 3px rgba(255, 248, 230, 0.5);
+  will-change: transform;
+}
+
+.hoverDustMote1 {
+  width: 2px;
+  height: 2px;
+  top: 35%;
+  left: 30%;
+  animation: hoverDrift1 4.5s ease-in-out infinite;
+}
+
+.hoverDustMote2 {
+  width: 1.5px;
+  height: 1.5px;
+  top: 55%;
+  left: 60%;
+  animation: hoverDrift2 5.2s ease-in-out infinite;
+  animation-delay: -1.8s;
+}
+
+.hoverDustMote3 {
+  width: 2.5px;
+  height: 2.5px;
+  top: 65%;
+  left: 45%;
+  animation: hoverDrift3 6s ease-in-out infinite;
+  animation-delay: -3.2s;
+  opacity: 0.8;
+}
+
+.hoverDustMote4 {
+  width: 3px;
+  height: 3px;
+  top: 70%;
+  left: 20%;
+  animation: hoverDrift4 3.8s ease-in-out infinite;
+  animation-delay: -0.5s;
+}
+
+.hoverDustMote5 {
+  width: 1.5px;
+  height: 1.5px;
+  top: 40%;
+  left: 70%;
+  animation: hoverDrift5 4.8s ease-in-out infinite;
+  animation-delay: -2.1s;
+}
+
+@keyframes hoverDrift1 {
+  0%   { transform: translate(0, 0); opacity: 0; }
+  15%  { opacity: 1; }
+  50%  { transform: translate(6px, -4px); }
+  85%  { opacity: 1; }
+  100% { transform: translate(10px, -8px); opacity: 0; }
+}
+
+@keyframes hoverDrift2 {
+  0%   { transform: translate(0, 0); opacity: 0; }
+  20%  { opacity: 1; }
+  50%  { transform: translate(-5px, -3px); }
+  80%  { opacity: 1; }
+  100% { transform: translate(-9px, 2px); opacity: 0; }
+}
+
+@keyframes hoverDrift3 {
+  0%   { transform: translate(0, 0) scale(1); opacity: 0; }
+  25%  { opacity: 0.8; }
+  50%  { transform: translate(3px, -6px) scale(0.8); }
+  75%  { opacity: 0.8; }
+  100% { transform: translate(-2px, -10px) scale(0.5); opacity: 0; }
+}
+
+@keyframes hoverDrift4 {
+  0%   { transform: translate(0, 0); opacity: 0; }
+  30%  { opacity: 1; }
+  60%  { transform: translate(8px, -12px); opacity: 1; }
+  100% { transform: translate(15px, -20px); opacity: 0; }
+}
+
+@keyframes hoverDrift5 {
+  0%   { transform: translate(0, 0); opacity: 0; }
+  25%  { opacity: 1; }
+  50%  { transform: translate(5px, -5px); opacity: 1; }
+  100% { transform: translate(12px, -10px); opacity: 0; }
+}
+
+/* ============================================================
+   REGISTRATION TICK — Tiny frame mark below active link
+   ============================================================ */
+.registrationTick {
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 5px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  opacity: 0;
+  transition: opacity 0.3s ease 0.15s;
+  pointer-events: none;
+}
+
+.navLink.active .registrationTick {
+  opacity: 1;
+}
+
+/* ============================================================
+   SCENE INDICATOR — "SC. 01"
+   ============================================================ */
+.sceneIndicator {
+  position: absolute;
+  top: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-geist-mono), 'Courier New', monospace;
+  font-size: 7.5px;
+  font-weight: 400;
+  letter-spacing: 1.5px;
+  color: rgba(255, 255, 255, 0.22);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  text-transform: uppercase;
+}
+
+.navLink.active .sceneIndicator {
+  opacity: 1;
+}
+
+/* ============================================================
+   ACTIONS — Right side
+   ============================================================ */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  z-index: 10;
+  margin-left: auto;
+}
+
+.joinBtn {
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  padding: 10px 24px;
+  border-radius: 40px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+.joinBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+}
+
+/* ============================================================
+   MOBILE TOGGLE
+   ============================================================ */
+.mobileToggle {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  z-index: 110;
+  position: relative;
+}
+
+.hamburger {
+  position: relative;
+  width: 26px;
+  height: 18px;
+}
+
+.hamburger span {
+  position: absolute;
+  left: 50%;
+  height: 1.5px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 2px;
+  transition:
+    transform 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+    opacity 0.3s ease,
+    width 0.3s cubic-bezier(0.25, 1, 0.5, 1),
+    top 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.hamburger span:nth-child(1) {
+  top: 0px;
+  width: 16px;
+  transform: translateX(-50%);
+}
+.hamburger span:nth-child(2) {
+  top: 8px;
+  width: 26px;
+  transform: translateX(-50%);
+}
+.hamburger span:nth-child(3) {
+  top: 16px;
+  width: 16px;
+  transform: translateX(-50%);
+}
+
+.mobileToggle.open .hamburger span:nth-child(1) {
+  top: 8px;
+  width: 22px;
+  transform: translateX(-50%) rotate(45deg);
+}
+.mobileToggle.open .hamburger span:nth-child(2) {
+  opacity: 0;
+  width: 0;
+}
+.mobileToggle.open .hamburger span:nth-child(3) {
+  top: 8px;
+  width: 22px;
+  transform: translateX(-50%) rotate(-45deg);
+}
+
+/* ============================================================
+   MOBILE MENU — "The Screening Room"
+   ============================================================ */
+.mobileMenu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  background: rgba(4, 4, 8, 0.98);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 90;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.45s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.mobileMenu.mobileOpen {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.mobileBeam {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1px;
+  height: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 245, 225, 0.5) 0%,
+    rgba(255, 240, 200, 0.15) 40%,
+    rgba(255, 235, 190, 0.03) 80%,
+    transparent 100%
+  );
+  box-shadow: 0 0 30px 4px rgba(255, 240, 200, 0.03);
+  transition: height 0.7s cubic-bezier(0.25, 1, 0.5, 1) 0.15s;
+  z-index: 0;
+}
+
+.mobileMenu.mobileOpen .mobileBeam {
+  height: 100%;
+}
+
+.mobileCenterMark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity 0.5s ease 0.6s;
+  pointer-events: none;
+}
+
+.mobileMenu.mobileOpen .mobileCenterMark {
+  opacity: 0.04;
+}
+
+.mobileCenterMark::before,
+.mobileCenterMark::after {
+  content: '';
+  position: absolute;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.mobileCenterMark::before {
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  transform: translateY(-50%);
+}
+
+.mobileCenterMark::after {
+  left: 50%;
+  top: 0;
+  width: 1px;
+  height: 100%;
+  transform: translateX(-50%);
+}
+
+.mobileNavLinks {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+  z-index: 1;
+}
+
+.mobileNavItem {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 0.45s ease,
+    transform 0.45s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.mobileMenu.mobileOpen .mobileNavItem {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.mobileNavLink {
+  color: rgba(255, 255, 255, 0.5);
+  text-decoration: none;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 1.6rem;
+  font-weight: 300;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.mobileNavLink:hover,
+.mobileNavLink.active {
+  color: rgba(255, 255, 255, 0.92);
+  text-shadow: 0 0 24px rgba(255, 240, 200, 0.2);
+}
+
+.mobileScene {
+  font-family: var(--font-geist-mono), 'Courier New', monospace;
+  font-size: 8px;
+  font-weight: 400;
+  letter-spacing: 2px;
+  color: rgba(255, 255, 255, 0.18);
+  display: none;
+}
+
+.mobileNavLink.active .mobileScene {
+  display: block;
+}
+
+.mobileJoinLink {
+  font-size: 1rem !important;
+  font-weight: 400 !important;
+  letter-spacing: 3px !important;
+  padding: 14px 36px;
+  border-radius: 40px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* ============================================================
+   NAVBAR ASSEMBLY ANIMATION
+   ============================================================ */
+.assembleHidden {
+  opacity: 0 !important;
+}
+
+.assembleFade {
+  transition: opacity 0.45s cubic-bezier(0.25, 1, 0.5, 1) !important;
+}
+
+.dividerDraw {
+  transform-origin: top center;
+  transform: scaleY(0);
+}
+
+.dividerDrawIn {
+  transform: scaleY(1);
+  transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1) !important;
+}
+
+/* ============================================================
+   REDUCED MOTION — Respect user preference
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  .projectionCone,
+  .hoverCone {
+    transition-duration: 0.01s !important;
+  }
+
+  .activeDustField,
+  .hoverDustField {
+    display: none !important;
+  }
+
+  .header {
+    transition-duration: 0.01s !important;
+  }
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 860px) {
+  .nav {
+    padding: 0 24px;
+  }
+
+  .navLinks,
+  .joinBtn,
+  .divider {
+    display: none;
+  }
+
+  .mobileToggle {
+    display: block;
+  }
+
+  .registrationLeft { left: 8px; }
+  .registrationRight { right: 8px; }
+
+  .header.scrolled .registrationLeft { left: 12px; }
+  .header.scrolled .registrationRight { right: 12px; }
+}
+
+@media (max-width: 480px) {
+  .brandName { font-size: 15px; }
+  .brandSubtitle { font-size: 7.5px; letter-spacing: 3px; }
+  .brandLogo { width: 34px; height: 34px; }
+  .header.scrolled .brandLogo { width: 30px; height: 30px; }
+}
