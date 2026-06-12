@@ -101,7 +101,23 @@ export function playStartupClunk(): void {
   const { ctx, master } = audioNodes;
   const t = ctx.currentTime;
 
-  // Part A: Mechanical clunk (loud filtered noise burst)
+  // Part 0: Relay click precursor — tiny tick before motor catches
+  const relay = ctx.createBufferSource();
+  relay.buffer = createNoiseBuffer(ctx, 0.02);
+  const relayHP = ctx.createBiquadFilter();
+  relayHP.type = 'highpass';
+  relayHP.frequency.value = 2000;
+  const relayEnv = ctx.createGain();
+  relayEnv.gain.setValueAtTime(0, t);
+  relayEnv.gain.linearRampToValueAtTime(0.15, t + 0.002);
+  relayEnv.gain.exponentialRampToValueAtTime(0.001, t + 0.02);
+  relay.connect(relayHP);
+  relayHP.connect(relayEnv);
+  relayEnv.connect(master);
+  relay.start(t);
+  relay.stop(t + 0.025);
+
+  // Part A: Mechanical clunk (40ms after relay)
   const clunkNoise = ctx.createBufferSource();
   clunkNoise.buffer = createNoiseBuffer(ctx, 0.12);
   const clunkBP = ctx.createBiquadFilter();
@@ -109,28 +125,28 @@ export function playStartupClunk(): void {
   clunkBP.frequency.value = 800;
   clunkBP.Q.value = 2;
   const clunkEnv = ctx.createGain();
-  clunkEnv.gain.setValueAtTime(0, t);
-  clunkEnv.gain.linearRampToValueAtTime(0.45, t + 0.005);
-  clunkEnv.gain.exponentialRampToValueAtTime(0.01, t + 0.10);
+  clunkEnv.gain.setValueAtTime(0, t + 0.04);
+  clunkEnv.gain.linearRampToValueAtTime(0.45, t + 0.045);
+  clunkEnv.gain.exponentialRampToValueAtTime(0.01, t + 0.14);
   clunkNoise.connect(clunkBP);
   clunkBP.connect(clunkEnv);
   clunkEnv.connect(master);
-  clunkNoise.start(t);
-  clunkNoise.stop(t + 0.12);
+  clunkNoise.start(t + 0.04);
+  clunkNoise.stop(t + 0.16);
 
-  // Part B: Bulb warm-up tone (sine sweep up)
+  // Part B: Bulb warm-up tone (warmer sine sweep)
   const bulb = ctx.createOscillator();
   bulb.type = 'sine';
-  bulb.frequency.setValueAtTime(150, t + 0.05);
-  bulb.frequency.exponentialRampToValueAtTime(400, t + 0.3);
+  bulb.frequency.setValueAtTime(120, t + 0.08);
+  bulb.frequency.exponentialRampToValueAtTime(350, t + 0.35);
   const bulbEnv = ctx.createGain();
-  bulbEnv.gain.setValueAtTime(0, t + 0.05);
-  bulbEnv.gain.linearRampToValueAtTime(0.12, t + 0.15);
-  bulbEnv.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
+  bulbEnv.gain.setValueAtTime(0, t + 0.08);
+  bulbEnv.gain.linearRampToValueAtTime(0.12, t + 0.18);
+  bulbEnv.gain.exponentialRampToValueAtTime(0.001, t + 0.45);
   bulb.connect(bulbEnv);
   bulbEnv.connect(master);
-  bulb.start(t + 0.05);
-  bulb.stop(t + 0.45);
+  bulb.start(t + 0.08);
+  bulb.stop(t + 0.5);
 }
 
 // ================================================================
@@ -232,6 +248,20 @@ export function startBeamSound(): void {
 
   audioNodes.beamSource = noise;
   audioNodes.beamGain = beamGain;
+
+  // Atmospheric swell — warm tonal body underneath the noise
+  const pad = ctx.createOscillator();
+  pad.type = 'sine';
+  pad.frequency.value = 180;
+  const padEnv = ctx.createGain();
+  padEnv.gain.setValueAtTime(0, t);
+  padEnv.gain.linearRampToValueAtTime(0.04, t + 1.0);
+  padEnv.gain.linearRampToValueAtTime(0.03, t + 3.0);
+  padEnv.gain.linearRampToValueAtTime(0, t + 5.0);
+  pad.connect(padEnv);
+  padEnv.connect(master);
+  pad.start(t);
+  pad.stop(t + 5.5);
 }
 
 export function stopBeamSound(): void {
@@ -311,64 +341,33 @@ export function stopFilmWhir(): void {
 }
 
 // ================================================================
-// 5. TECH SWEEP — Dolby Atmos style tech/sci-fi sweep
-//    Deep sub-bass drop + high-frequency crystalline shimmer.
+// 5. PRECISION CLICK — very short mechanical click
+//    Like precise machinery engaging. Used at construction landmarks.
 // ================================================================
-export function playTechSweep(pitch: 'low' | 'mid' | 'high' = 'mid'): void {
+export function playPrecisionClick(): void {
   if (!audioNodes) return;
   const { ctx, master } = audioNodes;
   const t = ctx.currentTime;
 
-  const freqMap = { low: 50, mid: 100, high: 200 };
-  const baseFreq = freqMap[pitch];
+  const click = ctx.createBufferSource();
+  click.buffer = createNoiseBuffer(ctx, 0.015);
 
-  // Layer 1: Deep resonant sub-bass drop (Dolby style rumble)
-  const sub = ctx.createOscillator();
-  sub.type = 'sine';
-  sub.frequency.setValueAtTime(baseFreq * 2, t);
-  sub.frequency.exponentialRampToValueAtTime(baseFreq * 0.5, t + 0.4);
+  const clickBP = ctx.createBiquadFilter();
+  clickBP.type = 'bandpass';
+  clickBP.frequency.value = 2500;
+  clickBP.Q.value = 4;
 
-  const subEnv = ctx.createGain();
-  subEnv.gain.setValueAtTime(0, t);
-  subEnv.gain.linearRampToValueAtTime(0.5, t + 0.05);
-  subEnv.gain.exponentialRampToValueAtTime(0.001, t + 0.5);
+  const clickEnv = ctx.createGain();
+  clickEnv.gain.setValueAtTime(0, t);
+  clickEnv.gain.linearRampToValueAtTime(0.12, t + 0.001);
+  clickEnv.gain.exponentialRampToValueAtTime(0.001, t + 0.015);
 
-  sub.connect(subEnv);
-  subEnv.connect(master);
-  sub.start(t);
-  sub.stop(t + 0.6);
+  click.connect(clickBP);
+  clickBP.connect(clickEnv);
+  clickEnv.connect(master);
 
-  // Layer 2: High-tech crystalline shimmer (digital tech sound)
-  const shimmer = ctx.createOscillator();
-  shimmer.type = 'triangle';
-  shimmer.frequency.setValueAtTime(baseFreq * 12, t);
-  shimmer.frequency.exponentialRampToValueAtTime(baseFreq * 24, t + 0.3);
-
-  const shimmerEnv = ctx.createGain();
-  shimmerEnv.gain.setValueAtTime(0, t);
-  shimmerEnv.gain.linearRampToValueAtTime(0.12, t + 0.02);
-  shimmerEnv.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
-
-  // Tremolo for the tech flutter effect
-  const tremolo = ctx.createOscillator();
-  tremolo.type = 'sine';
-  tremolo.frequency.value = 40; // Fast flutter
-  const tremGain = ctx.createGain();
-  tremGain.gain.value = 0.6;
-  tremolo.connect(tremGain);
-  
-  const shimmerVCA = ctx.createGain();
-  shimmerVCA.gain.value = 0.4;
-  tremGain.connect(shimmerVCA.gain);
-  
-  shimmer.connect(shimmerEnv);
-  shimmerEnv.connect(shimmerVCA);
-  shimmerVCA.connect(master);
-
-  shimmer.start(t);
-  shimmer.stop(t + 0.4);
-  tremolo.start(t);
-  tremolo.stop(t + 0.4);
+  click.start(t);
+  click.stop(t + 0.02);
 }
 
 // ================================================================
@@ -402,113 +401,175 @@ export function playConstructionTone(): void {
 }
 
 // ================================================================
-// 7. BRAND LOCK-IN — deep, satisfying THUD + harmonic ring
-//    Much more impactful than v1
+// 7. BRAND LOCK-IN — deep sub + warm, heavenly chime
+//    Replaced the noise impact with a lush tonal chord
 // ================================================================
 export function playLockinResonance(): void {
   if (!audioNodes) return;
   const { ctx, master } = audioNodes;
   const t = ctx.currentTime;
 
-  // Sub bass THUD
+  // Sub bass THUD — softened attack to prevent "speaker pop"
   const sub = ctx.createOscillator();
   sub.type = 'sine';
-  sub.frequency.setValueAtTime(100, t);
+  sub.frequency.setValueAtTime(90, t);
   sub.frequency.exponentialRampToValueAtTime(35, t + 0.4);
   const subEnv = ctx.createGain();
   subEnv.gain.setValueAtTime(0, t);
-  subEnv.gain.linearRampToValueAtTime(0.35, t + 0.01);
-  subEnv.gain.exponentialRampToValueAtTime(0.001, t + 0.7);
+  subEnv.gain.linearRampToValueAtTime(0.3, t + 0.04); // Slower attack (40ms)
+  subEnv.gain.exponentialRampToValueAtTime(0.001, t + 0.8);
   sub.connect(subEnv);
   subEnv.connect(master);
   sub.start(t);
-  sub.stop(t + 0.8);
+  sub.stop(t + 0.9);
 
-  // Impact noise transient
-  const impact = ctx.createBufferSource();
-  impact.buffer = createNoiseBuffer(ctx, 0.08);
-  const impactLP = ctx.createBiquadFilter();
-  impactLP.type = 'lowpass';
-  impactLP.frequency.value = 500;
-  const impactEnv = ctx.createGain();
-  impactEnv.gain.setValueAtTime(0, t);
-  impactEnv.gain.linearRampToValueAtTime(0.25, t + 0.003);
-  impactEnv.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
-  impact.connect(impactLP);
-  impactLP.connect(impactEnv);
-  impactEnv.connect(master);
-  impact.start(t);
-  impact.stop(t + 0.08);
+  // Heavenly Chime — warm, lush chord (A Major add9)
+  // Replaces the noisy "pat" with something beautiful
+  const chordFreqs = [220.0, 277.18, 329.63, 493.88]; // A3, C#4, E4, B4
+  chordFreqs.forEach((freq) => {
+    const osc = ctx.createOscillator();
+    osc.type = 'sine'; // Pure, clean tone
+    osc.frequency.value = freq;
+    
+    const env = ctx.createGain();
+    env.gain.setValueAtTime(0, t);
+    // Quick soft attack, long shimmering decay
+    env.gain.linearRampToValueAtTime(0.06, t + 0.02);
+    env.gain.exponentialRampToValueAtTime(0.001, t + 1.8);
+    
+    osc.connect(env);
+    env.connect(master);
+    osc.start(t);
+    osc.stop(t + 1.9);
+  });
 
-  // Harmonic ring (triangle at octave)
+  // Deep harmonic ring (A2) to ground the chime
   const ring = ctx.createOscillator();
   ring.type = 'triangle';
   ring.frequency.value = 110;
   const ringEnv = ctx.createGain();
-  ringEnv.gain.setValueAtTime(0, t + 0.01);
+  ringEnv.gain.setValueAtTime(0, t);
   ringEnv.gain.linearRampToValueAtTime(0.08, t + 0.05);
-  ringEnv.gain.exponentialRampToValueAtTime(0.001, t + 1.2);
+  ringEnv.gain.exponentialRampToValueAtTime(0.001, t + 1.6);
   ring.connect(ringEnv);
   ringEnv.connect(master);
   ring.start(t);
-  ring.stop(t + 1.3);
+  ring.stop(t + 1.7);
+
+  // Cinematic breath — filtered noise swell (kept very quiet for "air")
+  const breath = ctx.createBufferSource();
+  breath.buffer = createNoiseBuffer(ctx, 0.8);
+  const breathLP = ctx.createBiquadFilter();
+  breathLP.type = 'lowpass';
+  breathLP.frequency.setValueAtTime(200, t);
+  breathLP.frequency.linearRampToValueAtTime(600, t + 0.4);
+  breathLP.frequency.linearRampToValueAtTime(200, t + 0.8);
+  const breathEnv = ctx.createGain();
+  breathEnv.gain.setValueAtTime(0, t + 0.1);
+  breathEnv.gain.linearRampToValueAtTime(0.04, t + 0.35);
+  breathEnv.gain.linearRampToValueAtTime(0, t + 0.8);
+  breath.connect(breathLP);
+  breathLP.connect(breathEnv);
+  breathEnv.connect(master);
+  breath.start(t);
+  breath.stop(t + 0.9);
 }
 
 // ================================================================
-// 8. REVEAL SWELL — cinematic rise as website is unveiled
-//    Rising noise + chord swell + final shimmer
+// 8. REVEAL SWELL — warm, satisfying conclusion
+//    Medium-low pitch. No high frequencies. Pure warmth.
+//    All tones in 80-320Hz range for reliable speaker playback.
 // ================================================================
 export function playRevealSwell(): void {
   if (!audioNodes) return;
   const { ctx, master } = audioNodes;
   const t = ctx.currentTime;
 
-  // Rising noise sweep
-  const noise = ctx.createBufferSource();
-  noise.buffer = createNoiseBuffer(ctx, 1.5);
-  const swpLP = ctx.createBiquadFilter();
-  swpLP.type = 'lowpass';
-  swpLP.frequency.setValueAtTime(150, t);
-  swpLP.frequency.exponentialRampToValueAtTime(6000, t + 0.6);
-  swpLP.frequency.exponentialRampToValueAtTime(300, t + 1.2);
-  const noiseEnv = ctx.createGain();
-  noiseEnv.gain.setValueAtTime(0, t);
-  noiseEnv.gain.linearRampToValueAtTime(0.12, t + 0.35);
-  noiseEnv.gain.linearRampToValueAtTime(0, t + 1.1);
-  noise.connect(swpLP);
-  swpLP.connect(noiseEnv);
-  noiseEnv.connect(master);
-  noise.start(t);
-  noise.stop(t + 1.5);
+  // === Thud — soft percussive onset ===
+  const thud = ctx.createBufferSource();
+  thud.buffer = createNoiseBuffer(ctx, 0.06);
+  const thudLP = ctx.createBiquadFilter();
+  thudLP.type = 'lowpass';
+  thudLP.frequency.value = 300;
+  thudLP.Q.value = 0.8;
+  const thudEnv = ctx.createGain();
+  thudEnv.gain.setValueAtTime(0, t);
+  thudEnv.gain.linearRampToValueAtTime(0.25, t + 0.005);
+  thudEnv.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
+  thud.connect(thudLP);
+  thudLP.connect(thudEnv);
+  thudEnv.connect(master);
+  thud.start(t);
+  thud.stop(t + 0.12);
 
-  // Chord swell (G major: G3, B3, D4, G4)
-  const chordFreqs = [196, 246.94, 293.66, 392];
-  chordFreqs.forEach((freq) => {
-    const osc = ctx.createOscillator();
-    osc.type = 'sine';
-    osc.frequency.value = freq;
-    const env = ctx.createGain();
-    env.gain.setValueAtTime(0, t);
-    env.gain.linearRampToValueAtTime(0.06, t + 0.4);
-    env.gain.linearRampToValueAtTime(0, t + 1.0);
-    osc.connect(env);
-    env.connect(master);
-    osc.start(t);
-    osc.stop(t + 1.2);
-  });
+  // === Deep bloom — warm body (80Hz) ===
+  const bloom = ctx.createOscillator();
+  bloom.type = 'sine';
+  bloom.frequency.value = 80;
+  const bloomEnv = ctx.createGain();
+  bloomEnv.gain.setValueAtTime(0, t);
+  bloomEnv.gain.linearRampToValueAtTime(0.30, t + 0.025);
+  bloomEnv.gain.linearRampToValueAtTime(0.20, t + 0.2);
+  bloomEnv.gain.exponentialRampToValueAtTime(0.001, t + 1.3);
+  bloom.connect(bloomEnv);
+  bloomEnv.connect(master);
+  bloom.start(t);
+  bloom.stop(t + 1.4);
 
-  // Final shimmer
-  const shimmer = ctx.createOscillator();
-  shimmer.type = 'sine';
-  shimmer.frequency.value = 2000;
-  const shimEnv = ctx.createGain();
-  shimEnv.gain.setValueAtTime(0, t + 0.3);
-  shimEnv.gain.linearRampToValueAtTime(0.04, t + 0.5);
-  shimEnv.gain.exponentialRampToValueAtTime(0.001, t + 1.0);
-  shimmer.connect(shimEnv);
-  shimEnv.connect(master);
-  shimmer.start(t + 0.3);
-  shimmer.stop(t + 1.2);
+  // === Resolve — the satisfying middle tone (160Hz) ===
+  const resolve = ctx.createOscillator();
+  resolve.type = 'sine';
+  resolve.frequency.value = 160;
+  const resolveEnv = ctx.createGain();
+  resolveEnv.gain.setValueAtTime(0, t + 0.01);
+  resolveEnv.gain.linearRampToValueAtTime(0.18, t + 0.06);
+  resolveEnv.gain.exponentialRampToValueAtTime(0.001, t + 1.1);
+  resolve.connect(resolveEnv);
+  resolveEnv.connect(master);
+  resolve.start(t + 0.01);
+  resolve.stop(t + 1.2);
+
+  // === Warmth — upper harmonic (240Hz) ===
+  const warm = ctx.createOscillator();
+  warm.type = 'sine';
+  warm.frequency.value = 240;
+  const warmEnv = ctx.createGain();
+  warmEnv.gain.setValueAtTime(0, t + 0.03);
+  warmEnv.gain.linearRampToValueAtTime(0.07, t + 0.1);
+  warmEnv.gain.exponentialRampToValueAtTime(0.001, t + 0.9);
+  warm.connect(warmEnv);
+  warmEnv.connect(master);
+  warm.start(t + 0.03);
+  warm.stop(t + 1.0);
+
+  // === Subtle body — adds fullness (320Hz, very quiet) ===
+  const body = ctx.createOscillator();
+  body.type = 'sine';
+  body.frequency.value = 320;
+  const bodyEnv = ctx.createGain();
+  bodyEnv.gain.setValueAtTime(0, t + 0.04);
+  bodyEnv.gain.linearRampToValueAtTime(0.03, t + 0.12);
+  bodyEnv.gain.exponentialRampToValueAtTime(0.001, t + 0.7);
+  body.connect(bodyEnv);
+  bodyEnv.connect(master);
+  body.start(t + 0.04);
+  body.stop(t + 0.8);
+
+  // === Air — very subtle room ambiance ===
+  const air = ctx.createBufferSource();
+  air.buffer = createNoiseBuffer(ctx, 1.0);
+  const airLP = ctx.createBiquadFilter();
+  airLP.type = 'lowpass';
+  airLP.frequency.value = 400;
+  const airEnv = ctx.createGain();
+  airEnv.gain.setValueAtTime(0, t);
+  airEnv.gain.linearRampToValueAtTime(0.03, t + 0.15);
+  airEnv.gain.linearRampToValueAtTime(0, t + 0.8);
+  air.connect(airLP);
+  airLP.connect(airEnv);
+  airEnv.connect(master);
+  air.start(t);
+  air.stop(t + 0.9);
 }
 
 // ================================================================

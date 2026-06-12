@@ -14,7 +14,7 @@ import {
   startProjectorHum,
   startBeamSound,
   startFilmWhir,
-  playTechSweep,
+  playPrecisionClick,
   playConstructionTone,
   playLockinResonance,
   playRevealSwell,
@@ -179,16 +179,18 @@ export default function CinemaLoader({ children }: CinemaLoaderProps) {
 
       // ==========================================
       // SCENE 1 — Darkness (0.00 - 0.30s)
+      // Gate cross-dissolves into darkness
       // ==========================================
       tl.addLabel('darkness', 0);
       tl.to(filmGrain, { opacity: 0.015, duration: 0.2 }, 0.1);
 
       // ==========================================
-      // SCENE 2 — Projector Powers On (0.30 - 0.80s)
+      // SCENE 2 — Projector Powers On (0.30 - 0.65s)
+      // Motor engages, lamp ignites
       // ==========================================
       tl.addLabel('projector-on', 0.3);
 
-      // 🔊 Audio: mechanical CLUNK + hum
+      // 🔊 Audio: relay click → mechanical CLUNK + hum
       tl.call(() => {
         resumeAudio();
         playStartupClunk();
@@ -198,7 +200,13 @@ export default function CinemaLoader({ children }: CinemaLoaderProps) {
       // Projector body fades in
       tl.to(body, { opacity: 1, duration: 0.15, ease: 'none' }, 0.3);
 
-      // Lens flickers on
+      // Startup motor tremor — felt not seen
+      tl.to(body, { y: -1, duration: 0.03, ease: 'none' }, 0.32);
+      tl.to(body, { y: 1, duration: 0.03, ease: 'none' }, 0.35);
+      tl.to(body, { y: -0.5, duration: 0.03, ease: 'none' }, 0.38);
+      tl.to(body, { y: 0, duration: 0.05, ease: 'power1.out' }, 0.41);
+
+      // Lens flickers on — finding steady state
       tl.to(lens, { opacity: 0.3, duration: 0.06, ease: 'none' }, 0.32);
       tl.to(lens, { opacity: 0.1, duration: 0.04, ease: 'none' }, 0.38);
       tl.to(lens, { opacity: 0.6, duration: 0.05, ease: 'none' }, 0.42);
@@ -209,17 +217,17 @@ export default function CinemaLoader({ children }: CinemaLoaderProps) {
       tl.to(vignette, { opacity: 1, duration: 0.5, ease: 'power1.in' }, 0.4);
 
       // ==========================================
-      // SCENE 3 — Beam Fires (0.60 - 1.00s)
-      // Beam extends from projector to center
+      // SCENE 3 — Beam Fires (0.60 - 1.05s)
+      // Light extends from projector to center
       // ==========================================
       tl.addLabel('beam-fires', 0.6);
 
-      // 🔊 Audio: beam projection sound starts
+      // 🔊 Audio: beam projection sound + atmospheric swell
       tl.call(() => {
         startBeamSound();
       }, [], 0.6);
 
-      // Beam grows from projector — height increases, width widens
+      // Beam grows from projector
       tl.fromTo(beam, {
         height: 0,
         width: '4px',
@@ -252,141 +260,176 @@ export default function CinemaLoader({ children }: CinemaLoaderProps) {
         stagger: 0.1,
       }, 0.7);
 
+      // Beam instability — lamp warming up (felt not seen)
+      tl.to(beam, { width: '38vmin', duration: 0.1, ease: 'sine.inOut' }, 1.0);
+      tl.to(beam, { width: '41vmin', duration: 0.12, ease: 'sine.inOut' }, 1.1);
+      tl.to(beam, { width: '40vmin', duration: 0.15, ease: 'power1.out' }, 1.22);
+
       // ==========================================
-      // SCENE 4 — Projection Illuminates (0.90 - 1.30s)
+      // SCENE 4 — Projection Illuminates (1.05 - 1.45s)
+      // Surface flickers, dust enters, beam settles
       // ==========================================
-      tl.addLabel('illuminate', 0.9);
+      tl.addLabel('illuminate', 1.05);
 
       // 🔊 Audio: film whir starts
       tl.call(() => {
         startFilmWhir();
-      }, [], 0.95);
+      }, [], 1.05);
 
       // Projection surface flickers then stabilizes
-      tl.to(projection, { opacity: 0.1, duration: 0.06, ease: 'none' }, 0.90);
-      tl.to(projection, { opacity: 0.03, duration: 0.04, ease: 'none' }, 0.96);
-      tl.to(projection, { opacity: 0.25, scale: 0.7, duration: 0.1, ease: 'none' }, 1.00);
+      tl.to(projection, { opacity: 0.1, duration: 0.06, ease: 'none' }, 1.05);
+      tl.to(projection, { opacity: 0.03, duration: 0.04, ease: 'none' }, 1.11);
+      tl.to(projection, { opacity: 0.25, scale: 0.7, duration: 0.1, ease: 'none' }, 1.15);
       tl.to(projection, {
         opacity: 0.55,
         scale: 1,
         duration: 0.3,
         ease: 'power2.out',
-      }, 1.10);
+      }, 1.25);
 
       // Hotspot
-      tl.to(hotspot, { opacity: 0.15, scale: 0.5, duration: 0.1, ease: 'none' }, 0.95);
-      tl.to(hotspot, { opacity: 0.05, duration: 0.05, ease: 'none' }, 1.05);
+      tl.to(hotspot, { opacity: 0.15, scale: 0.5, duration: 0.1, ease: 'none' }, 1.10);
+      tl.to(hotspot, { opacity: 0.05, duration: 0.05, ease: 'none' }, 1.20);
       tl.to(hotspot, {
         opacity: 0.5,
         scale: 0.8,
         duration: 0.3,
         ease: 'power2.out',
-      }, 1.10);
+      }, 1.25);
 
       // Film grain increases
-      tl.to(filmGrain, { opacity: 0.04, duration: 0.3 }, 1.0);
+      tl.to(filmGrain, { opacity: 0.04, duration: 0.3 }, 1.15);
 
       // Dust particles
       tl.call(() => {
         dust?.setMaskRadius(Math.min(window.innerWidth, window.innerHeight) * 0.22);
-      }, [], 1.0);
+      }, [], 1.15);
       tl.to(`.${styles.dustCanvas}`, {
         opacity: 1,
         duration: 0.4,
         ease: 'power1.in',
-      }, 1.0);
+      }, 1.15);
+
+      // Subtle brightness fluctuation — bulb finding steady state
+      tl.to(projection, { opacity: 0.50, duration: 0.15, ease: 'sine.inOut' }, 1.40);
+      tl.to(projection, { opacity: 0.55, duration: 0.1, ease: 'sine.inOut' }, 1.55);
 
       // ==========================================
-      // SCENE 5 — "acm" Construction (1.30 - 2.00s)
+      // SCENE 5 — "acm" Construction (1.50 - 2.30s)
+      // Deliberate, precise stroke construction
       // ==========================================
-      tl.addLabel('construction', 1.3);
+      tl.addLabel('construction', 1.50);
 
-      // 🔊 Audio: construction tone
+      // 🔊 Audio: precision click + construction pad
       tl.call(() => {
+        playPrecisionClick();
         playConstructionTone();
-      }, [], 1.35);
+      }, [], 1.50);
 
       // Logo container fades in
       tl.to(logoContainer, {
         opacity: 1,
         duration: 0.2,
         ease: 'power1.in',
-      }, 1.3);
+      }, 1.50);
 
-      // "acm" stroke construction
+      // "acm" stroke construction — deliberate and precise
       tl.to('#logo-acm-text', {
         strokeDashoffset: 0,
-        duration: 0.55,
+        duration: 0.65,
         ease: 'power2.inOut',
-      }, 1.35);
+      }, 1.55);
 
-      // Fill fades in as stroke completes
+      // Fill blooms in as stroke completes
       tl.to('#logo-acm-text', {
         fillOpacity: 0.85,
         duration: 0.25,
         ease: 'power1.in',
-      }, 1.7);
+      }, 2.05);
 
       // Expand dust mask
       tl.call(() => {
         dust?.setMaskRadius(Math.min(window.innerWidth, window.innerHeight) * 0.28);
-      }, [], 1.5);
+      }, [], 1.75);
 
       // ==========================================
-      // SCENE 6 — Circle Forms (2.00 - 2.30s)
+      // 2.30 - 2.45: Absorb moment
+      // Audience sees completed "acm", anticipation builds
       // ==========================================
-      tl.addLabel('circle', 2.0);
+
+      // ==========================================
+      // SCENE 6 — Circle Forms (2.45 - 2.75s)
+      // ==========================================
+      tl.addLabel('circle', 2.45);
+
+      // 🔊 Audio: precision click
+      tl.call(() => {
+        playPrecisionClick();
+      }, [], 2.45);
 
       tl.to('#logo-circle', {
         strokeDashoffset: 0,
         duration: 0.3,
         ease: 'power2.inOut',
-      }, 2.0);
+      }, 2.45);
 
       // ==========================================
-      // SCENE 7 — Diamond Forms (2.20 - 2.55s)
+      // SCENE 7 — Diamond Forms (2.65 - 3.00s)
       // ==========================================
-      tl.addLabel('diamond', 2.2);
+      tl.addLabel('diamond', 2.65);
+
+      // 🔊 Audio: precision click
+      tl.call(() => {
+        playPrecisionClick();
+      }, [], 2.65);
 
       tl.to('#logo-diamond', {
         strokeDashoffset: 0,
         duration: 0.35,
         ease: 'power2.inOut',
-      }, 2.2);
+      }, 2.65);
 
       // Projection tightens around the assembling logo
-      tl.to(projection, { scale: 0.85, duration: 0.4, ease: 'power2.inOut' }, 2.1);
-      tl.to(hotspot, { scale: 0.65, duration: 0.4, ease: 'power2.inOut' }, 2.1);
+      tl.to(projection, { scale: 0.85, duration: 0.4, ease: 'power2.inOut' }, 2.55);
+      tl.to(hotspot, { scale: 0.65, duration: 0.4, ease: 'power2.inOut' }, 2.55);
 
       // ==========================================
-      // SCENE 8 — "NIT SURAT" Appears (2.50 - 2.80s)
+      // SCENE 8 — "NIT SURAT" Appears (2.90 - 3.15s)
       // ==========================================
-      tl.addLabel('nit-surat', 2.5);
+      tl.addLabel('nit-surat', 2.90);
 
-      tl.to('#logo-nit-surat', { opacity: 1, duration: 0.05 }, 2.5);
+      tl.to('#logo-nit-surat', { opacity: 1, duration: 0.05 }, 2.90);
       tl.to('#logo-nit-surat', {
         strokeDashoffset: 0,
         duration: 0.25,
         ease: 'power2.out',
-      }, 2.5);
+      }, 2.90);
       tl.to('#logo-nit-surat', {
         fillOpacity: 1,
         duration: 0.2,
         ease: 'power1.in',
-      }, 2.65);
+      }, 3.05);
 
       // ==========================================
-      // SCENE 9 — Logo Lock-In (2.75 - 3.20s)
+      // FILM-FRAME JITTER (3.12 - 3.18s)
+      // Projector finds perfect focus — <100ms
       // ==========================================
-      tl.addLabel('lockin', 2.75);
+      tl.to(logoContainer, { y: -1.5, duration: 0.03, ease: 'none' }, 3.12);
+      tl.to(logoContainer, { y: 0, duration: 0.04, ease: 'power2.out' }, 3.15);
 
-      // 🔊 Audio: brand resonance THUD
+      // ==========================================
+      // SCENE 9 — Logo Lock-In ★ HERO MOMENT ★ (3.18 - 3.65s)
+      // The emotional peak of the entire sequence
+      // ==========================================
+      tl.addLabel('lockin', 3.18);
+
+      // 🔊 Audio: brand resonance THUD (extended ring + cinematic breath)
       tl.call(() => {
         playLockinResonance();
-      }, [], 2.8);
+      }, [], 3.20);
 
       // Diamond fill floods in with blue gradient
-      tl.to('#logo-diamond', { fillOpacity: 1, duration: 0.3, ease: 'power1.in' }, 2.8);
+      tl.to('#logo-diamond', { fillOpacity: 1, duration: 0.3, ease: 'power1.in' }, 3.20);
 
       // Shift strokes to final brand colors
       tl.to('#logo-diamond', {
@@ -394,114 +437,118 @@ export default function CinemaLoader({ children }: CinemaLoaderProps) {
         strokeWidth: 0,
         duration: 0.3,
         ease: 'power1.inOut',
-      }, 2.8);
+      }, 3.20);
       tl.to('#logo-circle', {
         stroke: '#ffffff',
         duration: 0.25,
         ease: 'power1.inOut',
-      }, 2.8);
+      }, 3.20);
       tl.to('#logo-acm-text', {
         stroke: '#ffffff',
         strokeWidth: 0,
         fillOpacity: 1,
         duration: 0.25,
         ease: 'power1.inOut',
-      }, 2.8);
+      }, 3.20);
 
-      // Scale settle — brand moment
-      tl.to(logoContainer, { scale: 1.08, duration: 0.15, ease: 'power2.out' }, 3.0);
-      tl.to(logoContainer, { scale: 1.0, duration: 0.2, ease: 'power2.inOut' }, 3.15);
+      // Luminance pulse — synchronized with thud
+      tl.to(hotspot, { opacity: 0.9, duration: 0.08, ease: 'power1.in' }, 3.20);
+      tl.to(hotspot, { opacity: 0.5, duration: 0.2, ease: 'power1.out' }, 3.28);
+      tl.to(projection, { opacity: 0.7, duration: 0.08, ease: 'power1.in' }, 3.20);
+      tl.to(projection, { opacity: 0.55, duration: 0.2, ease: 'power1.out' }, 3.28);
 
-      // Glow pulse
-      tl.to(hotspot, { opacity: 0.8, duration: 0.15, ease: 'power1.in' }, 3.0);
-      tl.to(hotspot, { opacity: 0.5, duration: 0.15, ease: 'power1.out' }, 3.15);
+      // Triple settle — "click into place"
+      tl.to(logoContainer, { scale: 1.06, duration: 0.1, ease: 'power2.out' }, 3.35);
+      tl.to(logoContainer, { scale: 0.98, duration: 0.08, ease: 'power2.inOut' }, 3.45);
+      tl.to(logoContainer, { scale: 1.0, duration: 0.12, ease: 'power2.out' }, 3.53);
 
       // ==========================================
-      // SCENE 10 — Illumination (3.30 - 3.65s)
+      // SCENE 10 — Illumination (3.70 - 4.00s)
       // ==========================================
-      tl.addLabel('illumination', 3.3);
+      tl.addLabel('illumination', 3.70);
 
       tl.to(projection, {
-        opacity: 0.85, scale: 1.2, duration: 0.35, ease: 'power1.in',
-      }, 3.3);
+        opacity: 0.85, scale: 1.2, duration: 0.3, ease: 'power1.in',
+      }, 3.70);
       tl.to(hotspot, {
-        opacity: 0.9, scale: 1.0, duration: 0.35, ease: 'power1.in',
-      }, 3.3);
+        opacity: 0.9, scale: 1.0, duration: 0.3, ease: 'power1.in',
+      }, 3.70);
       tl.to(ambient, {
-        opacity: 1, scale: 1.3, duration: 0.35, ease: 'power1.in',
-      }, 3.3);
+        opacity: 1, scale: 1.3, duration: 0.3, ease: 'power1.in',
+      }, 3.70);
 
       // Beam brightens
       tl.to(beam, {
         width: '55vmin',
-        duration: 0.35,
+        duration: 0.3,
         ease: 'power1.in',
-      }, 3.3);
+      }, 3.70);
 
-      tl.to(filmGrain, { opacity: 0.06, duration: 0.25 }, 3.3);
+      tl.to(filmGrain, { opacity: 0.06, duration: 0.2 }, 3.75);
 
       // Dust burst
       tl.call(() => {
         dust?.setMaskRadius(Math.min(window.innerWidth, window.innerHeight) * 0.45);
         dust?.burst();
-      }, [], 3.4);
+      }, [], 3.80);
 
       // ==========================================
-      // SCENE 11 — Projected Into Existence (3.65 - 4.50s)
+      // SCENE 11 — Projected Into Existence (4.00 - 4.70s)
+      // Website revealed inside projection
       // ==========================================
-      tl.addLabel('reveal', 3.65);
+      tl.addLabel('reveal', 4.00);
 
-      // 🔊 Audio: reveal swell + stop continuous sounds
+      // 🔊 Audio: cinematic impact + reveal swell + stop continuous sounds
       tl.call(() => {
         stopProjectorHum();
         stopBeamSound();
         stopFilmWhir();
         playRevealSwell();
-      }, [], 3.65);
+      }, [], 4.00);
 
       // Logo recedes upward
       tl.to(logoContainer, {
         scale: 0.5, opacity: 0, y: -40,
-        duration: 0.25, ease: 'power2.in',
-      }, 3.65);
+        duration: 0.2, ease: 'power2.in',
+      }, 4.00);
 
       // Buttons fade
       tl.to([skipBtn, muteBtn], {
         opacity: 0, y: 8,
-        duration: 0.2, ease: 'power2.in',
-      }, 3.65);
+        duration: 0.15, ease: 'power2.in',
+      }, 4.00);
 
       // Beam collapses back up
       tl.to(beam, {
         height: 0, opacity: 0,
-        duration: 0.4, ease: 'power2.in',
-      }, 3.7);
+        duration: 0.35, ease: 'power2.in',
+      }, 4.05);
 
       // Projector body fades
-      tl.to(body, { opacity: 0, duration: 0.3, ease: 'power1.out' }, 3.75);
+      tl.to(body, { opacity: 0, duration: 0.25, ease: 'power1.out' }, 4.10);
 
-      // Overlay circle-wipes away
+      // Overlay circle-wipes away — tighter for impact
       tl.fromTo(overlay, {
         clipPath: 'circle(150% at 50% 50%)',
       }, {
         clipPath: 'circle(0% at 50% 50%)',
-        duration: 0.75,
+        duration: 0.55,
         ease: 'power3.inOut',
-      }, 3.75);
+      }, 4.10);
 
       // Fade out projector elements
       tl.to([ambient, projection, hotspot], {
-        opacity: 0, duration: 0.35, ease: 'power1.out',
-      }, 3.8);
-      tl.to(vignette, { opacity: 0, duration: 0.35, ease: 'power1.out' }, 3.8);
-      tl.to(filmGrain, { opacity: 0, duration: 0.25 }, 3.8);
+        opacity: 0, duration: 0.3, ease: 'power1.out',
+      }, 4.15);
+      tl.to(vignette, { opacity: 0, duration: 0.3, ease: 'power1.out' }, 4.15);
+      tl.to(filmGrain, { opacity: 0, duration: 0.2 }, 4.15);
 
       // Dust fades
-      tl.call(() => { dust?.fadeOut(); }, [], 3.75);
-      tl.to(`.${styles.dustCanvas}`, { opacity: 0, duration: 0.35 }, 3.8);
+      tl.call(() => { dust?.fadeOut(); }, [], 4.10);
+      tl.to(`.${styles.dustCanvas}`, { opacity: 0, duration: 0.3 }, 4.15);
 
       // Complete
-      tl.call(() => { setLoaderState('complete'); }, [], 4.5);
+      tl.call(() => { setLoaderState('complete'); }, [], 4.70);
     });
 
     // Skip handlers
