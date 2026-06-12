@@ -83,14 +83,16 @@ const ProjectorLight = forwardRef<ProjectorLightRefs, ProjectorLightProps>(
         </div>
 
         {/* Light beam — visible cone from projector to center */}
-        <div ref={beamRef} className={styles.lightBeam}>
-          {/* Volumetric rays inside the beam */}
-          <div ref={beamRaysRef} className={styles.beamRays}>
-            <div className={styles.beamRay} style={{ left: '30%', opacity: 0.3 }} />
-            <div className={styles.beamRay} style={{ left: '45%', opacity: 0.5 }} />
-            <div className={styles.beamRay} style={{ left: '50%', opacity: 0.6 }} />
-            <div className={styles.beamRay} style={{ left: '55%', opacity: 0.5 }} />
-            <div className={styles.beamRay} style={{ left: '70%', opacity: 0.3 }} />
+        <div className={styles.beamBlurWrapper}>
+          <div ref={beamRef} className={styles.lightBeam}>
+            {/* Volumetric rays inside the beam */}
+            <div ref={beamRaysRef} className={styles.beamRays}>
+              <div className={styles.beamRay} style={{ left: '30%', opacity: 0.3 }} />
+              <div className={styles.beamRay} style={{ left: '45%', opacity: 0.5 }} />
+              <div className={styles.beamRay} style={{ left: '50%', opacity: 0.6 }} />
+              <div className={styles.beamRay} style={{ left: '55%', opacity: 0.5 }} />
+              <div className={styles.beamRay} style={{ left: '70%', opacity: 0.3 }} />
+            </div>
           </div>
         </div>
 

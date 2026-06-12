@@ -296,6 +296,15 @@
    LIGHT BEAM — Visible cone from projector
    Cinematic trapezoid with feathered edges
    ======================================== */
+.beamBlurWrapper {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  filter: blur(24px); /* This blurs the sharp clip-path edges naturally */
+  z-index: 4;
+  mix-blend-mode: screen;
+}
+
 .lightBeam {
   position: absolute;
   top: 40px;
@@ -304,33 +313,15 @@
   width: 4px;
   height: 0;
   opacity: 0;
-  z-index: 4;
   will-change: opacity, height, width;
   background: linear-gradient(
     180deg,
-    rgba(255, 240, 210, 0.25) 0%,
-    rgba(255, 230, 180, 0.12) 40%,
-    rgba(255, 210, 140, 0.04) 80%,
+    rgba(255, 240, 210, 0.4) 0%,
+    rgba(255, 230, 180, 0.2) 40%,
+    rgba(255, 210, 140, 0.05) 80%,
     transparent 100%
   );
-  clip-path: polygon(calc(50% - 18px) 0%, calc(50% + 18px) 0%, 100% 100%, 0% 100%);
-  /* Feather the left/right edges to soften the clip-path */
-  mask-image: linear-gradient(
-    to right,
-    transparent 0%,
-    black 15%,
-    black 85%,
-    transparent 100%
-  );
-  -webkit-mask-image: linear-gradient(
-    to right,
-    transparent 0%,
-    black 15%,
-    black 85%,
-    transparent 100%
-  );
-  filter: blur(6px);
-  mix-blend-mode: screen;
+  clip-path: polygon(calc(50% - 12px) 0%, calc(50% + 12px) 0%, 100% 100%, 0% 100%);
 }
 
 /* Volumetric light rays inside beam */

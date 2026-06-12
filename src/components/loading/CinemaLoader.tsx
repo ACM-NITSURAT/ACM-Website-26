@@ -301,10 +301,9 @@ export default function CinemaLoader({ children }: CinemaLoaderProps) {
       // ==========================================
       tl.addLabel('construction', 1.3);
 
-      // 🔊 Audio: construction tone + tech sweep
+      // 🔊 Audio: construction tone
       tl.call(() => {
         playConstructionTone();
-        playTechSweep('mid');
       }, [], 1.35);
 
       // Logo container fades in
@@ -338,11 +337,6 @@ export default function CinemaLoader({ children }: CinemaLoaderProps) {
       // ==========================================
       tl.addLabel('circle', 2.0);
 
-      // 🔊 Audio: circle tech sweep
-      tl.call(() => {
-        playTechSweep('low');
-      }, [], 2.0);
-
       tl.to('#logo-circle', {
         strokeDashoffset: 0,
         duration: 0.3,
@@ -353,11 +347,6 @@ export default function CinemaLoader({ children }: CinemaLoaderProps) {
       // SCENE 7 — Diamond Forms (2.20 - 2.55s)
       // ==========================================
       tl.addLabel('diamond', 2.2);
-
-      // 🔊 Audio: diamond tech sweep (higher pitch)
-      tl.call(() => {
-        playTechSweep('high');
-      }, [], 2.2);
 
       tl.to('#logo-diamond', {
         strokeDashoffset: 0,
@@ -533,7 +522,7 @@ export default function CinemaLoader({ children }: CinemaLoaderProps) {
       ctx.revert();
       timelineRef.current = null;
     };
-  }, [handleSkip]);
+  }, [handleSkip, loaderState]);
 
   if (loaderState === 'hidden') {
     return <>{children}</>;
@@ -571,6 +560,8 @@ export default function CinemaLoader({ children }: CinemaLoaderProps) {
             </button>
           </div>
         </div>
+
+
 
         <div ref={filmGrainRef} className={styles.filmGrain} />
         <div ref={vignetteRef} className={styles.vignette} />
