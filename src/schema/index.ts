@@ -7,3 +7,4 @@ export type {
   TeamParticipant,
   Participant,
 } from './participant';
+export type { ExecutivesDict } from './dict';
