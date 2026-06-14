@@ -97,6 +97,25 @@ These fields are only meaningful when `isTeamEvent === true`. When `false`, set 
 
 > When `isFemaleMandatory === false`, `minFemaleRequired` should be `0` but is not enforced at the schema level — enforce in application logic or Security Rules.
 
+### Prize configuration
+
+| Field | Type | Notes |
+|---|---|---|
+| `prizeMoney` | `number` | Total prize pool in INR (₹). Set to `0` if no prize money |
+| `prizeMoneyDistribution` | `PrizeMoneyDistribution` | Breakdown across top three positions |
+
+#### `PrizeMoneyDistribution` shape
+
+| TS key | Firestore key | Type | Notes |
+|---|---|---|---|
+| `firstPrize` | `first-prize` | `number` | INR value for 1st place. `0` if unused |
+| `secondPrize` | `second-prize` | `number` | INR value for 2nd place. `0` if unused |
+| `thirdPrize` | `third-prize` | `number` | INR value for 3rd place. `0` if unused |
+
+> **Key naming:** Firestore stores these with hyphens (`first-prize`). The TypeScript interface uses camelCase because hyphens are not valid in identifier names. When writing raw Firestore data use the hyphenated keys; the typed SDK handles this transparently via the field mapping.
+
+All three keys are always present in the document. For events with no prize money, set `prizeMoney: 0` and all three distribution values to `0`.
+
 ---
 
 ## 3. `/events/{eventId}/participants/{participantId}`

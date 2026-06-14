@@ -77,4 +77,26 @@ export interface Event {
 
   /** Minimum number of female participants required per team. */
   minFemaleRequired: number;
+
+  // ── Prize configuration ───────────────────────────────────────────────────
+
+  /** Total prize pool in INR (₹). Set to `0` if there is no prize money. */
+  prizeMoney: number;
+
+  /**
+   * Breakdown of prize money across the top three positions (INR).
+   * All three keys are always present; set a position to `0` if unused.
+   *
+   * Firestore key names use hyphens (`first-prize`, `second-prize`, `third-prize`).
+   * Access via bracket notation when reading raw Firestore data:
+   *   `data['first-prize']`
+   */
+  prizeMoneyDistribution: PrizeMoneyDistribution;
+}
+
+/** Prize breakdown across the top three positions. Values are in INR (₹). */
+export interface PrizeMoneyDistribution {
+  firstPrize: number;
+  secondPrize: number;
+  thirdPrize: number;
 }
