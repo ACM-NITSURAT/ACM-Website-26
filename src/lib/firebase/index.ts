@@ -10,3 +10,5 @@ export {
   sendPasswordReset,
   logout,
 } from './auth';
+export { useAuth } from './useAuth';
+
