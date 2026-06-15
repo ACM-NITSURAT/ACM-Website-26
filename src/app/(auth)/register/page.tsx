@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { registerWithEmail, signInWithGoogle } from '@/lib/firebase';
+import { registerWithEmail, signInWithGoogle, callSessionApi } from '@/lib/firebase';
 import { FirebaseError } from 'firebase/app';
 
 export default function RegisterPage() {
@@ -26,6 +26,8 @@ export default function RegisterPage() {
     try {
       const credential = await registerWithEmail(email, password);
       console.log('[Register] Firebase credential:', credential);
+      const role = await callSessionApi();
+      console.log('[Register] resolved role:', role);
       setDone(true);
     } catch (err) {
       setError(err instanceof FirebaseError ? err.message : 'Registration failed.');
@@ -40,6 +42,8 @@ export default function RegisterPage() {
     try {
       const credential = await signInWithGoogle();
       console.log('[Google Register] Firebase credential:', credential);
+      const role = await callSessionApi();
+      console.log('[Google Register] resolved role:', role);
     } catch (err) {
       setError(err instanceof FirebaseError ? err.message : 'Google sign-in failed.');
     } finally {
@@ -79,9 +83,7 @@ export default function RegisterPage() {
 
       <form onSubmit={handleRegister} className="flex flex-col gap-4">
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="email" className="text-sm text-zinc-300">
-            Email
-          </label>
+          <label htmlFor="email" className="text-sm text-zinc-300">Email</label>
           <input
             id="email"
             type="email"
@@ -95,9 +97,7 @@ export default function RegisterPage() {
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="password" className="text-sm text-zinc-300">
-            Password
-          </label>
+          <label htmlFor="password" className="text-sm text-zinc-300">Password</label>
           <input
             id="password"
             type="password"
@@ -112,9 +112,7 @@ export default function RegisterPage() {
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="confirm" className="text-sm text-zinc-300">
-            Confirm password
-          </label>
+          <label htmlFor="confirm" className="text-sm text-zinc-300">Confirm password</label>
           <input
             id="confirm"
             type="password"

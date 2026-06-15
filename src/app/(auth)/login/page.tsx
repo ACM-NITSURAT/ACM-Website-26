@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { loginWithEmail, signInWithGoogle } from '@/lib/firebase';
+import { loginWithEmail, signInWithGoogle, callSessionApi } from '@/lib/firebase';
 import { FirebaseError } from 'firebase/app';
 
 export default function LoginPage() {
@@ -18,6 +18,8 @@ export default function LoginPage() {
     try {
       const credential = await loginWithEmail(email, password);
       console.log('[Login] Firebase credential:', credential);
+      const role = await callSessionApi();
+      console.log('[Login] resolved role:', role);
     } catch (err) {
       setError(err instanceof FirebaseError ? err.message : 'Login failed.');
     } finally {
@@ -31,6 +33,8 @@ export default function LoginPage() {
     try {
       const credential = await signInWithGoogle();
       console.log('[Google Login] Firebase credential:', credential);
+      const role = await callSessionApi();
+      console.log('[Google Login] resolved role:', role);
     } catch (err) {
       setError(err instanceof FirebaseError ? err.message : 'Google sign-in failed.');
     } finally {
@@ -50,9 +54,7 @@ export default function LoginPage() {
 
       <form onSubmit={handleEmailLogin} className="flex flex-col gap-4">
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="email" className="text-sm text-zinc-300">
-            Email
-          </label>
+          <label htmlFor="email" className="text-sm text-zinc-300">Email</label>
           <input
             id="email"
             type="email"
@@ -67,9 +69,7 @@ export default function LoginPage() {
 
         <div className="flex flex-col gap-1.5">
           <div className="flex items-center justify-between">
-            <label htmlFor="password" className="text-sm text-zinc-300">
-              Password
-            </label>
+            <label htmlFor="password" className="text-sm text-zinc-300">Password</label>
             <Link
               href="/forgot-password"
               className="text-xs text-zinc-400 hover:text-white underline underline-offset-4"

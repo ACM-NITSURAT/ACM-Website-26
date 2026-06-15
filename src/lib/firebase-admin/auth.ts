@@ -1,56 +1,63 @@
 import { FieldValue } from 'firebase-admin/firestore';
+import { getAuth } from 'firebase-admin/auth';
 import type { DecodedIdToken } from 'firebase-admin/auth';
 import adminDb from './firestore';
+import adminApp from './app';
 import type { User } from '@/schema/user';
 
-// ── Role resolution ───────────────────────────────────────────────────────────
+// ── Types ─────────────────────────────────────────────────────────────────────
 
 type Role = User['role'];
 
+/** Shape of the custom claims we write into the Firebase JWT. */
+export interface AppClaims {
+  role: Role;
+}
+
+// ── Role resolution ───────────────────────────────────────────────────────────
+
 /**
- * Determines the correct role for a user based on the following priority:
- *
- *  1. If the user already has `role: 'core'` or `role: 'adviser'` in Firestore,
- *     keep it — these are set manually and must never be downgraded automatically.
- *  2. If the user's email appears in `/dict/executives`, assign `'executive'`.
- *  3. Otherwise assign `'member'`.
- *
- * Called internally by `syncUser` on every sign-in.
+ * Determines the correct role for a user:
+ *  1. Existing 'core' or 'adviser' in Firestore → keep it (manual-only roles).
+ *  2. Email in /dict/executives → 'executive'.
+ *  3. Everyone else → 'member'.
  */
 async function resolveRole(email: string, existingRole?: Role): Promise<Role> {
-  // Manual roles are never overwritten by automation.
   if (existingRole === 'core' || existingRole === 'adviser') {
     return existingRole;
   }
 
-  const dictSnap = await adminDb.doc('dict/executives').get();
+  const dictQuery = await adminDb
+    .collection('dict')
+    .where('emails', 'array-contains', email.toLowerCase().trim())
+    .limit(1)
+    .get();
 
-  if (dictSnap.exists) {
-    const emails: string[] = dictSnap.data()?.emails ?? [];
-    if (emails.includes(email.toLowerCase().trim())) {
-      return 'executive';
-    }
+  if (!dictQuery.empty) {
+    return 'executive';
   }
 
   return 'member';
 }
 
-// ── User sync ─────────────────────────────────────────────────────────────────
+// ── User sync + claim write ───────────────────────────────────────────────────
 
 /**
- * Creates or updates the `/users/{uid}` document after a successful sign-in.
+ * Called server-side after every sign-in / registration.
  *
- * - On first sign-in: creates the document with `role: 'member'` (or
- *   `'executive'` if the email is in `/dict/executives`).
- * - On subsequent sign-ins: re-evaluates the role against the executives dict
- *   (so adding/removing an email takes effect on the next login) while
- *   preserving any manually assigned `'core'` or `'adviser'` role.
+ * On first sign-in:
+ *  - Creates /users/{uid} with all schema defaults.
+ *  - Resolves role from /dict/executives or defaults to 'member'.
+ *  - Writes role as a Firebase Custom Claim on the JWT.
  *
- * Call this from a server-side Route Handler or Server Action immediately
- * after verifying the Firebase ID token.
+ * On subsequent sign-ins:
+ *  - Re-evaluates role (catches promotions/demotions in the dict).
+ *  - Updates /users/{uid}.role and the JWT claim.
+ *  - Role change takes effect on the client's next token refresh (≤1 hour).
  *
- * @param token - The decoded ID token returned by `adminAuth.verifyIdToken()`.
- * @returns The resolved role that was written to Firestore.
+ * isSuperAdmin is NEVER written to claims — always read server-side from Firestore.
+ *
+ * @returns The resolved role written to both Firestore and the JWT claim.
  */
 export async function syncUser(token: DecodedIdToken): Promise<Role> {
   const { uid, email, name, picture } = token;
@@ -67,43 +74,47 @@ export async function syncUser(token: DecodedIdToken): Promise<Role> {
   const role = await resolveRole(email, existingRole);
 
   if (!snap.exists) {
-    // First sign-in — create the full user document.
+    // First sign-in — create full user document per schema.
     const [firstName = '', ...rest] = (name ?? '').split(' ');
     const lastName = rest.join(' ');
 
     const newUser: Omit<User, 'id'> = {
       firstName,
       lastName,
-      email: email.toLowerCase().trim(),
-      rollNumber: '',
-      gender: 'other',
-      profileImageUrl: picture ?? '',
+      email:                email.toLowerCase().trim(),
+      rollNumber:           '',
+      gender:               'other',
+      profileImageUrl:      picture ?? '',
       role,
-      isSuperAdmin: false,
+      isSuperAdmin:         false,
       registrationTimestamp: FieldValue.serverTimestamp() as never,
     };
 
     await userRef.set(newUser);
   } else {
-    // Returning user — only update fields that may have changed automatically.
+    // Returning user — re-check role only.
     await userRef.update({ role });
   }
+
+  // Write role into the JWT custom claims.
+  // The client must call getIdToken(true) to force-refresh and receive the update.
+  const claims: AppClaims = { role };
+  await getAuth(adminApp).setCustomUserClaims(uid, claims);
 
   return role;
 }
 
-// ── Token verification helper ─────────────────────────────────────────────────
+// ── Token verification ────────────────────────────────────────────────────────
 
 /**
- * Verifies a Firebase ID token string and returns the decoded payload.
- * Use this at the top of any protected Route Handler to authenticate the caller.
+ * Verifies a raw Firebase ID token and returns the decoded payload.
+ * Use at the top of every protected Route Handler.
  *
  * @example
- * const token = await verifyIdToken(request.headers.get('Authorization')?.split('Bearer ')[1] ?? '');
- * const role  = await syncUser(token);
+ * const token = await verifyIdToken(
+ *   request.headers.get('Authorization')?.split('Bearer ')[1] ?? ''
+ * );
  */
 export async function verifyIdToken(idToken: string): Promise<DecodedIdToken> {
-  const { getAuth } = await import('firebase-admin/auth');
-  const { default: adminApp } = await import('./app');
   return getAuth(adminApp).verifyIdToken(idToken);
 }

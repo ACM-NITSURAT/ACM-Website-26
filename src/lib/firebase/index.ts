@@ -11,4 +11,6 @@ export {
   logout,
 } from './auth';
 export { useAuth } from './useAuth';
+export { callSessionApi } from './session';
+
 

@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { useAuth, logout } from '@/lib/firebase';
 
 export default function ProfilePage() {
-  const { user, loading } = useAuth();
+  const { user, role, loading } = useAuth();
   const router = useRouter();
 
   // Redirect to login if not authenticated
@@ -64,6 +64,9 @@ export default function ProfilePage() {
             <p className="text-white text-lg font-semibold">{user.displayName}</p>
           )}
           <p className="text-zinc-400 text-sm mt-0.5">{user.email}</p>
+          {role && (
+            <p className="text-xs text-zinc-500 mt-1 uppercase tracking-widest">{role}</p>
+          )}
           {!user.emailVerified && (
             <p className="text-amber-400 text-xs mt-2">Email not verified</p>
           )}
