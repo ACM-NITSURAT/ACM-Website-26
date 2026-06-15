@@ -15,6 +15,7 @@ ACM SVNIT — `acm-nit-surat` project.
 /users/{userId}
 /events/{eventId}
     └── /participants/{participantId}
+/dict/executives
 ```
 
 ---
@@ -42,9 +43,9 @@ The document ID is the Firebase Auth UID of the account owner.
 
 ```
 adviser  ──┐
-core     ──┤  (privileged)
-executive ─┤
-member   ──┘  (base)
+core     ──┤  (privileged — set manually in Firestore only)
+executive ─┤  (set automatically via /dict/executives)
+member   ──┘  (default for all new accounts)
 ```
 
 `isSuperAdmin` is orthogonal to `role` — a member could technically be a super-admin, though in practice it is only set on core/adviser accounts.
@@ -228,3 +229,30 @@ import { Timestamp } from 'firebase/firestore';
 const now = Timestamp.now();
 const fromDate = Timestamp.fromDate(new Date('2025-09-01'));
 ```
+
+---
+
+## 4. `/dict/executives`
+
+**File:** `src/schema/dict.ts`
+
+A single-document collection used as a server-side email allowlist for automatic role assignment.
+
+Path: `/dict/executives` (document ID is always `"executives"`)
+
+| Field | Type | Notes |
+|---|---|---|
+| `emails` | `string[]` | Lowercase email addresses that receive `role: 'executive'` on sign-in |
+
+### How role assignment works
+
+| Condition | Assigned role |
+|---|---|
+| Existing role is `'core'` or `'adviser'` | Kept as-is — never overwritten automatically |
+| Email is in `/dict/executives` | `'executive'` |
+| Neither of the above | `'member'` (default for all new accounts) |
+
+- `'core'` and `'adviser'` must be set **manually** in Firestore. There is no interface or automated path for these roles.
+- Role is re-evaluated on **every sign-in**, so adding or removing an email from the dict takes effect on the user's next login.
+- See `docs/auth.md` for the server-side implementation (`syncUser`, `verifyIdToken`).
+
