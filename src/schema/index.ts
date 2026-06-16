@@ -1,5 +1,5 @@
 export type { Timestamp } from './firestore';
-export type { User } from './user';
+export type { User, CorePosition } from './user';
 export type { Event, PrizeMoneyDistribution } from './event';
 export type {
   TeamMember,
@@ -7,3 +7,4 @@ export type {
   TeamParticipant,
   Participant,
 } from './participant';
+export type { ExecutivesDict } from './dict';
