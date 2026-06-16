@@ -113,6 +113,64 @@ Common error codes:
 
 ---
 
+## Email validation
+
+**Files:**
+- `src/lib/validators/email.ts` — Email domain validation logic
+- `src/config/index.ts` — `EARLY_REJECT` flag
+- `src/components/auth/InvalidEmailModal.tsx` — Rejection acknowledgement modal
+- `src/components/auth/LoggedOutModal.tsx` — Logout notification modal (EARLY_REJECT=false)
+
+When `DEV_MODE=false`, only `@svnit.ac.in` emails are accepted. Emails are validated server-side in the session API.
+
+### Rejection modes
+
+#### EARLY_REJECT = true (default)
+
+The user is **immediately logged out** when signing in with an unauthorized email, then shown an acknowledgement modal.
+
+**Flow:**
+1. User signs in with non-SVNIT email
+2. Session API validates email → returns 403
+3. Client detects `emailRejected: true`
+4. **Logout immediately** (invalid session priority)
+5. Redirect to auth page with `?rejected=1` query param
+6. `InvalidEmailModal` shown on mount (reads `?rejected=1`)
+7. Modal dismiss clears query param
+
+**Why logout first?** The session is invalid — logging out is the top priority. The modal is just for user acknowledgement.
+
+**Why URL param?** Clean state management without module-level flags. The flow is debuggable by inspecting the URL.
+
+#### EARLY_REJECT = false
+
+The user reaches the onboarding page but sees a friendly error when they try to submit the form. **Additionally, if the user tries to navigate to any other page (e.g., `/profile`, `/events`), they are automatically logged out and redirected to the login page with a modal explaining they were logged out due to incomplete registration.**
+
+**Flow:**
+1. User signs in with non-SVNIT email
+2. Session API validates email → returns 403 and sets `email_rejected` cookie
+3. Client redirects to `/onboarding`
+4. User fills onboarding form
+5. Form submission fails with friendly message: "Please register with a valid institute email (ending with @svnit.ac.in)"
+
+**OR if user tries to access other pages:**
+1. Middleware detects `email_rejected` cookie
+2. User redirected to `/login?logged_out=incomplete_registration`
+3. Auth cookies cleared (logout enforced)
+4. `LoggedOutModal` shown explaining they were logged out
+5. Modal dismiss clears query param
+
+### Implementation notes
+
+- Email validation happens server-side in `/api/auth/session` (cannot be bypassed)
+- Validation uses `isValidSvnitEmail()` from `src/lib/validators/email.ts`
+- Regex: `^[a-zA-Z0-9._%+-]+@svnit\.ac\.in$`
+- Client-side hint shown on register page when `DEV_MODE=false`
+- In `DEV_MODE=true`, all emails are accepted (for local development)
+- When `EARLY_REJECT=false`, middleware enforces logout if rejected users try to access non-onboarding pages
+
+---
+
 ## Server-side authorization
 
 **File:** `src/lib/firebase-admin/auth.ts`
