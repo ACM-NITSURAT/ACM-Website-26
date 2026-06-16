@@ -13,13 +13,12 @@ export default function AuthLayout({
   const router = useRouter();
 
   useEffect(() => {
-    if (!loading && user) {
-      router.replace('/profile');
-    }
+    // Redirect signed-in users to onboarding (or they'll go to profile if complete)
+    if (loading || !user) return;
+    router.replace('/onboarding');
   }, [user, loading, router]);
 
-  // Don't flash the auth form while Firebase resolves the session
-  if (loading || user) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-zinc-950">
         <span className="text-zinc-500 text-sm">Loading…</span>
@@ -27,6 +26,16 @@ export default function AuthLayout({
     );
   }
 
+  // Signed in → show loading while redirect is in-flight
+  if (user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-zinc-950">
+        <span className="text-zinc-500 text-sm">Loading…</span>
+      </div>
+    );
+  }
+
+  // Not signed in → render auth pages
   return (
     <div className="min-h-screen flex items-center justify-center bg-zinc-950 px-4 py-12">
       {children}

@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
 import { verifyIdToken, syncUser } from '@/lib/firebase-admin/auth';
 import { isValidSvnitEmail, SVNIT_EMAIL_ERROR } from '@/lib/validators/email';
+import { EARLY_REJECT } from '@/config';
 
-const COOKIE = 'onboarding_complete';
+const ONBOARDING_COOKIE = 'onboarding_complete';
+const EMAIL_REJECTED_COOKIE = 'email_rejected';
 const COOKIE_OPTS = {
   httpOnly: true,
   secure: process.env.NODE_ENV === 'production',
@@ -32,13 +34,20 @@ export async function POST(request: Request) {
 
     const devMode = process.env.DEV_MODE === 'true';
     if (!isValidSvnitEmail(token.email ?? '', devMode)) {
-      return NextResponse.json({ error: SVNIT_EMAIL_ERROR }, { status: 403 });
+      // When EARLY_REJECT=false, set cookie so middleware can enforce logout
+      const res = NextResponse.json({ error: SVNIT_EMAIL_ERROR }, { status: 403 });
+      if (!EARLY_REJECT) {
+        res.cookies.set(EMAIL_REJECTED_COOKIE, 'true', COOKIE_OPTS);
+      }
+      return res;
     }
 
     const { role, isOnboardingCompleted } = await syncUser(token);
 
     const res = NextResponse.json({ role, isOnboardingCompleted });
-    res.cookies.set(COOKIE, String(isOnboardingCompleted), COOKIE_OPTS);
+    res.cookies.set(ONBOARDING_COOKIE, String(isOnboardingCompleted), COOKIE_OPTS);
+    // Clear email_rejected cookie if it was set previously
+    res.cookies.delete(EMAIL_REJECTED_COOKIE);
     return res;
   } catch (err) {
     console.error('[POST /api/auth/session]', err);

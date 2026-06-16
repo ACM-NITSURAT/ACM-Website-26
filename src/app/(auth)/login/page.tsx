@@ -1,22 +1,61 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { loginWithEmail, signInWithGoogle, callSessionApi } from '@/lib/firebase';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { loginWithEmail, signInWithGoogle, callSessionApi, logout } from '@/lib/firebase';
 import { FirebaseError } from 'firebase/app';
+import InvalidEmailModal from '@/components/auth/InvalidEmailModal';
+import LoggedOutModal from '@/components/auth/LoggedOutModal';
+import { EARLY_REJECT } from '@/config';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const [showLoggedOutModal, setShowLoggedOutModal] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // On mount, check for modal triggers
+  useEffect(() => {
+    if (searchParams.get('rejected') === '1') {
+      setShowEmailModal(true);
+    } else if (searchParams.get('logged_out') === 'incomplete_registration') {
+      setShowLoggedOutModal(true);
+    }
+  }, [searchParams]);
 
   async function afterSignIn() {
-    const { role, isOnboardingCompleted } = await callSessionApi();
-    console.log('[Login] role:', role, '| onboarding done:', isOnboardingCompleted);
+    const { role, isOnboardingCompleted, emailRejected } = await callSessionApi();
+    console.log('[Login] role:', role, '| onboarding done:', isOnboardingCompleted, '| email rejected:', emailRejected);
+
+    if (emailRejected) {
+      if (EARLY_REJECT) {
+        // Priority: logout immediately (invalid session)
+        await logout();
+        // Then show acknowledgement modal via URL param
+        router.replace('/login?rejected=1');
+      } else {
+        // Late rejection: onboarding form will show friendly error
+        router.replace('/onboarding');
+      }
+      return;
+    }
+
     router.replace(isOnboardingCompleted ? '/profile' : '/onboarding');
+  }
+
+  function handleDismissEmailModal() {
+    setShowEmailModal(false);
+    router.replace('/login');
+  }
+
+  function handleDismissLoggedOutModal() {
+    setShowLoggedOutModal(false);
+    router.replace('/login');
   }
 
   async function handleEmailLogin(e: React.FormEvent) {
@@ -28,7 +67,7 @@ export default function LoginPage() {
       console.log('[Login] Firebase credential:', credential);
       await afterSignIn();
     } catch (err) {
-      setError(err instanceof FirebaseError ? err.message : 'Login failed.');
+      setError(err instanceof FirebaseError ? err.message : 'Sign-in failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -42,85 +81,91 @@ export default function LoginPage() {
       console.log('[Google Login] Firebase credential:', credential);
       await afterSignIn();
     } catch (err) {
-      setError(err instanceof FirebaseError ? err.message : 'Google sign-in failed.');
+      if (err instanceof FirebaseError && err.code === 'auth/popup-closed-by-user') return;
+      setError(err instanceof FirebaseError ? err.message : 'Sign-in failed. Please try again.');
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="w-full max-w-sm">
-      <h1 className="text-2xl font-semibold text-white mb-1">Sign in</h1>
-      <p className="text-sm text-zinc-400 mb-8">
-        Don&apos;t have an account?{' '}
-        <Link href="/register" className="text-white underline underline-offset-4">
-          Register
-        </Link>
-      </p>
+    <>
+      {showEmailModal && <InvalidEmailModal onDismiss={handleDismissEmailModal} />}
+      {showLoggedOutModal && <LoggedOutModal onDismiss={handleDismissLoggedOutModal} />}
 
-      <form onSubmit={handleEmailLogin} className="flex flex-col gap-4">
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="email" className="text-sm text-zinc-300">Email</label>
-          <input
-            id="email"
-            type="email"
-            autoComplete="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="bg-zinc-900 border border-zinc-700 rounded-md px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-500"
-            placeholder="you@example.com"
-          />
-        </div>
+      <div className="w-full max-w-sm">
+        <h1 className="text-2xl font-semibold text-white mb-1">Sign in</h1>
+        <p className="text-sm text-zinc-400 mb-8">
+          Don&apos;t have an account?{' '}
+          <Link href="/register" className="text-white underline underline-offset-4">
+            Register
+          </Link>
+        </p>
 
-        <div className="flex flex-col gap-1.5">
-          <div className="flex items-center justify-between">
-            <label htmlFor="password" className="text-sm text-zinc-300">Password</label>
-            <Link
-              href="/forgot-password"
-              className="text-xs text-zinc-400 hover:text-white underline underline-offset-4"
-            >
-              Forgot password?
-            </Link>
+        <form onSubmit={handleEmailLogin} className="flex flex-col gap-4">
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="email" className="text-sm text-zinc-300">Email</label>
+            <input
+              id="email"
+              type="email"
+              autoComplete="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="bg-zinc-900 border border-zinc-700 rounded-md px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-500"
+              placeholder="you@example.com"
+            />
           </div>
-          <input
-            id="password"
-            type="password"
-            autoComplete="current-password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="bg-zinc-900 border border-zinc-700 rounded-md px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-500"
-            placeholder="••••••••"
-          />
-        </div>
 
-        {error && <p className="text-xs text-red-400">{error}</p>}
+          <div className="flex flex-col gap-1.5">
+            <div className="flex items-center justify-between">
+              <label htmlFor="password" className="text-sm text-zinc-300">Password</label>
+              <Link
+                href="/forgot-password"
+                className="text-xs text-zinc-400 hover:text-white underline underline-offset-4"
+              >
+                Forgot password?
+              </Link>
+            </div>
+            <input
+              id="password"
+              type="password"
+              autoComplete="current-password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="bg-zinc-900 border border-zinc-700 rounded-md px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-500"
+              placeholder="••••••••"
+            />
+          </div>
+
+          {error && <p className="text-xs text-red-400">{error}</p>}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="mt-1 bg-white text-zinc-900 rounded-md py-2 text-sm font-medium hover:bg-zinc-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            {loading ? 'Signing in…' : 'Sign in'}
+          </button>
+        </form>
+
+        <div className="flex items-center gap-3 my-6">
+          <span className="flex-1 h-px bg-zinc-800" />
+          <span className="text-xs text-zinc-500">or</span>
+          <span className="flex-1 h-px bg-zinc-800" />
+        </div>
 
         <button
-          type="submit"
+          onClick={handleGoogleLogin}
           disabled={loading}
-          className="mt-1 bg-white text-zinc-900 rounded-md py-2 text-sm font-medium hover:bg-zinc-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="w-full flex items-center justify-center gap-2.5 bg-zinc-900 border border-zinc-700 rounded-md py-2 text-sm text-white hover:bg-zinc-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
-          {loading ? 'Signing in…' : 'Sign in'}
+          <GoogleIcon />
+          Continue with Google
         </button>
-      </form>
-
-      <div className="flex items-center gap-3 my-6">
-        <span className="flex-1 h-px bg-zinc-800" />
-        <span className="text-xs text-zinc-500">or</span>
-        <span className="flex-1 h-px bg-zinc-800" />
       </div>
-
-      <button
-        onClick={handleGoogleLogin}
-        disabled={loading}
-        className="w-full flex items-center justify-center gap-2.5 bg-zinc-900 border border-zinc-700 rounded-md py-2 text-sm text-white hover:bg-zinc-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-      >
-        <GoogleIcon />
-        Continue with Google
-      </button>
-    </div>
+    </>
   );
 }
 

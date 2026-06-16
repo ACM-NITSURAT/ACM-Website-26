@@ -16,6 +16,10 @@ import { ONBOARDING_ALLOWLIST } from './server/onboarding-allowlist';
  * The `onboarding_complete` cookie is set by:
  *  - POST /api/auth/session  (on every sign-in)
  *  - POST /api/onboarding    (when the form is submitted)
+ *
+ * When EARLY_REJECT=false, users with invalid emails have `email_rejected` cookie
+ * set. If they try to access routes other than /onboarding, they're logged out
+ * and redirected with ?logged_out=incomplete_registration.
  */
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -31,6 +35,22 @@ export function middleware(request: NextRequest) {
   }
 
   const onboardingComplete = request.cookies.get('onboarding_complete')?.value === 'true';
+  const emailRejected = request.cookies.get('email_rejected')?.value === 'true';
+
+  // If user has rejected email and tries to access non-onboarding page, force logout
+  if (emailRejected && pathname !== '/onboarding') {
+    const authPaths = ['/login', '/register', '/forgot-password'];
+    if (!authPaths.includes(pathname)) {
+      const url = request.nextUrl.clone();
+      url.pathname = '/login';
+      url.searchParams.set('logged_out', 'incomplete_registration');
+      const res = NextResponse.redirect(url);
+      // Clear auth-related cookies
+      res.cookies.delete('onboarding_complete');
+      res.cookies.delete('email_rejected');
+      return res;
+    }
+  }
 
   // If onboarding is already done, nothing to gate
   if (onboardingComplete) return NextResponse.next();

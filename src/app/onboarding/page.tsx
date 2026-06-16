@@ -58,8 +58,8 @@ export default function OnboardingPage() {
       });
 
       if (!res.ok) {
-        const data = await res.json();
-        setError(data.error ?? 'Something went wrong.');
+        console.error('[onboarding] server returned', res.status, await res.text());
+        setError('Please register using your institute email address (ending with .svnit.ac.in).');
         return;
       }
 

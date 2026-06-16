@@ -1,11 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { registerWithEmail, signInWithGoogle, callSessionApi } from '@/lib/firebase';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { registerWithEmail, signInWithGoogle, callSessionApi, logout } from '@/lib/firebase';
 import { FirebaseError } from 'firebase/app';
 import { isValidSvnitEmail, SVNIT_EMAIL_ERROR } from '@/lib/validators/email';
+import InvalidEmailModal from '@/components/auth/InvalidEmailModal';
+import LoggedOutModal from '@/components/auth/LoggedOutModal';
+import { EARLY_REJECT } from '@/config';
 
 const devMode = process.env.NEXT_PUBLIC_DEV_MODE === 'true';
 
@@ -16,12 +19,49 @@ export default function RegisterPage() {
   const [error, setError] = useState('');
   const [done, setDone] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const [showLoggedOutModal, setShowLoggedOutModal] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
 
-  async function afterSignIn() {
-    const { role, isOnboardingCompleted } = await callSessionApi();
-    console.log('[Register] role:', role, '| onboarding done:', isOnboardingCompleted);
+  // On mount, check for modal triggers
+  useEffect(() => {
+    if (searchParams.get('rejected') === '1') {
+      setShowEmailModal(true);
+    } else if (searchParams.get('logged_out') === 'incomplete_registration') {
+      setShowLoggedOutModal(true);
+    }
+  }, [searchParams]);
+
+  async function afterSignIn(): Promise<boolean> {
+    const { role, isOnboardingCompleted, emailRejected } = await callSessionApi();
+    console.log('[Register] role:', role, '| onboarding done:', isOnboardingCompleted, '| email rejected:', emailRejected);
+
+    if (emailRejected) {
+      if (EARLY_REJECT) {
+        // Priority: logout immediately (invalid session)
+        await logout();
+        // Then show acknowledgement modal via URL param
+        router.replace('/register?rejected=1');
+      } else {
+        // Late rejection: onboarding form will show friendly error
+        router.replace('/onboarding');
+      }
+      return false;
+    }
+
     if (!isOnboardingCompleted) router.replace('/onboarding');
+    return true;
+  }
+
+  function handleDismissEmailModal() {
+    setShowEmailModal(false);
+    router.replace('/register');
+  }
+
+  function handleDismissLoggedOutModal() {
+    setShowLoggedOutModal(false);
+    router.replace('/register');
   }
 
   async function handleRegister(e: React.FormEvent) {
@@ -33,10 +73,10 @@ export default function RegisterPage() {
     try {
       const credential = await registerWithEmail(email, password);
       console.log('[Register] Firebase credential:', credential);
-      await afterSignIn();
-      setDone(true);
+      const ok = await afterSignIn();
+      if (ok) setDone(true);
     } catch (err) {
-      setError(err instanceof FirebaseError ? err.message : 'Registration failed.');
+      setError(err instanceof FirebaseError ? err.message : 'Registration failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -50,15 +90,20 @@ export default function RegisterPage() {
       console.log('[Google Register] Firebase credential:', credential);
       await afterSignIn();
     } catch (err) {
-      setError(err instanceof FirebaseError ? err.message : 'Google sign-in failed.');
+      if (err instanceof FirebaseError && err.code === 'auth/popup-closed-by-user') return;
+      setError(err instanceof FirebaseError ? err.message : 'Sign-in failed. Please try again.');
     } finally {
       setLoading(false);
     }
   }
 
-  if (done) {
-    return (
-      <div className="w-full max-w-sm text-center">
+  return (
+    <>
+      {showEmailModal && <InvalidEmailModal onDismiss={handleDismissEmailModal} />}
+      {showLoggedOutModal && <LoggedOutModal onDismiss={handleDismissLoggedOutModal} />}
+
+      {done ? (
+        <div className="w-full max-w-sm text-center">
         <div className="text-3xl mb-4" aria-hidden="true">✉️</div>
         <h1 className="text-xl font-semibold text-white mb-2">Verify your email</h1>
         <p className="text-sm text-zinc-400">
@@ -73,11 +118,8 @@ export default function RegisterPage() {
           Back to sign in
         </Link>
       </div>
-    );
-  }
-
-  return (
-    <div className="w-full max-w-sm">
+    ) : (
+      <div className="w-full max-w-sm">
       <h1 className="text-2xl font-semibold text-white mb-1">Create account</h1>
       <p className="text-sm text-zinc-400 mb-8">
         Already have an account?{' '}
@@ -159,6 +201,8 @@ export default function RegisterPage() {
         Continue with Google
       </button>
     </div>
+    )}
+    </>
   );
 }
 
