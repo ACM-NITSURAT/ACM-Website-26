@@ -40,6 +40,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${spaceGrotesk.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col relative">
+        <div className="cinemaGrainOverlay" aria-hidden="true" />
         <Navbar />
         {children}
       </body>

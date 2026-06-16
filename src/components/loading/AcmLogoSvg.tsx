@@ -29,10 +29,12 @@ export interface AcmLogoSvgHandle {
 interface AcmLogoSvgProps {
   className?: string;
   style?: React.CSSProperties;
+  completed?: boolean;
+  animatedBorders?: boolean;
 }
 
 const AcmLogoSvg = forwardRef<AcmLogoSvgHandle, AcmLogoSvgProps>(
-  ({ className, style }, ref) => {
+  ({ className, style, completed = false, animatedBorders = false }, ref) => {
     const acmTextRef = useRef<SVGTextElement>(null);
     const nitSuratTextRef = useRef<SVGTextElement>(null);
     const svgRef = useRef<SVGSVGElement>(null);
@@ -51,19 +53,16 @@ const AcmLogoSvg = forwardRef<AcmLogoSvgHandle, AcmLogoSvgProps>(
       const acmEl = acmTextRef.current;
       const nitEl = nitSuratTextRef.current;
       if (acmEl) {
-        // For bold text construction, we need the perimeter of all glyphs.
-        // getComputedTextLength returns advance width; for stroke around
-        // thick glyphs we need more. Using a multiplier for the outline.
         const len = acmEl.getComputedTextLength() * 3.5;
         acmEl.style.strokeDasharray = `${len}`;
-        acmEl.style.strokeDashoffset = `${len}`;
+        acmEl.style.strokeDashoffset = completed ? '0' : `${len}`;
       }
       if (nitEl) {
         const len = nitEl.getComputedTextLength() * 3.5;
         nitEl.style.strokeDasharray = `${len}`;
-        nitEl.style.strokeDashoffset = `${len}`;
+        nitEl.style.strokeDashoffset = completed ? '0' : `${len}`;
       }
-    }, []);
+    }, [completed]);
 
     return (
       <svg
@@ -71,7 +70,7 @@ const AcmLogoSvg = forwardRef<AcmLogoSvgHandle, AcmLogoSvgProps>(
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 200 200"
         className={className}
-        style={style}
+        style={{ ...style, overflow: 'visible' }}
         aria-label="ACM NIT SURAT logo"
         role="img"
       >
@@ -81,25 +80,57 @@ const AcmLogoSvg = forwardRef<AcmLogoSvgHandle, AcmLogoSvgProps>(
             <stop offset="50%" stopColor="#4ba5e4" />
             <stop offset="100%" stopColor="#2a82ca" />
           </linearGradient>
+          {animatedBorders && (
+            <style>
+              {`
+                @keyframes raceAround {
+                  from { stroke-dashoffset: 566; }
+                  to { stroke-dashoffset: 0; }
+                }
+                @keyframes raceCircle {
+                  from { stroke-dashoffset: 365; }
+                  to { stroke-dashoffset: 0; }
+                }
+                .light-diamond {
+                  animation: raceAround 3s linear infinite;
+                  filter: drop-shadow(0 0 6px rgba(255,255,255,1));
+                }
+                .light-circle {
+                  animation: raceCircle 4s linear infinite reverse;
+                  filter: drop-shadow(0 0 6px rgba(255,255,255,1));
+                }
+              `}
+            </style>
+          )}
         </defs>
 
-        {/* Diamond (Rhombus) — EXACT match to provided SVG
-            Path: M 100,0 L 200,100 L 100,200 L 0,100 Z
-            Perimeter ≈ 4 × √(100² + 100²) ≈ 566 */}
+        {/* Diamond (Rhombus) */}
         <path
           id="logo-diamond"
           d="M 100,0 L 200,100 L 100,200 L 0,100 Z"
           fill="url(#acm-blue-gradient)"
-          fillOpacity={0}
+          fillOpacity={completed ? 1 : 0}
           stroke="#F5E6C8"
           strokeWidth={1.5}
           strokeLinejoin="round"
           strokeDasharray={566}
-          strokeDashoffset={566}
+          strokeDashoffset={completed ? 0 : 566}
         />
+        
+        {/* Diamond - Moving Light */}
+        {animatedBorders && (
+          <path
+            d="M 100,0 L 200,100 L 100,200 L 0,100 Z"
+            fill="none"
+            stroke="#ffffff"
+            strokeWidth={2.5}
+            strokeDasharray="40 526"
+            strokeLinejoin="round"
+            className="light-diamond"
+          />
+        )}
 
-        {/* Circle — EXACT match: cx=100 cy=100 r=58, white, stroke-width=5
-            Circumference = 2π×58 ≈ 364.42 */}
+        {/* Circle */}
         <circle
           id="logo-circle"
           cx={100}
@@ -109,15 +140,25 @@ const AcmLogoSvg = forwardRef<AcmLogoSvgHandle, AcmLogoSvgProps>(
           stroke="#F5E6C8"
           strokeWidth={5}
           strokeDasharray={365}
-          strokeDashoffset={365}
+          strokeDashoffset={completed ? 0 : 365}
         />
+        
+        {/* Circle - Moving Light */}
+        {animatedBorders && (
+          <circle
+            cx={100}
+            cy={100}
+            r={58}
+            fill="none"
+            stroke="#ffffff"
+            strokeWidth={5}
+            strokeDasharray="20 345"
+            strokeLinecap="round"
+            className="light-circle"
+          />
+        )}
 
-        {/* "acm" text — EXACT match to logo typography
-            font: Arial/Helvetica, size 44, weight 900 (black), white
-            x=100 y=108, text-anchor middle, letter-spacing -1.5
-            
-            Stroke animation: stroke draws the text outline, then fill fades in.
-            Initial state: stroke-dashoffset = full, fill-opacity = 0 */}
+        {/* "acm" text */}
         <text
           ref={acmTextRef}
           id="logo-acm-text"
@@ -127,7 +168,7 @@ const AcmLogoSvg = forwardRef<AcmLogoSvgHandle, AcmLogoSvgProps>(
           fontSize={44}
           fontWeight={900}
           fill="#ffffff"
-          fillOpacity={0}
+          fillOpacity={completed ? 1 : 0}
           stroke="#F5E6C8"
           strokeWidth={0.8}
           strokeLinecap="round"
@@ -139,9 +180,7 @@ const AcmLogoSvg = forwardRef<AcmLogoSvgHandle, AcmLogoSvgProps>(
           acm
         </text>
 
-        {/* "NIT SURAT" — EXACT match to logo
-            font: Arial/Helvetica, size 11, bold, white
-            x=100 y=130, text-anchor middle, letter-spacing 0.5 */}
+        {/* "NIT SURAT" */}
         <text
           ref={nitSuratTextRef}
           id="logo-nit-surat"
@@ -151,14 +190,14 @@ const AcmLogoSvg = forwardRef<AcmLogoSvgHandle, AcmLogoSvgProps>(
           fontSize={11}
           fontWeight="bold"
           fill="#ffffff"
-          fillOpacity={0}
+          fillOpacity={completed ? 1 : 0}
           stroke="#F5E6C8"
           strokeWidth={0.3}
           strokeLinecap="round"
           strokeLinejoin="round"
           textAnchor="middle"
           letterSpacing={0.5}
-          opacity={0}
+          opacity={completed ? 1 : 0}
         >
           NIT SURAT
         </text>

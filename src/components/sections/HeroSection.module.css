@@ -39,16 +39,46 @@
   overflow: hidden;
   /* Darker base — makes projection light pop without crushing blacks */
   background: #070707;
+  z-index: 10;
 }
 
 /* ============================================================
    BACKGROUND LAYER SYSTEM
    ============================================================ */
+/* --- The Beam System --- */
+.projectionBeam {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  /* Blend screen is critical so light accumulates */
+  mix-blend-mode: screen;
+}
+
+.lightSurge {
+  animation: beamSurge 2000ms ease-in forwards;
+}
+
+@keyframes beamSurge {
+  0% { opacity: 1; transform: scale(1); filter: brightness(1); }
+  50% { opacity: 1; transform: scale(1.1); filter: brightness(1.5); }
+  100% { opacity: 1; transform: scale(1.5); filter: brightness(4); }
+}
+
 .heroBg {
   position: absolute;
   inset: 0;
   pointer-events: none;
   z-index: 0;
+  transition: filter 2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.heroBgBlue {
+  filter: hue-rotate(180deg) saturate(2.2) brightness(1.4);
+}
+
+.blueLightTransition {
+  transition: filter 2s cubic-bezier(0.16, 1, 0.3, 1);
+  filter: hue-rotate(180deg) saturate(2.2) brightness(1.4);
 }
 
 /* Film Grain — Barely visible, cinematic texture */
@@ -447,8 +477,48 @@
   pointer-events: none;
 }
 
+.reelSlots {
+  transition: filter 600ms ease;
+  filter: blur(0px);
+}
+
+.reelSlotsBlur {
+  filter: blur(1.5px);
+}
+
+.reelGlobalBlur {
+  filter: blur(0.5px);
+}
+
+.centralGlow {
+  opacity: 0;
+  transition: opacity 600ms ease;
+  mix-blend-mode: screen;
+}
+
+.glowStage2 {
+  opacity: 0.3;
+}
+
+.glowStage3 {
+  opacity: 0.7;
+}
+
+.preFlashRing {
+  opacity: 0;
+  transform: scale(0.8);
+  transform-origin: 250px 250px;
+  transition: all 600ms ease-out;
+}
+
+.preFlashRingActive {
+  opacity: 1;
+  transform: scale(3.5);
+  stroke-width: 0.5;
+}
+
 /* ============================================================
-   INNER CONTAINER — Asymmetric Layout
+   THE REEL ITSELF
    ============================================================ */
 .heroInner {
   position: relative;
@@ -464,6 +534,22 @@
   gap: 0px;
   min-height: 100vh;
   min-height: 100dvh;
+  transition: opacity 200ms ease-out;
+}
+
+.heroShake {
+  animation: reelShake 60ms infinite alternate;
+}
+
+@keyframes reelShake {
+  0% { transform: translate(0, 0); }
+  50% { transform: translate(1px, -1px); }
+  100% { transform: translate(-1px, 1px); }
+}
+
+.hidden {
+  opacity: 0;
+  pointer-events: none;
 }
 
 /* ============================================================
@@ -579,6 +665,19 @@
     0 2px 12px rgba(0, 0, 0, 0.2);
 }
 
+.heroCtaActive {
+  box-shadow: 0 0 24px rgba(201, 168, 76, 0.4);
+  border-color: rgba(201, 168, 76, 0.8);
+  color: #fff;
+  animation: buttonPulse 800ms ease-out forwards;
+}
+
+@keyframes buttonPulse {
+  0% { box-shadow: 0 0 0 rgba(201, 168, 76, 0); }
+  50% { box-shadow: 0 0 24px rgba(201, 168, 76, 0.6); }
+  100% { box-shadow: 0 0 32px rgba(201, 168, 76, 0.8); }
+}
+
 .heroCta:hover {
   color: rgba(255, 255, 255, 1);
 }
@@ -688,6 +787,7 @@
       rgba(0, 0, 0, 0.6) 92%,
       transparent 95%);
   mix-blend-mode: soft-light;
+  transition: filter 2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Rim Catch Light — specular highlight on upper-left rim quadrant */
@@ -697,6 +797,7 @@
   border-radius: 50%;
   pointer-events: none;
   z-index: 11;
+  transition: filter 2s cubic-bezier(0.16, 1, 0.3, 1);
   background: conic-gradient(from 210deg at 50% 50%,
       transparent 0deg,
       rgba(255, 230, 120, 0.05) 45deg,
@@ -821,6 +922,30 @@
   mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%);
   mix-blend-mode: multiply;
   filter: blur(10px);
+}
+
+.loadingDots {
+  display: flex;
+  gap: 2px;
+  color: #c9a84c;
+}
+
+.loadingDots span {
+  animation: blink 1.4s infinite both;
+}
+
+.loadingDots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.loadingDots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes blink {
+  0% { opacity: 0.2; }
+  20% { opacity: 1; }
+  100% { opacity: 0.2; }
 }
 
 /* ============================================================
@@ -985,4 +1110,111 @@
   .scrollLine {
     height: 28px;
   }
+}
+/* ============================================================
+   LIGHTNING CURRENT ANIMATION (Explore -> Reel)
+   ============================================================ */
+
+.lightningOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 100;
+  /* Glow filter for the entire SVG */
+  filter: drop-shadow(0 0 8px rgba(75, 165, 228, 0.8)) drop-shadow(0 0 20px rgba(75, 165, 228, 0.4));
+  opacity: 0;
+  transition: opacity 0.1s ease-out;
+}
+
+.lightningOverlay.active {
+  opacity: 1;
+}
+
+.lightningGlow {
+  fill: none;
+  stroke: rgba(75, 165, 228, 0.3);
+  stroke-width: 12;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: blur(4px);
+  stroke-dasharray: 2000;
+  stroke-dashoffset: 2000;
+  animation: lightningDraw 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.lightningCore {
+  fill: none;
+  stroke: #ffffff;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 2000;
+  stroke-dashoffset: 2000;
+  animation: lightningDraw 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards,
+             lightningPulse 0.1s infinite alternate;
+}
+
+.lightningCoreSecondary {
+  fill: none;
+  stroke: #8cd0ff;
+  stroke-width: 1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 2000;
+  stroke-dashoffset: 2000;
+  /* Slightly delayed draw for organic feel */
+  animation: lightningDraw 0.4s 0.05s cubic-bezier(0.16, 1, 0.3, 1) forwards,
+             lightningPulse 0.08s 0.02s infinite alternate;
+}
+
+@keyframes lightningDraw {
+  0% { stroke-dashoffset: 2000; opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 1; }
+}
+
+@keyframes lightningPulse {
+  0% { stroke-width: 2; opacity: 0.8; }
+  100% { stroke-width: 4; opacity: 1; }
+}
+
+.lightningBranch {
+  fill: none;
+  stroke: rgba(140, 208, 255, 0.4);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  /* Shorter drawing for branches so they look like they shoot off the main bolt */
+  stroke-dasharray: 2000;
+  stroke-dashoffset: 2000;
+  animation: lightningDraw 0.2s 0.1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.sparkPoint {
+  fill: #ffffff;
+  filter: drop-shadow(0 0 10px #8cd0ff);
+  opacity: 0;
+  animation: sparkFlash 0.1s 0.2s infinite alternate forwards;
+}
+
+.sparkPointLarge {
+  fill: #ffffff;
+  filter: drop-shadow(0 0 15px #8cd0ff);
+  opacity: 0;
+  /* Reel spark blooms larger and slightly delayed */
+  animation: sparkFlashLarge 0.15s 0.3s infinite alternate forwards;
+}
+
+@keyframes sparkFlash {
+  0% { opacity: 0; transform: scale(0.5); }
+  50% { opacity: 1; transform: scale(1.5); }
+  100% { opacity: 0.5; transform: scale(1); }
+}
+
+@keyframes sparkFlashLarge {
+  0% { opacity: 0; transform: scale(0.2); }
+  50% { opacity: 1; transform: scale(2); }
+  100% { opacity: 0.6; transform: scale(1.2); }
 }

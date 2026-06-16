@@ -5,6 +5,7 @@ import { motion, useScroll, useTransform, useAnimationFrame, useMotionValue } fr
 import styles from './HeroSection.module.css';
 import FilmReel from './FilmReel';
 import CinematicDust from './CinematicDust';
+import { getMasterVolume } from '../loading/ProjectorAudio';
 
 /* ============================================================
    HeroSection — "The First Frame"
@@ -29,14 +30,196 @@ import CinematicDust from './CinematicDust';
    - Projection beam expands (scale 1→1.3)
    ============================================================ */
 
-export default function HeroSection() {
+import { TransitionState } from '@/app/page';
+
+export interface HeroSectionProps {
+  onExploreClick?: () => void;
+  isTransitioning?: boolean;
+  transitionState?: TransitionState;
+}
+
+export default function HeroSection({ onExploreClick, isTransitioning, transitionState }: HeroSectionProps = {}) {
   const containerRef = useRef<HTMLElement>(null);
+  const ctaRef = useRef<HTMLAnchorElement>(null);
 
   /* ==========================================
      SCENE ESTABLISHMENT
      Projection glow fades in over ~1.2s after mount.
      ========================================== */
   const [sceneEstablished, setSceneEstablished] = useState(false);
+  const [lightningPaths, setLightningPaths] = useState<{
+    main: string;
+    sparks: { cx: number; cy: number; r: number; opacity: number }[];
+    startX: number;
+    startY: number;
+    endX: number;
+    endY: number;
+  } | null>(null);
+
+  // Calculate lightning path when transitioning begins
+  useEffect(() => {
+    if (!isTransitioning || !ctaRef.current) {
+      setLightningPaths(null);
+      return;
+    }
+
+    let animationFrameId: number;
+    let lastDraw = 0;
+
+    const drawLightning = (timestamp: number) => {
+      animationFrameId = requestAnimationFrame(drawLightning);
+
+      // Throtte to ~24fps for choppy electrical feel
+      if (timestamp - lastDraw < 40) return;
+      lastDraw = timestamp;
+
+      if (!ctaRef.current) return;
+
+      const ctaRect = ctaRef.current.getBoundingClientRect();
+      const hub = document.querySelector('[data-reel-hub]');
+      if (!hub) return;
+
+      const hubRect = hub.getBoundingClientRect();
+      const startX = ctaRect.right;
+      const startY = ctaRect.top + ctaRect.height / 2;
+      const endX = hubRect.left + hubRect.width / 2;
+      const endY = hubRect.top + hubRect.height / 2;
+
+      const dx = endX - startX;
+      const dy = endY - startY;
+
+      const generateMainPathAndSparks = (segments: number, spreadMultiplier: number) => {
+        let path = `M ${startX},${startY} `;
+        let currentX = startX;
+        let currentY = startY;
+        const sparks: { cx: number, cy: number, r: number, opacity: number }[] = [];
+
+        for (let i = 1; i <= segments; i++) {
+          const t = i / segments;
+
+          const tx = startX + dx * t;
+          const ty = startY + dy * t;
+
+          const spread = Math.sin(t * Math.PI) * spreadMultiplier;
+          const offsetX = (Math.random() - 0.5) * spread;
+          const offsetY = (Math.random() - 0.5) * spread;
+
+          currentX = tx + offsetX;
+          currentY = ty + offsetY;
+
+          path += `L ${currentX},${currentY} `;
+
+          // Generate 1-3 tiny sparks around this segment node
+          const numSparks = Math.floor(Math.random() * 3) + 1;
+          for (let j = 0; j < numSparks; j++) {
+            sparks.push({
+              cx: currentX + (Math.random() - 0.5) * 25, // Hug the beam tightly
+              cy: currentY + (Math.random() - 0.5) * 25,
+              r: Math.random() * 1.5 + 0.5, // Tiny radius: 0.5px to 2px
+              opacity: Math.random() * 0.8 + 0.2
+            });
+          }
+        }
+
+        path += `L ${endX},${endY}`;
+        return { path, sparks };
+      };
+
+      const { path: mainPath, sparks } = generateMainPathAndSparks(16, 40);
+
+      setLightningPaths({
+        main: mainPath,
+        sparks,
+        startX,
+        startY,
+        endX,
+        endY
+      });
+    };
+
+    animationFrameId = requestAnimationFrame(drawLightning);
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, [isTransitioning]);
+
+  /* ==========================================
+     AUDIO EFFECT (ELECTRIC BEAM)
+     ========================================== */
+  const audioCtxRef = useRef<AudioContext | null>(null);
+  const gainNodeRef = useRef<GainNode | null>(null);
+
+  useEffect(() => {
+    if (isTransitioning) {
+      try {
+        // Respect the global "Enter Silently" mute state
+        if (getMasterVolume() === 0) return;
+
+        const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+        if (!AudioContextClass) return;
+
+        const ctx = new AudioContextClass();
+        audioCtxRef.current = ctx;
+
+        const masterGain = ctx.createGain();
+        masterGain.gain.value = 0; // Start at 0 for fade in
+        masterGain.connect(ctx.destination);
+        gainNodeRef.current = masterGain;
+
+        // 120Hz AC mains hum (First harmonic, much more audible on laptop speakers than 60Hz)
+        const hum1 = ctx.createOscillator();
+        hum1.type = 'sawtooth';
+        hum1.frequency.value = 120;
+        
+        // Slightly detuned hum to create a "throbbing" electric phase effect
+        const hum2 = ctx.createOscillator();
+        hum2.type = 'sawtooth';
+        hum2.frequency.value = 121;
+        
+        // Lowpass filter: High enough to hear the "buzz" texture, low enough to not be harsh
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.value = 900; 
+
+        hum1.connect(filter);
+        hum2.connect(filter);
+        filter.connect(masterGain);
+
+        hum1.start();
+        hum2.start();
+
+        // Fade in gradually over 1.2 seconds so it swells up like a machine powering on
+        // rather than hitting the user suddenly
+        masterGain.gain.setValueAtTime(0, ctx.currentTime);
+        masterGain.gain.linearRampToValueAtTime(0.06, ctx.currentTime + 1.2);
+
+      } catch (e) {
+        console.warn("Web Audio API not supported", e);
+      }
+    } else {
+      // Fade out and close
+      if (audioCtxRef.current && gainNodeRef.current) {
+        const ctx = audioCtxRef.current;
+        const gain = gainNodeRef.current;
+        gain.gain.setValueAtTime(gain.gain.value, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+        setTimeout(() => {
+          if (ctx.state !== 'closed') ctx.close();
+          audioCtxRef.current = null;
+        }, 300);
+      }
+    }
+
+    return () => {
+      // Cleanup on unmount
+      if (audioCtxRef.current && audioCtxRef.current.state !== 'closed') {
+        audioCtxRef.current.close();
+        audioCtxRef.current = null;
+      }
+    };
+  }, [isTransitioning]);
+
   useEffect(() => {
     const timer = setTimeout(() => setSceneEstablished(true), 50);
     return () => clearTimeout(timer);
@@ -96,11 +279,16 @@ export default function HeroSection() {
   });
 
   return (
-    <section ref={containerRef} className={styles.hero} id="hero" data-nav-section="hero">
+    <section 
+      ref={containerRef} 
+      className={styles.hero} 
+      id="hero" 
+      data-nav-section="hero"
+    >
       {/* ========================================
           ATMOSPHERE SYSTEM — The Projection Environment
           ======================================== */}
-      <div className={styles.heroBg}>
+      <div className={`${styles.heroBg} ${isTransitioning ? styles.heroBgBlue : ''}`}>
         {/* Foundational layers */}
         <div className={styles.heroFilmGrain} aria-hidden="true" />
         <div className={styles.heroVignette} aria-hidden="true" />
@@ -125,7 +313,7 @@ export default function HeroSection() {
             }}
           >
             {/* Projection Beam — off-screen source illumination */}
-            <div className={styles.projectionBeam}>
+            <div className={`${styles.projectionBeam} ${transitionState === 'accel1' ? styles.lightSurge : ''}`}>
               <div className={styles.projectionSourceRays} />
               <div className={styles.beamCore} />
               <div className={styles.beamFlare} />
@@ -165,7 +353,8 @@ export default function HeroSection() {
       {/* ========================================
           MAIN CONTENT CONTAINER
           ======================================== */}
-      <div className={styles.heroInner}>
+      <div className={`${styles.heroInner} ${transitionState === 'accel3' ? styles.heroShake : ''} ${transitionState === 'flash' || transitionState === 'intro' ? styles.hidden : ''}`}>
+        
         {/* --- Left: Content Block --- */}
         <motion.div 
           className={styles.heroContent}
@@ -191,24 +380,38 @@ export default function HeroSection() {
           </p>
 
           <motion.a 
+            ref={ctaRef}
             href="#about" 
-            className={styles.heroCta}
-            whileHover={{ 
+            className={`${styles.heroCta} ${isTransitioning ? styles.heroCtaActive : ''}`}
+            onClick={(e) => {
+              e.preventDefault();
+              if (onExploreClick && !isTransitioning) onExploreClick();
+            }}
+            whileHover={!isTransitioning ? { 
               boxShadow: "0 0 32px rgba(255, 200, 100, 0.15), inset 0 1px 0 rgba(255, 240, 200, 0.15)",
               borderColor: "rgba(255, 210, 140, 0.3)",
               backgroundColor: "rgba(255, 255, 255, 0.04)"
-            }}
+            } : undefined}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            style={{ pointerEvents: isTransitioning ? 'none' : 'auto' }}
           >
-            <svg 
-              className={styles.ctaIcon}
-              viewBox="0 0 24 24" 
-              fill="currentColor"
-              aria-hidden="true"
-            >
-              <polygon points="8,5 19,12 8,19" />
-            </svg>
-            Explore
+            {isTransitioning ? (
+              <div className={styles.loadingDots}>
+                <span>.</span><span>.</span><span>.</span>
+              </div>
+            ) : (
+              <>
+                <svg 
+                  className={styles.ctaIcon}
+                  viewBox="0 0 24 24" 
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <polygon points="8,5 19,12 8,19" />
+                </svg>
+                Explore
+              </>
+            )}
           </motion.a>
         </motion.div>
 
@@ -217,7 +420,8 @@ export default function HeroSection() {
           className={styles.heroReelSide}
           style={{ y: reelY }}
         >
-          <FilmReel atmosphereOpacity={breathOpacity} />
+          {/* The Actual Reel Component */}
+          <FilmReel transitionState={transitionState} />
         </motion.div>
       </div>
 
@@ -229,6 +433,37 @@ export default function HeroSection() {
       >
         <div className={styles.scrollLine} />
       </motion.div>
+
+      {/* Electricity Arc Overlay */}
+      <div className={`${styles.lightningOverlay} ${lightningPaths ? styles.active : ''}`}>
+        {lightningPaths && (
+          <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <filter id="electricityGlow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="6" result="blur1" />
+                <feGaussianBlur stdDeviation="15" result="blur2" />
+                <feGaussianBlur stdDeviation="30" result="blur3" />
+                <feMerge>
+                  <feMergeNode in="blur3" />
+                  <feMergeNode in="blur2" />
+                  <feMergeNode in="blur1" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+            </defs>
+            
+            {/* Main Arc */}
+            <path className={styles.lightningGlow} d={lightningPaths.main} />
+            <path className={styles.lightningCoreSecondary} d={lightningPaths.main} />
+            <path className={styles.lightningCore} d={lightningPaths.main} />
+            
+            {/* Microscopic sparks hugging the beam */}
+            {lightningPaths.sparks.map((spark, i) => (
+              <circle key={i} cx={spark.cx} cy={spark.cy} r={spark.r} fill="#ffffff" opacity={spark.opacity} filter="url(#electricityGlow)" />
+            ))}
+          </svg>
+        )}
+      </div>
     </section>
   );
 }

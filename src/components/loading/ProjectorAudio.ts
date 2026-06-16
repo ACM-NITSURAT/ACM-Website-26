@@ -22,6 +22,7 @@
    2.5s  — NIT SURAT: Soft text appear
    2.8s  — Lock-in: Deep resonant THUD
    3.65s — Reveal: Cinematic swell outward
+   [Explore] — Acceleration whir
    ============================================================ */
 
 type AudioNodes = {
@@ -573,6 +574,134 @@ export function playRevealSwell(): void {
 }
 
 // ================================================================
+// 9. ACCELERATION WHIR — reel speeding up on "Explore"
+// ================================================================
+export function playAccelerationWhir(duration: number = 1.8): void {
+  if (!audioNodes) return;
+  const { ctx, master } = audioNodes;
+  const t = ctx.currentTime;
+
+  // Rich, motorcycle/engine hum using two detuned sawtooth oscillators
+  const osc1 = ctx.createOscillator();
+  const osc2 = ctx.createOscillator();
+  osc1.type = 'sawtooth';
+  osc2.type = 'sawtooth';
+  
+  // Pitch rises like a heavy engine accelerating (30Hz to 180Hz)
+  osc1.frequency.setValueAtTime(30, t);
+  osc1.frequency.exponentialRampToValueAtTime(180, t + duration);
+  
+  osc2.frequency.setValueAtTime(30.5, t); // Slight detune for thickness
+  osc2.frequency.exponentialRampToValueAtTime(183, t + duration);
+
+  const engineLP = ctx.createBiquadFilter();
+  engineLP.type = 'lowpass';
+  // Filter opens up as it accelerates, creating a "revving" effect
+  engineLP.frequency.setValueAtTime(100, t);
+  engineLP.frequency.exponentialRampToValueAtTime(800, t + duration);
+  engineLP.Q.value = 2; // Slight resonance
+
+  const engineGain = ctx.createGain();
+  engineGain.gain.setValueAtTime(0, t);
+  engineGain.gain.linearRampToValueAtTime(0.12, t + 0.3); // Smooth fade in
+  engineGain.gain.setValueAtTime(0.12, t + duration);
+  engineGain.gain.linearRampToValueAtTime(0, t + duration + 0.3); // Smooth fade out
+
+  osc1.connect(engineLP);
+  osc2.connect(engineLP);
+  engineLP.connect(engineGain);
+  engineGain.connect(master);
+  
+  osc1.start(t);
+  osc2.start(t);
+  osc1.stop(t + duration + 0.5);
+  osc2.stop(t + duration + 0.5);
+
+  // Add a very subtle "turbine" sine wave layer for that high-end EV sound
+  const turbine = ctx.createOscillator();
+  turbine.type = 'sine';
+  turbine.frequency.setValueAtTime(100, t);
+  turbine.frequency.exponentialRampToValueAtTime(800, t + duration);
+  
+  const turbineGain = ctx.createGain();
+  turbineGain.gain.setValueAtTime(0, t);
+  turbineGain.gain.linearRampToValueAtTime(0.04, t + 0.4);
+  turbineGain.gain.setValueAtTime(0.04, t + duration);
+  turbineGain.gain.linearRampToValueAtTime(0, t + duration + 0.3);
+
+  turbine.connect(turbineGain);
+  turbineGain.connect(master);
+  
+  turbine.start(t);
+  turbine.stop(t + duration + 0.5);
+}
+
+// ================================================================
+// 10. LIGHT FLASH — subtle, mature cinematic flash
+// ================================================================
+export function playLightFlash(): void {
+  if (!audioNodes) return;
+  const { ctx, master } = audioNodes;
+  const t = ctx.currentTime;
+
+  // 1. Deep cinematic sub-drop (mature, modern bass)
+  const sub = ctx.createOscillator();
+  sub.type = 'sine';
+  sub.frequency.setValueAtTime(90, t);
+  sub.frequency.exponentialRampToValueAtTime(20, t + 0.6);
+  
+  const subEnv = ctx.createGain();
+  subEnv.gain.setValueAtTime(0, t);
+  subEnv.gain.linearRampToValueAtTime(0.4, t + 0.02);
+  subEnv.gain.exponentialRampToValueAtTime(0.001, t + 0.6);
+  
+  sub.connect(subEnv);
+  subEnv.connect(master);
+  sub.start(t);
+  sub.stop(t + 0.7);
+
+  // 2. Soft, warm air displacement (low-passed noise)
+  const air = ctx.createBufferSource();
+  air.buffer = createNoiseBuffer(ctx, 0.4);
+  
+  const airLP = ctx.createBiquadFilter();
+  airLP.type = 'lowpass';
+  airLP.frequency.setValueAtTime(400, t);
+  airLP.frequency.exponentialRampToValueAtTime(100, t + 0.3);
+  
+  const airEnv = ctx.createGain();
+  airEnv.gain.setValueAtTime(0, t);
+  airEnv.gain.linearRampToValueAtTime(0.08, t + 0.02);
+  airEnv.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
+  
+  air.connect(airLP);
+  airLP.connect(airEnv);
+  airEnv.connect(master);
+  air.start(t);
+  air.stop(t + 0.5);
+
+  // 3. Crisp mechanical shutter click (very short, muted)
+  const click = ctx.createBufferSource();
+  click.buffer = createNoiseBuffer(ctx, 0.02);
+  
+  const clickBP = ctx.createBiquadFilter();
+  clickBP.type = 'bandpass';
+  clickBP.frequency.value = 1200;
+  clickBP.Q.value = 2;
+  
+  const clickEnv = ctx.createGain();
+  clickEnv.gain.setValueAtTime(0, t);
+  clickEnv.gain.linearRampToValueAtTime(0.1, t + 0.001);
+  clickEnv.gain.exponentialRampToValueAtTime(0.001, t + 0.02);
+  
+  click.connect(clickBP);
+  clickBP.connect(clickEnv);
+  clickEnv.connect(master);
+  click.start(t);
+  click.stop(t + 0.03);
+}
+
+// ================================================================
 // Master volume & cleanup
 // ================================================================
 
@@ -586,12 +715,16 @@ export function setMasterVolume(volume: number): void {
   );
 }
 
+export function getMasterVolume(): number {
+  if (!audioNodes) return 1;
+  return audioNodes.master.gain.value;
+}
+
 export function disposeAudio(): void {
   if (!audioNodes) return;
   stopProjectorHum();
   stopBeamSound();
   stopFilmWhir();
-  try { audioNodes.ctx.close(); } catch { /* already closed */ }
-  audioNodes = null;
-  isInitialized = false;
+  // We no longer close the AudioContext or nullify audioNodes
+  // because the site continues to use the audio engine (e.g. Explore acceleration whir)
 }

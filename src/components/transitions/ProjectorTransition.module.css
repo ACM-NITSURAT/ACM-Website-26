@@ -1,0 +1,158 @@
+/* ============================================================
+   PROJECTOR TRANSITION LAYERS
+   ============================================================ */
+
+/* --- Flicker Overlay --- */
+.flickerOverlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(255, 240, 180, 0.12);
+  pointer-events: none;
+  z-index: 999; /* Highest layer */
+  opacity: 0;
+  mix-blend-mode: screen;
+}
+
+.flickerActive {
+  animation: projectorFlicker 400ms linear;
+  animation-fill-mode: both;
+}
+
+@keyframes projectorFlicker {
+  0% { opacity: 0; }
+  10% { opacity: 0.18; }
+  22% { opacity: 0; }
+  38% { opacity: 0.10; }
+  55% { opacity: 0; }
+  72% { opacity: 0.06; }
+  100% { opacity: 0; }
+}
+/* --- Cinematic Flash (Projector Bulb turning on) --- */
+.cinematicFlash {
+  position: fixed;
+  top: var(--oy, 50vh);
+  left: var(--ox, 50vw);
+  width: 250vmax;
+  height: 250vmax;
+  transform: translate(-50%, -50%) scale(0);
+  background: radial-gradient(circle closest-side, rgba(255, 240, 180, 0.4) 0%, rgba(201, 168, 76, 0.15) 50%, transparent 100%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  mix-blend-mode: screen;
+}
+
+.cinematicFlashActive {
+  animation: projectorFlashAnim 500ms cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
+@keyframes projectorFlashAnim {
+  0% { 
+    transform: translate(-50%, -50%) scale(0); 
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  60% { 
+    transform: translate(-50%, -50%) scale(1); 
+    opacity: 1; 
+  }
+  100% { 
+    transform: translate(-50%, -50%) scale(1.2); 
+    opacity: 0; 
+  }
+}
+
+.flashWhiteout {
+  position: fixed;
+  inset: 0;
+  background: rgba(201, 168, 76, 0.15); /* Soft gold tint */
+  backdrop-filter: blur(40px) brightness(1.5);
+  -webkit-backdrop-filter: blur(40px) brightness(1.5);
+  z-index: 9998;
+  pointer-events: none;
+}
+
+.flashWhiteoutActive {
+  animation: whiteoutAnim 500ms forwards;
+}
+
+@keyframes whiteoutAnim {
+  0% { opacity: 0; }
+  30% { opacity: 0; }
+  60% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* --- Film Strip Pull-Down --- */
+.filmStripPullDown {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 35vh; /* Covers roughly 30-35% of the screen */
+  background: #000;
+  z-index: 50; /* Above hero background, below flicker */
+  pointer-events: none;
+  transform: translateY(-100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.filmStripPullDownActive {
+  /* Using keyframes to ensure it holds state based on animation-fill-mode */
+  animation: pullDown 500ms ease-in;
+  animation-fill-mode: both;
+}
+
+@keyframes pullDown {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(0); }
+}
+
+/* Sprocket holes along top and bottom edges of the pull-down strip */
+.sprockets {
+  height: 12px;
+  width: 100%;
+  background-image: radial-gradient(circle, transparent 4px, #000 4px);
+  background-size: 16px 12px;
+  background-position: center;
+  background-repeat: repeat-x;
+  background-color: rgba(255, 255, 255, 0.1); /* To make holes transparent against background */
+  /* Wait, if background is black, transparent holes will just show what's behind the strip. */
+  /* We can use CSS mask to punch holes in the black strip */
+}
+
+/* Since the main background is #000, we can use mask to punch the holes */
+.filmStripPullDown {
+  background: #040404;
+  -webkit-mask-image: 
+    radial-gradient(circle at 8px 6px, transparent 3px, black 3.5px),
+    radial-gradient(circle at 8px calc(100% - 6px), transparent 3px, black 3.5px),
+    linear-gradient(black, black);
+  -webkit-mask-size: 16px 12px, 16px 12px, 100% 100%;
+  -webkit-mask-repeat: repeat-x, repeat-x, no-repeat;
+  -webkit-mask-position: top left, bottom left, center;
+  -webkit-mask-composite: source-out, source-out, source-over;
+  mask-composite: subtract, subtract, add;
+}
+
+/* Empty frames inside the strip */
+.framesContainer {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 12px;
+  margin: 16px 0;
+}
+
+.frame {
+  flex: 1;
+  height: 100%;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.05); /* very faint ghost frames */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}

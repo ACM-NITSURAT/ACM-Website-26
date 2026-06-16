@@ -51,6 +51,7 @@ export default function CinemaLoader({ children }: CinemaLoaderProps) {
   const [loaderState, setLoaderState] = useState<'waiting' | 'playing' | 'complete' | 'hidden'>('waiting');
   const [isMuted, setIsMuted] = useState(false);
   const overlayRef = useRef<HTMLDivElement>(null);
+  const contentWrapperRef = useRef<HTMLDivElement>(null);
   const filmGrainRef = useRef<HTMLDivElement>(null);
   const vignetteRef = useRef<HTMLDivElement>(null);
   const logoContainerRef = useRef<HTMLDivElement>(null);
@@ -62,6 +63,11 @@ export default function CinemaLoader({ children }: CinemaLoaderProps) {
   const timelineRef = useRef<gsap.core.Timeline | null>(null);
   const hasSkippedRef = useRef(false);
   const isMutedRef = useRef(false);
+
+  const [assetsProgress, setAssetsProgress] = useState(0);
+  const [assetsLoaded, setAssetsLoaded] = useState(false);
+  const [isWaitingForAssets, setIsWaitingForAssets] = useState(false);
+  const assetsLoadedRef = useRef(false);
 
   const handleSkip = useCallback(() => {
     if (hasSkippedRef.current) return;
@@ -107,6 +113,72 @@ export default function CinemaLoader({ children }: CinemaLoaderProps) {
   useEffect(() => {
     if (loaderState !== 'playing') return;
 
+    // List of heavy assets to preload
+    const assetsToLoad = [
+      '/film-grain-35mm.avif',
+      '/dotslash/videoplayback.webm',
+      '/webp/DSC_1274.webp',
+      '/webp/DSC_2075.webp',
+      '/webp/DSC_2136.webp',
+      '/dotslash/DSC_2163 (1).webp',
+      '/webp/DSC_6725.webp',
+    ];
+
+    let loadedCount = 0;
+    let hasFinished = false;
+
+    const complete = () => {
+      if (hasFinished) return;
+      hasFinished = true;
+      setAssetsProgress(100);
+      setAssetsLoaded(true);
+      assetsLoadedRef.current = true;
+    };
+
+    const increment = () => {
+      if (hasFinished) return;
+      loadedCount++;
+      setAssetsProgress(Math.min(99, Math.floor((loadedCount / assetsToLoad.length) * 100)));
+      if (loadedCount >= assetsToLoad.length) {
+        complete();
+      }
+    };
+
+    assetsToLoad.forEach(src => {
+      if (src.endsWith('.webm')) {
+        const req = new XMLHttpRequest();
+        req.open('GET', src, true);
+        req.responseType = 'blob';
+        req.onload = increment;
+        req.onerror = increment;
+        req.send();
+      } else {
+        const img = new Image();
+        img.onload = increment;
+        img.onerror = increment;
+        img.src = src;
+      }
+    });
+
+    // Fallback: forcefully complete after 3.5 seconds so user doesn't get stuck
+    const fallback = setTimeout(complete, 3500);
+
+    return () => clearTimeout(fallback);
+  }, [loaderState]);
+
+  useEffect(() => {
+    if (assetsLoaded && isWaitingForAssets && timelineRef.current) {
+      setIsWaitingForAssets(false);
+      // Give it a tiny delay so the user sees "100%"
+      setTimeout(() => {
+        if (timelineRef.current) timelineRef.current.play();
+      }, 200);
+    }
+  }, [assetsLoaded, isWaitingForAssets]);
+
+  useEffect(() => {
+    if (loaderState !== 'playing') return;
+
     setMasterVolume(isMutedRef.current ? 0 : 1);
 
     const prefersReducedMotion = window.matchMedia(
@@ -145,7 +217,7 @@ export default function CinemaLoader({ children }: CinemaLoaderProps) {
       return;
     }
 
-    // --- Full cinematic animation ---
+      // --- Full cinematic animation ---
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({
         onComplete: () => setLoaderState('hidden'),
@@ -154,6 +226,7 @@ export default function CinemaLoader({ children }: CinemaLoaderProps) {
       timelineRef.current = tl;
 
       const overlay = overlayRef.current;
+      const contentWrapper = contentWrapperRef.current;
       const filmGrain = filmGrainRef.current;
       const vignette = vignetteRef.current;
       const logoContainer = logoContainerRef.current;
@@ -169,13 +242,16 @@ export default function CinemaLoader({ children }: CinemaLoaderProps) {
       const dust = dustRef.current;
 
       if (
-        !overlay || !filmGrain || !vignette || !logoContainer ||
+        !overlay || !contentWrapper || !filmGrain || !vignette || !logoContainer ||
         !skipBtn || !muteBtn || !body || !lens || !beam || !beamRays ||
         !ambient || !projection || !hotspot
       ) {
         setLoaderState('hidden');
         return;
       }
+
+      // Pre-set the hero section to be pushed back and blurred
+      gsap.set(contentWrapper, { scale: 0.9, filter: 'blur(15px)' });
 
       // ==========================================
       // SCENE 1 — Darkness (0.00 - 0.30s)
@@ -492,6 +568,14 @@ export default function CinemaLoader({ children }: CinemaLoaderProps) {
         dust?.burst();
       }, [], 3.80);
 
+      // Pause here to wait for actual asset loading
+      tl.add(() => {
+        if (!assetsLoadedRef.current && !hasSkippedRef.current) {
+          setIsWaitingForAssets(true);
+          tl.pause();
+        }
+      }, 3.90);
+
       // ==========================================
       // SCENE 11 — Projected Into Existence (4.00 - 4.70s)
       // Website revealed inside projection
@@ -527,14 +611,20 @@ export default function CinemaLoader({ children }: CinemaLoaderProps) {
       // Projector body fades
       tl.to(body, { opacity: 0, duration: 0.25, ease: 'power1.out' }, 4.10);
 
-      // Overlay circle-wipes away — tighter for impact
-      tl.fromTo(overlay, {
-        clipPath: 'circle(150% at 50% 50%)',
-      }, {
-        clipPath: 'circle(0% at 50% 50%)',
-        duration: 0.55,
-        ease: 'power3.inOut',
-      }, 4.10);
+      // Hero Section Zoom-In / Parallax Push Forward
+      tl.to(contentWrapper, {
+        scale: 1,
+        filter: 'blur(0px)',
+        duration: 1.5,
+        ease: 'power3.out',
+      }, 4.00);
+
+      // The loading screen melts away smoothly
+      tl.to(overlay, {
+        opacity: 0,
+        duration: 0.8,
+        ease: 'power2.inOut',
+      }, 4.05);
 
       // Fade out projector elements
       tl.to([ambient, projection, hotspot], {
@@ -580,7 +670,7 @@ export default function CinemaLoader({ children }: CinemaLoaderProps) {
 
   return (
     <>
-      <div className={styles.contentWrapper}>{children}</div>
+      <div ref={contentWrapperRef} className={styles.contentWrapper}>{children}</div>
 
       <div
         ref={overlayRef}
@@ -620,6 +710,14 @@ export default function CinemaLoader({ children }: CinemaLoaderProps) {
 
         <div ref={logoContainerRef} className={styles.logoContainer}>
           <AcmLogoSvg ref={logoSvgRef} className={styles.logoSvg} />
+        </div>
+
+        {/* Cinematic Loading Bar */}
+        <div className={`${styles.loadingBarContainer} ${isWaitingForAssets ? styles.visible : ''}`}>
+          <div className={styles.loadingBarTrack}>
+            <div className={styles.loadingBarFill} style={{ width: `${assetsProgress}%` }} />
+          </div>
+          <div className={styles.loadingText}>LOADING ASSETS... {assetsProgress}%</div>
         </div>
 
         <button

@@ -59,6 +59,12 @@ export default function Navbar() {
   const [activeConeStyle, setActiveConeStyle] = useState<React.CSSProperties>({ opacity: 0 });
   const [hoverConeStyle, setHoverConeStyle] = useState<React.CSSProperties>({});
 
+  // Global navigation handler for cinematic transitions
+  const handleNavClick = useCallback((e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault();
+    window.dispatchEvent(new CustomEvent('nav-route-clicked', { detail: href }));
+  }, []);
+
   // Refs
   const navRef = useRef<HTMLElement>(null);
   const brandRef = useRef<HTMLAnchorElement>(null);
@@ -356,6 +362,7 @@ export default function Navbar() {
           className={styles.brandBlock}
           ref={brandRef}
           aria-label="ACM NIT SURAT — Home"
+          onClick={(e) => handleNavClick(e, '/')}
         >
           <svg viewBox="0 0 200 200" className={styles.brandLogo} aria-hidden="true">
             <defs>
@@ -413,6 +420,10 @@ export default function Navbar() {
                   ref={(el) => { linkRefs.current[i] = el; }}
                   onMouseEnter={() => setHoverIndex(i)}
                   onMouseLeave={() => setHoverIndex(null)}
+                  onClick={(e) => {
+                    handleNavClick(e, link.href);
+                    setIsMobileOpen(false);
+                  }}
                 >
                   {/* Scene Indicator */}
                   <span
@@ -493,7 +504,10 @@ export default function Navbar() {
                 <Link
                   href={link.href}
                   className={`${styles.mobileNavLink} ${isActive ? styles.active : ''}`}
-                  onClick={() => setIsMobileOpen(false)}
+                  onClick={(e) => {
+                    handleNavClick(e, link.href);
+                    setIsMobileOpen(false);
+                  }}
                 >
                   <span className={styles.mobileScene}>{link.scene}</span>
                   {link.label}

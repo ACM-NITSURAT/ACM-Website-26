@@ -22,9 +22,21 @@ import styles from './HeroSection.module.css';
 interface FilmReelProps {
   className?: string;
   atmosphereOpacity?: any; // MotionValue<number>
+  isSpinningUp?: boolean;
+  size?: number; // default 500
+  speedMultiplier?: number; // default 1
+  direction?: number; // 1 for clockwise, -1 for counter-clockwise
+  transitionState?: 'idle' | 'accel1' | 'accel2' | 'accel3' | 'flash' | 'intro' | 'reverseFlash' | 'reverseFlashHero';
 }
 
-export default function FilmReel({ className, atmosphereOpacity }: FilmReelProps) {
+export default function FilmReel({ 
+  className, 
+  atmosphereOpacity, 
+  transitionState = 'idle',
+  size = 500,
+  speedMultiplier = 1,
+  direction = 1
+}: FilmReelProps) {
   const CX = 250;
   const CY = 250;
   
@@ -58,7 +70,10 @@ export default function FilmReel({ className, atmosphereOpacity }: FilmReelProps
   const time = useMotionValue(0);
   const rotateTransform = useTransform(rotation, (r) => `${r}deg`);
   const isHovered = useRef(false);
-  const currentBaseSpeed = useRef(8); // degrees per second (360° / 45s)
+  const currentBaseSpeed = useRef(8 * speedMultiplier); // degrees per second (360° / 45s)
+  const isBlurActive = transitionState === 'accel2' || transitionState === 'accel3';
+  const isGlobalBlurActive = transitionState === 'accel3';
+  const accelStartTime = useRef<number | null>(null);
 
   /* ==========================================
      SCROLL-DRIVEN MOMENTUM
@@ -81,21 +96,44 @@ export default function FilmReel({ className, atmosphereOpacity }: FilmReelProps
   const scrollVelocity = useVelocity(scrollY);
 
   const smoothVelocity = useSpring(scrollVelocity, {
-    damping: 50,
-    stiffness: 40,
-    mass: 4
+    damping: 60,
+    stiffness: 30,
+    mass: 6
   });
 
   useAnimationFrame((t, delta) => {
     // Prevent huge delta spikes on tab switch
     const safeDelta = Math.min(delta, 100);
 
-    /* 1. Hover acceleration
-       Target: 20 deg/s on hover (2.5x idle), 8 deg/s off hover
-       Easing: 0.04 per frame → reaches target in ~1.5 seconds
-       This feels like a machine responding to proximity. */
-    const targetBaseSpeed = isHovered.current ? 20 : 8;
-    currentBaseSpeed.current += (targetBaseSpeed - currentBaseSpeed.current) * 0.04;
+    /* 1. Hover & Spin-up acceleration
+       If spinning up, we increment speed based on time elapsed since accel started.
+       This overrides hover. */
+    let targetBaseSpeed = (isHovered.current ? 20 : 8) * speedMultiplier;
+    let acceleration = 0.02; // Reduced from 0.04 for smoother hover transitions
+
+    const isAccelerating = ['accel1', 'accel2', 'accel3'].includes(transitionState);
+
+    if (isAccelerating) {
+      if (accelStartTime.current === null) {
+        accelStartTime.current = t;
+      }
+      const elapsed = t - accelStartTime.current;
+      
+      // Continuous smooth ease-in curve instead of sharp piecewise blocks
+      const maxSpeed = 2250; // Roughly 37.5 * 60 deg/s
+      const progress = Math.min(elapsed / 1800, 1);
+      
+      // easeInCubic provides a weighty, gradual start that builds up immense momentum
+      const easeInCubic = progress * progress * progress;
+      
+      const targetSpeed = (8 * speedMultiplier) + (maxSpeed * easeInCubic);
+      
+      // Interpolate for extreme smoothness, avoiding any immediate snaps
+      currentBaseSpeed.current += (targetSpeed - currentBaseSpeed.current) * 0.08;
+    } else {
+      accelStartTime.current = null; // Reset when idle
+      currentBaseSpeed.current += (targetBaseSpeed - currentBaseSpeed.current) * acceleration;
+    }
 
     /* 2. Scroll momentum injection
        smoothVelocity is pixels per second, damped by the spring.
@@ -105,7 +143,7 @@ export default function FilmReel({ className, atmosphereOpacity }: FilmReelProps
 
     /* 3. Apply total rotation
        delta is milliseconds since last frame. */
-    const moveBy = (currentBaseSpeed.current + scrollDelta) * (safeDelta / 1000);
+    const moveBy = (currentBaseSpeed.current + scrollDelta) * (safeDelta / 1000) * direction;
     rotation.set(rotation.get() + moveBy);
     
     /* 4. Sync global time for breathing effects */
@@ -127,6 +165,7 @@ export default function FilmReel({ className, atmosphereOpacity }: FilmReelProps
   return (
     <div 
       className={`${styles.filmReelContainer} ${className || ''}`} 
+      style={{ width: size, height: size }}
       aria-hidden="true"
       onMouseEnter={() => (isHovered.current = true)}
       onMouseLeave={() => (isHovered.current = false)}
@@ -142,9 +181,9 @@ export default function FilmReel({ className, atmosphereOpacity }: FilmReelProps
       {/* FIXED DIRECTIONAL LIGHTING SYSTEM (does NOT rotate)
           These layers sit stationary. As the metal geometry
           rotates beneath them, highlights slide across the surface. */}
-      <div className={styles.filmReelFixedLighting} />
+      <div className={`${styles.filmReelFixedLighting} ${transitionState !== 'idle' ? styles.blueLightTransition : ''}`} />
       <motion.div 
-        className={styles.reelRimCatchLight} 
+        className={`${styles.reelRimCatchLight} ${transitionState !== 'idle' ? styles.blueLightTransition : ''}`} 
         style={{ opacity: syncedOpacity }}
       />
       <div className={styles.reelCoreShadow} />
@@ -156,7 +195,7 @@ export default function FilmReel({ className, atmosphereOpacity }: FilmReelProps
       >
         <svg
           viewBox="0 0 500 500"
-          className={styles.filmReelSvg}
+          className={`${styles.filmReelSvg} ${isGlobalBlurActive ? styles.reelGlobalBlur : ''}`}
           xmlns="http://www.w3.org/2000/svg"
         >
           <defs>
@@ -274,23 +313,43 @@ export default function FilmReel({ className, atmosphereOpacity }: FilmReelProps
               LAYER 5: THE CLASSIC 6-HOLE HUB
               ======================================== */}
           <circle cx={CX} cy={CY} r="48" fill="url(#metal-chrome)" stroke="rgba(0,0,0,0.7)" strokeWidth="3" />
+          {/* Film Slot Circles (grouped to apply blur selectively) */}
+          <g className={`${styles.reelSlots} ${isBlurActive ? styles.reelSlotsBlur : ''}`}>
+            {cutouts.map((hole, i) => {
+               const px = Number((CX + 28 * Math.cos(hole.angle * Math.PI / 180)).toFixed(4));
+               const py = Number((CY + 28 * Math.sin(hole.angle * Math.PI / 180)).toFixed(4));
+               return (
+                 <g key={`hub-hole-${i}`}>
+                   <circle cx={px} cy={py} r="5" fill="#060708" />
+                   <circle cx={px} cy={py} r="5" fill="none" stroke="rgba(0,0,0,0.8)" strokeWidth="2" />
+                   <circle cx={px} cy={py} r="5" fill="none" stroke="url(#edge-highlight)" strokeWidth="0.8" />
+                 </g>
+               );
+            })}
+          </g>
+          <circle cx="250" cy="250" r="45" fill="url(#metalGradient)" filter="url(#dropShadow)" />
           
-          {/* 6 authentic drive/ventilation holes */}
-          {cutouts.map((hole, i) => {
-             const px = Number((CX + 28 * Math.cos(hole.angle * Math.PI / 180)).toFixed(4));
-             const py = Number((CY + 28 * Math.sin(hole.angle * Math.PI / 180)).toFixed(4));
-             return (
-               <g key={`hub-hole-${i}`}>
-                 <circle cx={px} cy={py} r="5" fill="#060708" />
-                 <circle cx={px} cy={py} r="5" fill="none" stroke="rgba(0,0,0,0.8)" strokeWidth="2" />
-                 <circle cx={px} cy={py} r="5" fill="none" stroke="url(#edge-highlight)" strokeWidth="0.8" />
-               </g>
-             );
-          })}
-
-          {/* Central Axle */}
-          <circle cx={CX} cy={CY} r="18" fill="none" stroke="rgba(0,0,0,0.9)" strokeWidth="4" />
-          <circle cx={CX} cy={CY} r="18" fill="none" stroke="url(#edge-highlight)" strokeWidth="1.5" />
+          {/* Pre-flash cinematic expanding ring (Stage 3) */}
+          <circle 
+            cx="250" 
+            cy="250" 
+            r="45" 
+            fill="none" 
+            stroke="url(#accentGradient)" 
+            strokeWidth="2" 
+            className={`${styles.preFlashRing} ${transitionState === 'accel3' ? styles.preFlashRingActive : ''} ${transitionState !== 'idle' ? styles.blueLightTransition : ''}`} 
+          />
+          
+          {/* Pulsing Gold Glow (Stage 2 and 3) */}
+          <circle 
+            cx="250" 
+            cy="250" 
+            r="80" 
+            fill="url(#accentGradient)" 
+            className={`${styles.centralGlow} ${transitionState === 'accel2' ? styles.glowStage2 : ''} ${transitionState === 'accel3' ? styles.glowStage3 : ''} ${transitionState !== 'idle' ? styles.blueLightTransition : ''}`} 
+          />
+          
+          <circle data-reel-hub="true" cx="250" cy="250" r="20" fill="#0A0908" stroke="url(#edge-highlight)" strokeWidth="1.5" />
           <circle cx={CX} cy={CY} r="13" fill="#0a0a0c" />
           
         </svg>
