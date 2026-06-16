@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { loginWithEmail, signInWithGoogle, callSessionApi } from '@/lib/firebase';
 import { FirebaseError } from 'firebase/app';
 
@@ -10,6 +11,13 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
+  async function afterSignIn() {
+    const { role, isOnboardingCompleted } = await callSessionApi();
+    console.log('[Login] role:', role, '| onboarding done:', isOnboardingCompleted);
+    router.replace(isOnboardingCompleted ? '/profile' : '/onboarding');
+  }
 
   async function handleEmailLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -18,8 +26,7 @@ export default function LoginPage() {
     try {
       const credential = await loginWithEmail(email, password);
       console.log('[Login] Firebase credential:', credential);
-      const role = await callSessionApi();
-      console.log('[Login] resolved role:', role);
+      await afterSignIn();
     } catch (err) {
       setError(err instanceof FirebaseError ? err.message : 'Login failed.');
     } finally {
@@ -33,8 +40,7 @@ export default function LoginPage() {
     try {
       const credential = await signInWithGoogle();
       console.log('[Google Login] Firebase credential:', credential);
-      const role = await callSessionApi();
-      console.log('[Google Login] resolved role:', role);
+      await afterSignIn();
     } catch (err) {
       setError(err instanceof FirebaseError ? err.message : 'Google sign-in failed.');
     } finally {

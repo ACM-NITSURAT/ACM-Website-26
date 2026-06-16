@@ -14,6 +14,11 @@ export interface AppClaims {
   role: Role;
 }
 
+export interface SyncUserResult {
+  role: Role;
+  isOnboardingCompleted: boolean;
+}
+
 // ── Role resolution ───────────────────────────────────────────────────────────
 
 /**
@@ -57,9 +62,9 @@ async function resolveRole(email: string, existingRole?: Role): Promise<Role> {
  *
  * isSuperAdmin is NEVER written to claims — always read server-side from Firestore.
  *
- * @returns The resolved role written to both Firestore and the JWT claim.
+ * @returns SyncUserResult — resolved role and onboarding status.
  */
-export async function syncUser(token: DecodedIdToken): Promise<Role> {
+export async function syncUser(token: DecodedIdToken): Promise<SyncUserResult> {
   const { uid, email, name, picture } = token;
 
   if (!email) throw new Error(`Token for uid ${uid} has no email claim.`);
@@ -82,10 +87,12 @@ export async function syncUser(token: DecodedIdToken): Promise<Role> {
       firstName,
       lastName,
       email:                email.toLowerCase().trim(),
-      rollNumber:           '',
+      rollNumber:           email.split('@')[0].toLowerCase(),
       gender:               'other',
       profileImageUrl:      picture ?? '',
       role,
+      position:             null,
+      isOnboardingCompleted: false,
       isSuperAdmin:         false,
       registrationTimestamp: FieldValue.serverTimestamp() as never,
     };
@@ -101,7 +108,11 @@ export async function syncUser(token: DecodedIdToken): Promise<Role> {
   const claims: AppClaims = { role };
   await getAuth(adminApp).setCustomUserClaims(uid, claims);
 
-  return role;
+  const isOnboardingCompleted = snap.exists
+    ? ((snap.data() as Partial<User>).isOnboardingCompleted ?? false)
+    : false;
+
+  return { role, isOnboardingCompleted };
 }
 
 // ── Token verification ────────────────────────────────────────────────────────

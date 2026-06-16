@@ -1,27 +1,28 @@
 'use client';
 
 import { auth } from './auth';
-import type { AppClaims } from '@/lib/firebase-admin/auth';
+import type { AppClaims, SyncUserResult } from '@/lib/firebase-admin/auth';
 
 type Role = AppClaims['role'];
+
+export interface SessionResult {
+  role: Role | null;
+  isOnboardingCompleted: boolean;
+}
 
 /**
  * Calls POST /api/auth/session with the current user's ID token.
  *
- * This triggers server-side:
+ * Triggers server-side:
  *  - Firestore user document creation (first sign-in) or role re-check.
  *  - Custom claim write (role → JWT).
  *
- * After this resolves, we force-refresh the token so the client's next
- * getIdTokenResult() call returns a JWT that already contains the role.
- *
- * Call this immediately after every sign-in or registration.
- *
- * @returns The role resolved by the server.
+ * Force-refreshes the token after so useAuth() immediately reads the new role.
+ * Returns role and isOnboardingCompleted so the caller can redirect accordingly.
  */
-export async function callSessionApi(): Promise<Role | null> {
+export async function callSessionApi(): Promise<SessionResult> {
   const user = auth.currentUser;
-  if (!user) return null;
+  if (!user) return { role: null, isOnboardingCompleted: false };
 
   const idToken = await user.getIdToken();
 
@@ -33,14 +34,13 @@ export async function callSessionApi(): Promise<Role | null> {
 
   if (!res.ok) {
     console.error('[callSessionApi] server returned', res.status);
-    return null;
+    return { role: null, isOnboardingCompleted: false };
   }
 
-  const { role } = await res.json() as { role: Role };
+  const data = await res.json() as SyncUserResult;
 
-  // Force-refresh the JWT so the new claim is immediately available
-  // in the client's next getIdTokenResult() call (used by useAuth).
+  // Force-refresh so useAuth picks up the updated role claim immediately.
   await user.getIdToken(/* forceRefresh */ true);
 
-  return role;
+  return { role: data.role, isOnboardingCompleted: data.isOnboardingCompleted };
 }

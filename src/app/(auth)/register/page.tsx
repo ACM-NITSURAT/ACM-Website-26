@@ -2,8 +2,12 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { registerWithEmail, signInWithGoogle, callSessionApi } from '@/lib/firebase';
 import { FirebaseError } from 'firebase/app';
+import { isValidSvnitEmail, SVNIT_EMAIL_ERROR } from '@/lib/validators/email';
+
+const devMode = process.env.NEXT_PUBLIC_DEV_MODE === 'true';
 
 export default function RegisterPage() {
   const [email, setEmail] = useState('');
@@ -12,22 +16,24 @@ export default function RegisterPage() {
   const [error, setError] = useState('');
   const [done, setDone] = useState(false);
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
+  async function afterSignIn() {
+    const { role, isOnboardingCompleted } = await callSessionApi();
+    console.log('[Register] role:', role, '| onboarding done:', isOnboardingCompleted);
+    if (!isOnboardingCompleted) router.replace('/onboarding');
+  }
 
   async function handleRegister(e: React.FormEvent) {
     e.preventDefault();
     setError('');
-
-    if (password !== confirm) {
-      setError('Passwords do not match.');
-      return;
-    }
-
+    if (password !== confirm) { setError('Passwords do not match.'); return; }
+    if (!isValidSvnitEmail(email, devMode)) { setError(SVNIT_EMAIL_ERROR); return; }
     setLoading(true);
     try {
       const credential = await registerWithEmail(email, password);
       console.log('[Register] Firebase credential:', credential);
-      const role = await callSessionApi();
-      console.log('[Register] resolved role:', role);
+      await afterSignIn();
       setDone(true);
     } catch (err) {
       setError(err instanceof FirebaseError ? err.message : 'Registration failed.');
@@ -42,8 +48,7 @@ export default function RegisterPage() {
     try {
       const credential = await signInWithGoogle();
       console.log('[Google Register] Firebase credential:', credential);
-      const role = await callSessionApi();
-      console.log('[Google Register] resolved role:', role);
+      await afterSignIn();
     } catch (err) {
       setError(err instanceof FirebaseError ? err.message : 'Google sign-in failed.');
     } finally {
@@ -92,8 +97,11 @@ export default function RegisterPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="bg-zinc-900 border border-zinc-700 rounded-md px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-500"
-            placeholder="you@example.com"
+            placeholder={!devMode ? 'u24ai091.aid@svnit.ac.in' : 'you@example.com'}
           />
+          {!devMode && (
+            <p className="text-xs text-zinc-500">Only @svnit.ac.in emails are accepted.</p>
+          )}
         </div>
 
         <div className="flex flex-col gap-1.5">
