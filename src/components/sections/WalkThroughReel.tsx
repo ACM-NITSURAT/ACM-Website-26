@@ -51,11 +51,13 @@ const S3_MEMORY_FRAMES = Array.from({ length: 24 }).map((_, i) => {
   // Multiply by speed so the slower back rows are packed tighter, 
   // ensuring we see the same number of images across all rows despite different scroll speeds.
   const rowIdx = Math.floor(i / 3);
-  const xOffset = 90 + (rowIdx * 38 * speed) + (Math.sin(i * 4.3) * 3); // in vw
+  const baseOffset = 90 + (Math.sin(i * 4.3) * 3); // in vw
+  const spacingMultiplier = rowIdx * speed;
+  const xOffset = baseOffset + (spacingMultiplier * 38); // fallback
 
   // Add organic vertical variation
   const yOffset = (Math.cos(i * 3.7) * 3); // in vh
-
+  
   // Slight rotation
   const rot = Math.sin(i * 2.1) * 8; // -8 to 8 deg
 
@@ -82,6 +84,8 @@ const S3_MEMORY_FRAMES = Array.from({ length: 24 }).map((_, i) => {
     id: `mem-${i}`,
     label: `RECORD ${String(i + 1).padStart(2, '0')}`,
     row,
+    baseOffset,
+    spacingMultiplier,
     xOffset,
     yOffset,
     rot,
@@ -659,7 +663,9 @@ export default function WalkThroughReel({ isVisible, onBack }: WalkThroughReelPr
       if (scene1Active && hallCameraRef.current) {
         const camScale = 1 - dolly * 0.34;
         const camY = dolly * 4.2;
-        const perspective = 1200 - dolly * 400; /* P1: 1200 → 800 — real camera pull-back */
+        const basePersp = window.innerWidth < 520 ? 700 : window.innerWidth < 860 ? 900 : 1200;
+        const dropPersp = window.innerWidth < 520 ? 250 : window.innerWidth < 860 ? 300 : 400;
+        const perspective = basePersp - dolly * dropPersp;
         hallCameraRef.current.style.transform = `perspective(${perspective}px) scale(${camScale}) translateY(${camY}vh)`;
       }
 
@@ -701,13 +707,15 @@ export default function WalkThroughReel({ isVisible, onBack }: WalkThroughReelPr
       if (scene1Active && hallWallLeftRef.current) {
         const spread = dolly * 16;
         const baseOp = 0.48 + dolly * 0.52;
-        hallWallLeftRef.current.style.transform = `perspective(900px) rotateY(14deg) translateX(${-spread}vw) scale(${1 + dolly * 0.22})`;
+        const wallPersp = window.innerWidth < 520 ? 600 : window.innerWidth < 860 ? 750 : 900;
+        hallWallLeftRef.current.style.transform = `perspective(${wallPersp}px) rotateY(14deg) translateX(${-spread}vw) scale(${1 + dolly * 0.22})`;
         hallWallLeftRef.current.style.opacity = String(baseOp * (1 - scene1Handoff * 0.9));
       }
       if (scene1Active && hallWallRightRef.current) {
         const spread = dolly * 16;
         const baseOp = 0.48 + dolly * 0.52;
-        hallWallRightRef.current.style.transform = `perspective(900px) rotateY(-14deg) translateX(${spread}vw) scale(${1 + dolly * 0.22})`;
+        const wallPersp = window.innerWidth < 520 ? 600 : window.innerWidth < 860 ? 750 : 900;
+        hallWallRightRef.current.style.transform = `perspective(${wallPersp}px) rotateY(-14deg) translateX(${spread}vw) scale(${1 + dolly * 0.22})`;
         hallWallRightRef.current.style.opacity = String(baseOp * (1 - scene1Handoff * 0.9));
       }
       if (scene1Active && hallFloorRef.current) {
@@ -725,7 +733,8 @@ export default function WalkThroughReel({ isVisible, onBack }: WalkThroughReelPr
       }
       if (scene1Active && cinemaSeatsRef.current) {
         const baseOp = 0.52 + dolly * 0.48;
-        cinemaSeatsRef.current.style.transform = `translateX(-50%) perspective(500px) rotateX(32deg) translateY(${-dolly * 42}px) scale(${1 + dolly * 0.14})`;
+        const seatPersp = window.innerWidth < 520 ? 350 : window.innerWidth < 860 ? 400 : 500;
+        cinemaSeatsRef.current.style.transform = `translateX(-50%) perspective(${seatPersp}px) rotateX(32deg) translateY(${-dolly * 42}px) scale(${1 + dolly * 0.14})`;
         cinemaSeatsRef.current.style.opacity = String(baseOp * (1 - scene1Handoff * 0.85));
       }
       if (scene1Active && theatreScreenRef.current) {
@@ -816,19 +825,23 @@ export default function WalkThroughReel({ isVisible, onBack }: WalkThroughReelPr
           }
         }
 
+        // Determine mobile layout for gallery positioning and parallax
+        const isMobile = window.innerWidth < 860;
+
         // Gallery moves up from below into view and scrolls through
         if (dotslashGalleryRef.current) {
           // Starts at 100vh (below screen) and moves up 200vh (to -100vh) to scroll through all 8 images
-          const galleryY = 100 - (scrollUpT * 200);
+          const startY = isMobile ? 80 : 100;
+          const galleryY = startY - (scrollUpT * 200);
           dotslashGalleryRef.current.style.transform = `translateY(${galleryY}vh)`;
           dotslashGalleryRef.current.style.opacity = String(smoothstep(0.60, 0.65, dsProgress));
         }
 
-        // Slight parallax for gallery images as user scrolls through them
+        // Slight parallax for gallery images as user scrolls through them (disable stagger on mobile 1-column)
         for (let i = 0; i < DOTSLASH_IMAGES.length; i++) {
           const el = dotslashImagesRef.current[i];
           if (!el) continue;
-          const parallax = (0.5 - dsProgress) * 30 * (i % 2 === 0 ? 1 : -0.5);
+          const parallax = isMobile ? 0 : (0.5 - dsProgress) * 30 * (i % 2 === 0 ? 1 : -0.5);
           el.style.transform = `translateY(${parallax}px)`;
         }
       }
@@ -866,17 +879,19 @@ export default function WalkThroughReel({ isVisible, onBack }: WalkThroughReelPr
           // Staggered convergence
           const staggeredT = clamp01((convergeT - tile.delay * 0.2) / (1 - tile.delay * 0.2));
           const ease = 1 - Math.pow(1 - staggeredT, 3); // easeOutCubic
+          
+          const mScale = window.innerWidth < 520 ? 2.8 : window.innerWidth < 860 ? 1.8 : 1;
 
           // Interpolate scatter → grid
-          const x = tile.scatterX * (1 - ease) + tile.gridX * ease;
-          const y = tile.scatterY * (1 - ease) + tile.gridY * ease;
+          const x = (tile.scatterX * (1 - ease) + tile.gridX * ease) * mScale;
+          const y = (tile.scatterY * (1 - ease) + tile.gridY * ease) * mScale;
 
           const rot = tile.scatterRot * (1 - ease);
 
           // When forming the diamond, scale down to target Grid scale
-          const targetGridScale = 0.26;
+          const targetGridScale = 0.26 * mScale;
           // Animate the tiles shrinking into the logo stroke as they dissolve
-          const scale = (tile.scatterScale * (1 - ease) + targetGridScale * ease) * (1 - dissolveT * 0.8);
+          const scale = (tile.scatterScale * mScale * (1 - ease) + targetGridScale * ease) * (1 - dissolveT * 0.8);
 
           const opacity = ease * (1 - dissolveT);
 
@@ -1631,8 +1646,8 @@ export default function WalkThroughReel({ isVisible, onBack }: WalkThroughReelPr
                   key={frame.id}
                   className={styles.memoryFrame}
                   style={{
-                    left: `${8 + frame.xOffset}vw`,
-                    top: `${8 + frame.yOffset}vh`,
+                    left: `calc(${8 + frame.baseOffset}vw + calc(var(--s3-gap, 38vw) * ${frame.spacingMultiplier}))`,
+                    top: `calc(var(--s3-row0-y, 8vh) + ${frame.yOffset}vh)`,
                     transform: `scale(${frame.scale * 0.8}) rotate(${frame.rot}deg)`,
                     opacity: 0.3
                   }}
@@ -1663,8 +1678,8 @@ export default function WalkThroughReel({ isVisible, onBack }: WalkThroughReelPr
                   key={frame.id}
                   className={styles.memoryFrame}
                   style={{
-                    left: `${8 + frame.xOffset}vw`,
-                    top: `${36 + frame.yOffset}vh`,
+                    left: `calc(${8 + frame.baseOffset}vw + calc(var(--s3-gap, 38vw) * ${frame.spacingMultiplier}))`,
+                    top: `calc(var(--s3-row1-y, 36vh) + ${frame.yOffset}vh)`,
                     transform: `scale(${frame.scale}) rotate(${frame.rot}deg)`,
                     opacity: 0.6
                   }}
@@ -1695,8 +1710,8 @@ export default function WalkThroughReel({ isVisible, onBack }: WalkThroughReelPr
                   key={frame.id}
                   className={styles.memoryFrame}
                   style={{
-                    left: `${8 + frame.xOffset}vw`,
-                    top: `${64 + frame.yOffset}vh`,
+                    left: `calc(${8 + frame.baseOffset}vw + calc(var(--s3-gap, 38vw) * ${frame.spacingMultiplier}))`,
+                    top: `calc(var(--s3-row2-y, 64vh) + ${frame.yOffset}vh)`,
                     transform: `scale(${frame.scale * 1.2}) rotate(${frame.rot}deg)`,
                     opacity: 1.0
                   }}
@@ -1846,10 +1861,6 @@ export default function WalkThroughReel({ isVisible, onBack }: WalkThroughReelPr
               completed={true}
               animatedBorders={true}
               className={styles.mosaicLogoSvg}
-              style={{
-                width: '22.8vw',
-                height: '22.8vw',
-              }}
             />
           </div>
 

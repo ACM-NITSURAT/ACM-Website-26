@@ -80,8 +80,20 @@ export default function HeroSection({ onExploreClick, isTransitioning, transitio
       if (!hub) return;
 
       const hubRect = hub.getBoundingClientRect();
-      const startX = ctaRect.right;
-      const startY = ctaRect.top + ctaRect.height / 2;
+      let startX: number;
+      let startY: number;
+
+      // Determine layout based on horizontal positioning
+      // If the Reel (hub) is to the right of the CTA button (Desktop)
+      if (hubRect.left > ctaRect.right - 40) {
+        startX = ctaRect.right; // Right center
+        startY = ctaRect.top + ctaRect.height / 2;
+      } else {
+        // If they are stacked vertically (Mobile)
+        startX = ctaRect.left + ctaRect.width / 2; // Top center
+        startY = ctaRect.top;
+      }
+
       const endX = hubRect.left + hubRect.width / 2;
       const endY = hubRect.top + hubRect.height / 2;
 

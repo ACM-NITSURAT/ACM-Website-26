@@ -1040,8 +1040,8 @@
     justify-content: center;
     align-items: center;
     text-align: center;
-    padding: 120px 32px 80px;
-    gap: 48px;
+    padding: 100px 32px 60px;
+    gap: 32px;
   }
 
   .heroContent {
@@ -1066,13 +1066,14 @@
   }
 
   .filmReelContainer {
-    width: 340px;
-    height: 340px;
+    width: clamp(280px, 45vw, 340px);
+    height: clamp(280px, 45vw, 340px);
   }
 
   .heroReelSide {
     order: -1;
     margin-right: 0;
+    margin-left: 0;
   }
 }
 
@@ -1081,8 +1082,8 @@
    ============================================================ */
 @media (max-width: 520px) {
   .heroInner {
-    padding: 100px 24px 60px;
-    gap: 36px;
+    padding: 80px 20px 40px;
+    gap: 24px;
   }
 
   .headlineLine {
@@ -1094,8 +1095,8 @@
   }
 
   .filmReelContainer {
-    width: 250px;
-    height: 250px;
+    width: min(260px, 60vw);
+    height: min(260px, 60vw);
   }
 
   .sceneIndicator {

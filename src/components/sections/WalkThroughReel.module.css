@@ -293,6 +293,47 @@
       rgba(75, 165, 228, 0.07) 100%);
 }
 
+/* ============================================================
+   RESPONSIVE — Scene 1 Mobile & Tablet Adjustments
+   ============================================================ */
+@media (max-width: 860px) {
+  .cinemaSeats {
+    width: 160%;
+    height: 40%;
+  }
+  .seatBankLeft, .seatBankRight {
+    width: 25%;
+  }
+}
+
+@media (max-width: 520px) {
+  .cinemaSeats {
+    width: 220%;
+    height: 35%;
+  }
+  .seatBankLeft, .seatBankRight {
+    width: 28%;
+  }
+  .hallWallLeft, .hallWallRight {
+    width: 35%;
+  }
+  .hallBackWall {
+    width: 100%;
+    left: 0%;
+  }
+  .exitSignLeft, .exitSignRight {
+    display: none; /* Too cluttered on mobile */
+  }
+  .wallSconce {
+    width: 8px;
+    height: 20px;
+  }
+  .projectorHousing {
+    width: 90px;
+    height: 45px;
+  }
+}
+
 /* --- Seat banks (sides) --- */
 .seatBankLeft,
 .seatBankRight {
@@ -1492,6 +1533,32 @@
   height: min(68vh, 540px);
 }
 
+/* ============================================================
+   RESPONSIVE — Scene 2
+   ============================================================ */
+@media (max-width: 860px) {
+  .beatMemory1 .filmFrame,
+  .beatMemory2 .filmFrame,
+  .beatMemory3 .filmFrame {
+    width: 85vw;
+    height: auto;
+    aspect-ratio: 4 / 3;
+  }
+}
+
+@media (max-width: 520px) {
+  .beatMemory1 .filmFrame,
+  .beatMemory2 .filmFrame,
+  .beatMemory3 .filmFrame {
+    width: 92vw;
+    height: auto;
+    aspect-ratio: 4 / 3;
+  }
+  .frameCaptionBar {
+    padding: 12px 14px 14px;
+  }
+}
+
 .beatEcho {
   z-index: 2;
   filter: blur(1px);
@@ -1517,6 +1584,21 @@
   letter-spacing: -0.03em;
   opacity: 0.92;
   will-change: letter-spacing, transform;
+}
+
+@media (max-width: 860px) {
+  .beatTextLine {
+    white-space: normal;
+    font-size: clamp(32px, 7vw, 48px);
+  }
+}
+
+@media (max-width: 520px) {
+  .beatTextLine {
+    white-space: normal;
+    font-size: clamp(28px, 10vw, 38px);
+    line-height: 1.1;
+  }
 }
 
 @keyframes kineticTracking {
@@ -1867,6 +1949,7 @@
   font-weight: 900;
   color: #ffffff;
   letter-spacing: 0.05em;
+  text-align: center;
   opacity: 0;
   transform: scale(0.82);
   transform-origin: center center;
@@ -1989,6 +2072,12 @@
   overflow: visible;
   /* Central radial glow */
   background: radial-gradient(circle at 50% 50%, rgba(37, 99, 235, 0.08) 0%, transparent 60%);
+  
+  /* Responsive grid variables */
+  --s3-gap: 38vw;
+  --s3-row0-y: 8vh;
+  --s3-row1-y: 36vh;
+  --s3-row2-y: 64vh;
 }
 
 /* Individual Parallax Rows */
@@ -2477,8 +2566,9 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 150vw;
-  height: 150vw;
+  width: 150vmax;
+  height: 150vmax;
+  border-radius: 50%;
   transform: translate(-50%, -50%);
   background: conic-gradient(from 0deg at 50% 50%,
       transparent 0deg,
@@ -2568,6 +2658,8 @@
 
 /* To give the logo a crisp, brilliant look against the dark */
 .mosaicLogoSvg {
+  width: 22.8vw;
+  height: 22.8vw;
   filter: drop-shadow(0 0 40px rgba(110, 181, 240, 0.3));
 }
 
@@ -2595,6 +2687,8 @@
   margin: 0;
   opacity: 0;
   will-change: transform, opacity;
+  text-align: center;
+  width: 90vw;
 }
 
 .mosaicCta {
@@ -2719,4 +2813,102 @@
 .imageOverlayClose:hover {
   background: rgba(255, 255, 255, 0.2);
   transform: scale(1.1);
+}
+
+/* ============================================================
+   RESPONSIVE — SCENE 3 & 4 (DOTSLASH)
+   ============================================================ */
+@media (max-width: 860px) {
+  .scene3MidText {
+    white-space: normal;
+    width: 90vw;
+  }
+  
+  .memoryStripContainer {
+    --s3-gap: 48vw;
+  }
+  
+  .memoryFrame {
+    width: min(35vw, 320px);
+  }
+  
+  .dotslashVideoContainer {
+    width: 90vw;
+  }
+  
+  .dotslashGallery {
+    padding: 5vh 2vw;
+  }
+  
+  .dotslashGalleryImgWrapper {
+    width: 42vw;
+    height: 30vw;
+  }
+  
+  .mosaicLogoSvg {
+    width: 41vw;
+    height: 41vw;
+  }
+  
+  .mosaicHeader {
+    bottom: calc(50% + 20.5vw + 30px);
+  }
+  
+  .mosaicFooter {
+    top: calc(50% + 20.5vw + 20px);
+  }
+}
+
+@media (max-width: 520px) {
+  .scene3MidText {
+    font-size: clamp(28px, 8vw, 42px);
+  }
+  
+  .scene3Punchline {
+    font-size: clamp(28px, 8vw, 42px);
+  }
+  
+  .memoryStripContainer {
+    --s3-gap: 55vw;
+    --s3-row0-y: 12vh;
+    --s3-row1-y: 40vh;
+    --s3-row2-y: 68vh;
+  }
+  
+  .memoryFrame {
+    width: min(42vw, 320px);
+  }
+  
+  .dotslashVideoContainer {
+    width: 95vw;
+    aspect-ratio: 16 / 9;
+  }
+  
+  .dotslashGalleryImgWrapper {
+    width: 90vw;
+    height: 60vw;
+  }
+  
+  .mosaicLogoSvg {
+    width: 64vw;
+    height: 64vw;
+  }
+  
+  .mosaicHeader {
+    bottom: calc(50% + 32vw + 30px);
+    font-size: clamp(24px, 6vw, 42px);
+  }
+  
+  .mosaicFooter {
+    top: calc(50% + 32vw + 20px);
+  }
+  
+  .imageOverlayContent {
+    max-height: 70vh;
+  }
+  
+  .imageOverlayClose {
+    top: -60px;
+    right: 0;
+  }
 }

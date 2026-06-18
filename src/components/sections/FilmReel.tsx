@@ -33,7 +33,7 @@ export default function FilmReel({
   className, 
   atmosphereOpacity, 
   transitionState = 'idle',
-  size = 500,
+  size,
   speedMultiplier = 1,
   direction = 1
 }: FilmReelProps) {
@@ -165,7 +165,7 @@ export default function FilmReel({
   return (
     <div 
       className={`${styles.filmReelContainer} ${className || ''}`} 
-      style={{ width: size, height: size }}
+      style={size ? { width: size, height: size } : undefined}
       aria-hidden="true"
       onMouseEnter={() => (isHovered.current = true)}
       onMouseLeave={() => (isHovered.current = false)}
