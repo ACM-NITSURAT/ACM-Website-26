@@ -1,0 +1,893 @@
+/* ============================================================
+   ABOUT SECTION — Cinematic tonal contrast
+   Normal scrolling, same visual world as WalkThroughReel.
+   Background: #07060a, fonts: var(--font-display), var(--font-body),
+   monospace via var(--font-geist-mono).
+   ============================================================ */
+
+.aboutSection {
+  position: relative;
+  width: 100%;
+  background: linear-gradient(to bottom, #070707 0%, #07060a 300px);
+  padding: 120px 80px;
+  overflow: hidden;
+  /* Normal scroll — NO position:sticky/fixed */
+}
+
+.contentWrap {
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+
+/* ============================================================
+   BACKGROUND ATMOSPHERE — Behind all content (z-index: 0-1)
+   Technical grid, ambient SVGs, drifting glows.
+   ============================================================ */
+
+.bgAtmosphere {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* 1. Faint technical blueprint grid */
+.bgGrid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(37, 99, 235, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(37, 99, 235, 0.08) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black 20%, transparent 80%);
+}
+
+/* 2. Living Wireframe Scene (Replaces ambient SVGs) */
+.wireframeSceneContainer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.wireframeStructure {
+  position: absolute;
+  will-change: transform, opacity;
+  transform-origin: center center;
+}
+
+/* 3. Massive Parallax Background Typography */
+.bgTypography {
+  position: absolute;
+  font-family: var(--font-display), 'Space Grotesk', sans-serif;
+  font-weight: 900;
+  font-size: clamp(80px, 15vw, 240px);
+  color: rgba(37, 99, 235, 0.05);
+  /* Increased slightly to be noticeable */
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  pointer-events: none;
+  will-change: transform;
+  z-index: -2;
+  /* Behind wireframes */
+  user-select: none;
+}
+
+/* 3. Drifting glow blobs */
+.bgGlow1,
+.bgGlow2 {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.bgGlow1 {
+  width: 600px;
+  height: 600px;
+  top: 8%;
+  left: -5%;
+  animation: driftSlow1 25s ease-in-out infinite alternate;
+}
+
+.bgGlow2 {
+  width: 500px;
+  height: 500px;
+  bottom: 12%;
+  right: -8%;
+  animation: driftSlow2 35s ease-in-out infinite alternate;
+}
+
+@keyframes driftSlow1 {
+  0% {
+    transform: translate(0, 0);
+  }
+
+  100% {
+    transform: translate(80px, 40px);
+  }
+}
+
+@keyframes driftSlow2 {
+  0% {
+    transform: translate(0, 0);
+  }
+
+  100% {
+    transform: translate(-60px, -50px);
+  }
+}
+
+/* ============================================================
+   BLOCK 1 — Title Card
+   ============================================================ */
+
+.block1 {
+  padding-bottom: 100px;
+  position: relative;
+  /* Remove max-width from Block1 container — text gets max-width, clapperboard fills right */
+}
+
+.block1Text {
+  max-width: 720px;
+}
+
+/* Modifier to flip the layout for Mission & Vision */
+.block1Reverse .block1Text {
+  margin-left: auto;
+  text-align: right;
+}
+.block1Reverse .titleRule {
+  margin-left: auto;
+  margin-right: 0;
+}
+
+/* Shared eyebrow label style */
+.eyebrow {
+  font-family: var(--font-geist-mono), 'Courier New', monospace;
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: rgba(37, 99, 235, 0.7);
+  margin: 0 0 20px;
+}
+
+.heading {
+  font-family: var(--font-display), 'Space Grotesk', sans-serif;
+  font-size: clamp(36px, 5vw, 64px);
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+  margin: 0 0 32px;
+  line-height: 1.1;
+}
+
+.missionParagraph {
+  font-family: var(--font-display), 'Space Grotesk', sans-serif;
+  font-size: clamp(18px, 2vw, 24px);
+  font-weight: 300;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.75);
+  max-width: 640px;
+  margin: 0 0 40px;
+}
+
+.titleRule {
+  width: 0;
+  height: 2px;
+  background: #2563eb;
+  transition: width 400ms ease-out;
+}
+
+.titleRuleVisible {
+  width: 64px;
+}
+
+/* Clapperboard positioning */
+.clapperboardWrap {
+  position: absolute;
+  right: 60px;
+  top: 50%;
+  transform: translateY(-50%) rotate(4deg);
+  filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.6));
+  z-index: 3;
+  opacity: 0;
+  transition: opacity 500ms ease-out 500ms;
+}
+
+.clapperboardVisible {
+  opacity: 1;
+}
+
+/* Left-aligned clapperboard for alternating layout */
+.clapperboardWrapLeft {
+  position: absolute;
+  left: 60px;
+  top: 50%;
+  transform: translateY(-50%) rotate(-4deg);
+  filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.6));
+  opacity: 0;
+  transition: all 1s cubic-bezier(0.16, 1, 0.3, 1) 0.6s;
+}
+
+.clapperboardVisibleLeft {
+  opacity: 1;
+  transform: translateY(-50%) rotate(-2deg);
+}
+
+/* Alternate right-aligned clapperboard for a unique third layout */
+.clapperboardWrapAltRight {
+  position: absolute;
+  right: 100px;
+  top: 60%;
+  transform: translateY(-50%) rotate(-12deg);
+  filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.6));
+  opacity: 0;
+  transition: all 1s cubic-bezier(0.16, 1, 0.3, 1) 0.6s;
+}
+
+.clapperboardVisibleAltRight {
+  opacity: 1;
+  transform: translateY(-50%) rotate(-8deg);
+}
+
+/* Block 1 animations */
+.block1Hidden .eyebrow,
+.block1Hidden .heading,
+.block1Hidden .missionParagraph {
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+.block1Visible .eyebrow {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 500ms ease-out, transform 500ms ease-out;
+}
+
+.block1Visible .heading {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 500ms ease-out 150ms, transform 500ms ease-out 150ms;
+}
+
+.block1Visible .missionParagraph {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 500ms ease-out 300ms, transform 500ms ease-out 300ms;
+}
+
+/* ============================================================
+   BLOCK 2 — Timeline ("Reel of Years")
+   Full-bleed horizontal scroll strip.
+   ============================================================ */
+
+.block2 {
+  padding: 100px 0;
+}
+
+.block2Label {
+  font-family: var(--font-geist-mono), 'Courier New', monospace;
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.4);
+  margin: 0 0 40px;
+}
+
+/* Break out of 1200px container to full-bleed */
+.timelineFullBleed {
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+}
+
+.timelineStrip {
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  gap: 24px;
+  padding: 40px 80px;
+  scroll-snap-type: x proximity;
+  cursor: grab;
+
+  /* Hide scrollbar visually */
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE/Edge */
+}
+
+.timelineStrip::-webkit-scrollbar {
+  display: none;
+}
+
+.timelineStrip.grabbing {
+  cursor: grabbing;
+  user-select: none;
+  scroll-snap-type: none !important;
+}
+
+/* Year card */
+.yearCard {
+  flex-shrink: 0;
+  width: 280px;
+  min-height: 320px;
+  background: #0a0916;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  padding: 24px;
+  position: relative;
+  scroll-snap-align: start;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: flex;
+  flex-direction: column;
+
+  /* Sprocket strips top/bottom using filmstrip-horizontal.png */
+  background-image:
+    url('/filmstrip-horizontal.png'),
+    url('/filmstrip-horizontal.png');
+  background-repeat: no-repeat, no-repeat;
+  background-position: top center, bottom center;
+  background-size: 100% 20px, 100% 20px;
+}
+
+.yearCard:hover {
+  border-color: rgba(37, 99, 235, 0.4);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+}
+
+/* Cinematic glowing link connecting the cards */
+.cardConnector {
+  position: absolute;
+  top: 50%;
+  right: -24px;
+  /* Stretch across the 24px gap */
+  width: 24px;
+  height: 2px;
+  background: rgba(37, 99, 235, 0.6);
+  box-shadow: 0 0 12px rgba(37, 99, 235, 0.8);
+  pointer-events: none;
+  z-index: 0;
+  /* Add subtle data pulse animation */
+  animation: dataPulse 2s infinite alternate;
+}
+
+@keyframes dataPulse {
+  0% {
+    opacity: 0.3;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Corner registration marks — reuse WalkThroughReel pattern */
+.yearCard::before {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(rgba(37, 99, 235, 0.6), rgba(37, 99, 235, 0.6)) top left,
+    linear-gradient(rgba(37, 99, 235, 0.6), rgba(37, 99, 235, 0.6)) top left,
+    linear-gradient(rgba(37, 99, 235, 0.6), rgba(37, 99, 235, 0.6)) top right,
+    linear-gradient(rgba(37, 99, 235, 0.6), rgba(37, 99, 235, 0.6)) top right,
+    linear-gradient(rgba(37, 99, 235, 0.6), rgba(37, 99, 235, 0.6)) bottom left,
+    linear-gradient(rgba(37, 99, 235, 0.6), rgba(37, 99, 235, 0.6)) bottom left,
+    linear-gradient(rgba(37, 99, 235, 0.6), rgba(37, 99, 235, 0.6)) bottom right,
+    linear-gradient(rgba(37, 99, 235, 0.6), rgba(37, 99, 235, 0.6)) bottom right;
+  background-size:
+    12px 1px, 1px 12px,
+    12px 1px, 1px 12px,
+    12px 1px, 1px 12px,
+    12px 1px, 1px 12px;
+  background-repeat: no-repeat;
+}
+
+/* Interior noise texture — matches WalkThroughReel .frameImage::before */
+.yearCard::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 4px;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  opacity: 0.08;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.yearCardContent {
+  position: relative;
+  z-index: 2;
+  padding-top: 8px;
+}
+
+.yearNumber {
+  font-family: var(--font-display), 'Space Grotesk', sans-serif;
+  font-size: 48px;
+  font-weight: 900;
+  color: #2563eb;
+  line-height: 1;
+  margin: 0;
+}
+
+.milestoneTitle {
+  font-family: var(--font-display), 'Space Grotesk', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 12px 0 0;
+}
+
+.milestoneDesc {
+  font-family: var(--font-display), 'Space Grotesk', sans-serif;
+  font-size: 13px;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.5;
+  margin: 8px 0 0;
+}
+
+/* Block 2 card animations */
+.yearCardHidden {
+  opacity: 0;
+  transform: translateY(24px);
+}
+
+.yearCardVisible {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 500ms ease-out, transform 500ms ease-out;
+}
+
+/* ============================================================
+   BLOCK 3 — The Pillars ("What We Stand For")
+   ============================================================ */
+
+.block3 {
+  padding: 100px 0;
+}
+
+.block3Label {
+  font-family: var(--font-geist-mono), 'Courier New', monospace;
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: rgba(37, 99, 235, 0.7);
+  margin: 0 0 20px;
+  text-align: center;
+}
+
+.block3Heading {
+  font-family: var(--font-display), 'Space Grotesk', sans-serif;
+  font-size: clamp(32px, 4vw, 48px);
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+  text-align: center;
+  margin: 0;
+  line-height: 1.15;
+}
+
+.pillarsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  margin-top: 64px;
+}
+
+/* Pillar card — reuses WalkThroughReel's film-frame styling */
+.pillarCard {
+  aspect-ratio: 4 / 5;
+  background: #0a0916;
+  position: relative;
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  cursor: default;
+}
+
+/* Default slight rotation for each card */
+.pillarCard:nth-child(1) {
+  transform: rotate(-1deg);
+}
+
+.pillarCard:nth-child(2) {
+  transform: rotate(1.5deg);
+}
+
+.pillarCard:nth-child(3) {
+  transform: rotate(-0.5deg);
+}
+
+/* Spring-tilt-straighten hover — matches WalkThroughReel memory cards */
+.pillarCard:hover {
+  transform: rotate(0deg) !important;
+  border-color: rgba(37, 99, 235, 0.5);
+  box-shadow:
+    0 0 0 2px rgba(37, 99, 235, 0.5),
+    0 0 40px rgba(37, 99, 235, 0.15);
+}
+
+/* Corner registration marks — identical to WalkThroughReel .filmFrame::before */
+.pillarCard::before {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  z-index: 5;
+  pointer-events: none;
+  background:
+    linear-gradient(rgba(37, 99, 235, 0.8), rgba(37, 99, 235, 0.8)) top left,
+    linear-gradient(rgba(37, 99, 235, 0.8), rgba(37, 99, 235, 0.8)) top left,
+    linear-gradient(rgba(37, 99, 235, 0.8), rgba(37, 99, 235, 0.8)) top right,
+    linear-gradient(rgba(37, 99, 235, 0.8), rgba(37, 99, 235, 0.8)) top right,
+    linear-gradient(rgba(37, 99, 235, 0.8), rgba(37, 99, 235, 0.8)) bottom left,
+    linear-gradient(rgba(37, 99, 235, 0.8), rgba(37, 99, 235, 0.8)) bottom left,
+    linear-gradient(rgba(37, 99, 235, 0.8), rgba(37, 99, 235, 0.8)) bottom right,
+    linear-gradient(rgba(37, 99, 235, 0.8), rgba(37, 99, 235, 0.8)) bottom right;
+  background-size:
+    16px 2px, 2px 16px,
+    16px 2px, 2px 16px,
+    16px 2px, 2px 16px,
+    16px 2px, 2px 16px;
+  background-repeat: no-repeat;
+}
+
+/* Interior noise texture — boosted to 0.05 (actually 0.2 in my filter to hit the target look) */
+.pillarCard::after {
+  content: '';
+  position: absolute;
+  inset: -50%;
+  width: 200%;
+  height: 200%;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  opacity: 0.25;
+  /* Boosted noticeably */
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Pillar Card Background SVGs */
+.pillarBgIcon {
+  position: absolute;
+  top: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 140px;
+  height: 140px;
+  opacity: 0.12;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Scan Line Sweep Effect */
+.pillarScanLine {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(37, 99, 235, 0.6), transparent);
+  box-shadow: 0 0 12px rgba(37, 99, 235, 0.4);
+  z-index: 4;
+  opacity: 0;
+  animation: scanSweep 1.5s linear infinite;
+  animation-play-state: paused;
+}
+
+@keyframes scanSweep {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+
+  10% {
+    opacity: 1;
+  }
+
+  90% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(10000%);
+    opacity: 0;
+  }
+
+  /* translateY percentage is relative to its own height (2px). Let's use top instead. */
+}
+
+/* Corrected sweep animation using top to span the card */
+@keyframes scanSweepCorrected {
+  0% {
+    top: 0;
+    opacity: 0;
+  }
+
+  10% {
+    opacity: 1;
+  }
+
+  90% {
+    opacity: 1;
+  }
+
+  100% {
+    top: 100%;
+    opacity: 0;
+  }
+}
+
+.pillarScanLine {
+  /* Animation is applied only on hover so it resets and hides when unhovered */
+}
+
+.pillarCard:hover .pillarScanLine {
+  animation: scanSweepCorrected 1.6s linear infinite;
+}
+
+.pillarNumeral {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-family: var(--font-geist-mono), 'Courier New', monospace;
+  font-size: 13px;
+  color: rgba(37, 99, 235, 0.5);
+  z-index: 2;
+}
+
+.pillarContent {
+  position: relative;
+  z-index: 2;
+}
+
+.pillarTitle {
+  font-family: var(--font-display), 'Space Grotesk', sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.pillarDesc {
+  font-family: var(--font-display), 'Space Grotesk', sans-serif;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.6;
+  margin: 12px 0 0;
+}
+
+/* Block 3 card animations */
+.pillarCardHidden {
+  opacity: 0;
+  transform: translateY(24px);
+}
+
+/* Override the default rotation when animating in */
+.pillarCardVisible {
+  opacity: 1;
+  transition: opacity 500ms ease-out, transform 500ms ease-out;
+}
+
+.pillarCardVisible:nth-child(1) {
+  transform: rotate(-1deg);
+}
+
+.pillarCardVisible:nth-child(2) {
+  transform: rotate(1.5deg);
+}
+
+.pillarCardVisible:nth-child(3) {
+  transform: rotate(-0.5deg);
+}
+
+/* ============================================================
+   BLOCK 4 — Closing Quote & Group Photo
+   ============================================================ */
+
+.block4 {
+  /* Push the quote text further downwards while keeping overall height */
+  padding: 380px 0 20px 0;
+  text-align: center;
+  max-width: 680px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.block4Bg {
+  position: absolute;
+  inset: -60px -120px;
+  background: radial-gradient(ellipse 800px 400px at 50% 50%, rgba(37, 99, 235, 0.04), transparent);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.groupPhotoWrapper {
+  position: absolute;
+  /* Keep the photo exactly vertically and horizontally centered in the block */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 150%;
+  max-width: 1200px;
+  border-radius: 8px;
+  /* Fades the edges of the image to transparent to hide the background */
+  mask-image: radial-gradient(ellipse at center, rgba(0,0,0,1) 30%, rgba(0,0,0,0) 70%);
+  -webkit-mask-image: radial-gradient(ellipse at center, rgba(0,0,0,1) 30%, rgba(0,0,0,0) 70%);
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.3; /* Makes it subtle behind the quote */
+}
+
+.groupPhotoOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(37, 99, 235, 0.8);
+  mix-blend-mode: color;
+  /* Or overlay */
+  z-index: 1;
+}
+
+.groupPhoto {
+  display: block;
+  width: 100%;
+  height: auto;
+  /* Grayscale and contrast for that cinematic sci-fi feel */
+  filter: grayscale(1) contrast(1.4) brightness(0.7);
+}
+
+.quoteRule {
+  width: 40px;
+  height: 1px;
+  background: rgba(37, 99, 235, 0.4);
+  margin: 0 auto 32px;
+  position: relative;
+  z-index: 1;
+}
+
+.quoteText {
+  font-family: var(--font-display), 'Space Grotesk', sans-serif;
+  font-style: italic;
+  font-size: clamp(24px, 3vw, 36px);
+  font-weight: 500;
+  color: #ffffff;
+  line-height: 1.4;
+  margin: 0;
+  position: relative;
+  z-index: 1;
+  text-shadow: 0 4px 16px rgba(0, 0, 0, 0.8);
+}
+
+.quoteAttribution {
+  font-family: var(--font-geist-mono), 'Courier New', monospace;
+  font-size: 12px;
+  letter-spacing: 0.15em;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  margin: 24px 0 0;
+  position: relative;
+  z-index: 1;
+}
+
+/* Block 4 animation */
+.block4Hidden {
+  opacity: 0;
+  transform: scale(0.95);
+}
+
+.block4Visible {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 800ms ease-out, transform 800ms ease-out;
+}
+
+/* ============================================================
+   RESPONSIVE — Mobile & Tablet
+   ============================================================ */
+
+@media (max-width: 1024px) {
+  .clapperboardWrap {
+    right: 20px;
+    transform: translateY(-50%) rotate(4deg) scale(0.8);
+  }
+  .clapperboardWrapLeft {
+    left: 20px;
+    transform: translateY(-50%) rotate(-4deg) scale(0.8);
+  }
+  .clapperboardWrapAltRight {
+    right: 20px;
+    top: 65%;
+    transform: translateY(-50%) rotate(-12deg) scale(0.8);
+  }
+}
+
+@media (max-width: 768px) {
+  .aboutSection {
+    padding: 80px 24px;
+  }
+
+  .pillarsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .timelineStrip {
+    padding: 40px 24px;
+  }
+
+  .block4 {
+    padding: 100px 0;
+  }
+
+  .bgTypography {
+    display: none;
+    /* Hide massive text on mobile */
+  }
+
+  .yearCard {
+    width: 260px;
+    min-height: 280px;
+  }
+
+  .pillarCard {
+    aspect-ratio: auto;
+    min-height: 280px;
+  }
+
+  .clapperboardWrap,
+  .clapperboardWrapLeft,
+  .clapperboardWrapAltRight {
+    display: none;
+  }
+  
+  .block1Reverse .block1Text {
+    text-align: left;
+  }
+  .block1Reverse .titleRule {
+    margin-left: 0;
+  }
+
+  /* Background glows scale down */
+  .bgGlow1 {
+    width: 300px;
+    height: 300px;
+  }
+
+  .bgGlow2 {
+    width: 250px;
+    height: 250px;
+  }
+}
+
+@media (max-width: 480px) {
+  .aboutSection {
+    padding: 64px 16px;
+  }
+
+  .yearCard {
+    width: 240px;
+    min-height: 260px;
+  }
+
+  .timelineStrip {
+    padding: 32px 16px;
+    gap: 16px;
+  }
+
+  /* Hide specific wireframes on narrow mobile */
+  .wireframeStructure:nth-child(n+3) {
+    display: none;
+  }
+}

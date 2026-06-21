@@ -217,7 +217,7 @@ export default function CinemaLoader({ children }: CinemaLoaderProps) {
       return;
     }
 
-      // --- Full cinematic animation ---
+    // --- Full cinematic animation ---
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({
         onComplete: () => setLoaderState('hidden'),
@@ -674,9 +674,8 @@ export default function CinemaLoader({ children }: CinemaLoaderProps) {
 
       <div
         ref={overlayRef}
-        className={`${styles.loaderOverlay} ${
-          loaderState === 'complete' ? styles.complete : ''
-        }`}
+        className={`${styles.loaderOverlay} ${loaderState === 'complete' ? styles.complete : ''
+          }`}
       >
         {/* Start Experience Overlay */}
         <div className={`${styles.startOverlay} ${loaderState !== 'waiting' ? styles.hidden : ''}`}>

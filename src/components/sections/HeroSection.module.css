@@ -42,6 +42,19 @@
   z-index: 10;
 }
 
+/* Blend the bottom edge of the hero into the next section so the haze doesn't get cut off sharply */
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 200px;
+  background: linear-gradient(to top, #070707 0%, transparent 100%);
+  z-index: 50; /* Above the atmosphere to fade it out */
+  pointer-events: none;
+}
+
 /* ============================================================
    BACKGROUND LAYER SYSTEM
    ============================================================ */
@@ -59,9 +72,23 @@
 }
 
 @keyframes beamSurge {
-  0% { opacity: 1; transform: scale(1); filter: brightness(1); }
-  50% { opacity: 1; transform: scale(1.1); filter: brightness(1.5); }
-  100% { opacity: 1; transform: scale(1.5); filter: brightness(4); }
+  0% {
+    opacity: 1;
+    transform: scale(1);
+    filter: brightness(1);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+    filter: brightness(1.5);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1.5);
+    filter: brightness(4);
+  }
 }
 
 .heroBg {
@@ -542,9 +569,17 @@
 }
 
 @keyframes reelShake {
-  0% { transform: translate(0, 0); }
-  50% { transform: translate(1px, -1px); }
-  100% { transform: translate(-1px, 1px); }
+  0% {
+    transform: translate(0, 0);
+  }
+
+  50% {
+    transform: translate(1px, -1px);
+  }
+
+  100% {
+    transform: translate(-1px, 1px);
+  }
 }
 
 .hidden {
@@ -673,9 +708,17 @@
 }
 
 @keyframes buttonPulse {
-  0% { box-shadow: 0 0 0 rgba(201, 168, 76, 0); }
-  50% { box-shadow: 0 0 24px rgba(201, 168, 76, 0.6); }
-  100% { box-shadow: 0 0 32px rgba(201, 168, 76, 0.8); }
+  0% {
+    box-shadow: 0 0 0 rgba(201, 168, 76, 0);
+  }
+
+  50% {
+    box-shadow: 0 0 24px rgba(201, 168, 76, 0.6);
+  }
+
+  100% {
+    box-shadow: 0 0 32px rgba(201, 168, 76, 0.8);
+  }
 }
 
 .heroCta:hover {
@@ -943,9 +986,17 @@
 }
 
 @keyframes blink {
-  0% { opacity: 0.2; }
-  20% { opacity: 1; }
-  100% { opacity: 0.2; }
+  0% {
+    opacity: 0.2;
+  }
+
+  20% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0.2;
+  }
 }
 
 /* ============================================================
@@ -1112,6 +1163,7 @@
     height: 28px;
   }
 }
+
 /* ============================================================
    LIGHTNING CURRENT ANIMATION (Explore -> Reel)
    ============================================================ */
@@ -1155,7 +1207,7 @@
   stroke-dasharray: 2000;
   stroke-dashoffset: 2000;
   animation: lightningDraw 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards,
-             lightningPulse 0.1s infinite alternate;
+    lightningPulse 0.1s infinite alternate;
 }
 
 .lightningCoreSecondary {
@@ -1168,17 +1220,31 @@
   stroke-dashoffset: 2000;
   /* Slightly delayed draw for organic feel */
   animation: lightningDraw 0.4s 0.05s cubic-bezier(0.16, 1, 0.3, 1) forwards,
-             lightningPulse 0.08s 0.02s infinite alternate;
+    lightningPulse 0.08s 0.02s infinite alternate;
 }
 
 @keyframes lightningDraw {
-  0% { stroke-dashoffset: 2000; opacity: 1; }
-  100% { stroke-dashoffset: 0; opacity: 1; }
+  0% {
+    stroke-dashoffset: 2000;
+    opacity: 1;
+  }
+
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
 }
 
 @keyframes lightningPulse {
-  0% { stroke-width: 2; opacity: 0.8; }
-  100% { stroke-width: 4; opacity: 1; }
+  0% {
+    stroke-width: 2;
+    opacity: 0.8;
+  }
+
+  100% {
+    stroke-width: 4;
+    opacity: 1;
+  }
 }
 
 .lightningBranch {
@@ -1209,13 +1275,35 @@
 }
 
 @keyframes sparkFlash {
-  0% { opacity: 0; transform: scale(0.5); }
-  50% { opacity: 1; transform: scale(1.5); }
-  100% { opacity: 0.5; transform: scale(1); }
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.5);
+  }
+
+  100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
 }
 
 @keyframes sparkFlashLarge {
-  0% { opacity: 0; transform: scale(0.2); }
-  50% { opacity: 1; transform: scale(2); }
-  100% { opacity: 0.6; transform: scale(1.2); }
+  0% {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(2);
+  }
+
+  100% {
+    opacity: 0.6;
+    transform: scale(1.2);
+  }
 }

@@ -1,0 +1,36 @@
+.gridContainer {
+  position: absolute;
+  inset: 0;
+  z-index: 0; /* Ensures it sits above .bgGrid but behind content */
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.gridCell {
+  position: absolute;
+  width: 60px; /* Matches GRID_SIZE */
+  height: 60px;
+  background-color: transparent;
+  border: 1px solid rgba(37, 99, 235, 0.8);
+  box-shadow: 0 0 12px rgba(37, 99, 235, 0.6), inset 0 0 12px rgba(37, 99, 235, 0.6);
+  opacity: 0;
+  pointer-events: none;
+  will-change: opacity;
+}
+
+/* Active flash animation */
+.flashActive {
+  animation: dataFlash 2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+@keyframes dataFlash {
+  0% {
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.4;
+  }
+  100% {
+    opacity: 0;
+  }
+}

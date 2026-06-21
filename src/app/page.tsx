@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import CinemaLoader from "@/components/loading/CinemaLoader";
 import HeroSection from "@/components/sections/HeroSection";
+import AboutSection from "@/components/sections/AboutSection";
 import ProjectorTransition from "@/components/transitions/ProjectorTransition";
 import WalkThroughReel from "@/components/sections/WalkThroughReel";
 import { playAccelerationWhir, playLightFlash } from "@/components/loading/ProjectorAudio";
@@ -118,11 +119,14 @@ export default function Home() {
     <CinemaLoader>
       <main style={{ position: 'relative', width: '100%', minHeight: '100vh', overflowX: 'hidden' }}>
         {transitionState !== 'flash' && transitionState !== 'intro' && transitionState !== 'reverseFlash' && (
-          <HeroSection 
-            onExploreClick={handleExploreClick} 
-            isTransitioning={isTransitioning}
-            transitionState={transitionState}
-          />
+          <>
+            <HeroSection 
+              onExploreClick={handleExploreClick} 
+              isTransitioning={isTransitioning}
+              transitionState={transitionState}
+            />
+            <AboutSection />
+          </>
         )}
         <ProjectorTransition transitionState={transitionState} />
 
