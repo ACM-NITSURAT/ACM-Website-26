@@ -6,14 +6,28 @@ import { usePathname } from 'next/navigation';
 import styles from './Navbar.module.css';
 
 /* ============================================================
-   NAV LINKS — Each page is a "scene" in the production
+   NAV SECTIONS — Each section is a "scene" in the production
    ============================================================ */
-const NAV_LINKS = [
-  { label: 'About',    href: '/about',    scene: 'SC. 01', section: 'about' },
-  { label: 'Events',   href: '/events',   scene: 'SC. 02', section: 'events' },
-  { label: 'Projects', href: '/projects', scene: 'SC. 03', section: 'projects' },
-  { label: 'Team',     href: '/team',     scene: 'SC. 04', section: 'team' },
+const NAV_SECTIONS = [
+  { label: 'Hero',     scene: 'SC.01', section: 'hero',     href: '/#hero' },
+  { label: 'About',    scene: 'SC.02', section: 'about',    href: '/#about' },
+  { label: 'Events',   scene: 'SC.03', section: 'events',   href: '/events' },
+  { label: 'Projects', scene: 'SC.04', section: 'projects', href: '/projects' },
+  { label: 'Team',     scene: 'SC.05', section: 'team',     href: '/team' },
 ];
+
+/* ============================================================
+   TIMECODE — Generate a cinematic timecode from section index
+   Each section maps to a "film time". When section changes,
+   the timecode scrambles through random digits before settling.
+   ============================================================ */
+const SECTION_TIMECODES: Record<string, string> = {
+  hero:     '00:00:01',
+  about:    '00:02:18',
+  events:   '00:04:32',
+  projects: '00:06:45',
+  team:     '00:08:57',
+};
 
 /** Linearly interpolate between a and b */
 function lerp(a: number, b: number, t: number) {
@@ -21,57 +35,90 @@ function lerp(a: number, b: number, t: number) {
 }
 
 /* ============================================================
-   Navbar — Living Projection System
+   Navbar — "NOW SHOWING" Cinematic Scene Indicator
    
-   "The projector is always running."
+   Evolved from the original projection-beam navbar.
    
-   Dual Beam Architecture:
-   - Active Beam: Always on, tracks current section/route.
-     Sweeps between links with cinematic easing.
-   - Hover Beam: Secondary, dimmer. Shows potential destination.
-     Does NOT appear when hovering the active link.
+   Split layout:
+   LEFT:  ACM brand (always visible, persistent identity)
+   RIGHT: NOW SHOWING plate (scene indicator + navigation)
    
-   The beam responds to scroll:
-   - Hero: wider, softer, atmospheric
-   - Scrolled: narrower, sharper, focused
+   Preserves:
+   - Loader integration (cinema-loader-complete)
+   - IntersectionObserver section tracking
+   - Dual beam architecture (active + hover)
+   - Dust particle system
+   - Scene number scramble effect
+   - Assembly animation sequence
+   - Reduced motion respect
+   
+   Adds:
+   - Film timecode counter
+   - Projection sweep on section change
+   - Hover expansion (max ~450px, horizontal only)
+   - Mobile: horizontal scrollable scene strip
    ============================================================ */
 
 export default function Navbar() {
   const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
-  const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
 
-  // Assembly animation state
+  // Assembly animation state (preserved from original)
   const [loaderDone, setLoaderDone] = useState(false);
   const [assembled, setAssembled] = useState(false);
-  const [showLinks, setShowLinks] = useState(false);
-  const [showDivider, setShowDivider] = useState(false);
-  const [showMarks, setShowMarks] = useState(false);
-  const [showScene, setShowScene] = useState(false);
-  const [dividerDrawn, setDividerDrawn] = useState(false);
-  const [showActiveBeam, setShowActiveBeam] = useState(false);
+  const [showBrand, setShowBrand] = useState(false);
+  const [showPlate, setShowPlate] = useState(false);
 
-  // Beam state
-  const [activeIndex, setActiveIndex] = useState<number | 'brand' | null>(null);
+  // NOW SHOWING state
+  const [activeSection, setActiveSection] = useState<string>('hero');
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isMobileStripOpen, setIsMobileStripOpen] = useState(false);
+
+  // Section transition animation
+  const [sectionTransitionState, setSectionTransitionState] = useState<'visible' | 'exit' | 'enter'>('visible');
+  const [displaySection, setDisplaySection] = useState('hero');
+  const [isSweeping, setIsSweeping] = useState(false);
+
+  // Beam state (preserved from original)
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
-  const [activeConeStyle, setActiveConeStyle] = useState<React.CSSProperties>({ opacity: 0 });
-  const [hoverConeStyle, setHoverConeStyle] = useState<React.CSSProperties>({});
+  const [hoverConeStyle, setHoverConeStyle] = useState<React.CSSProperties>({ opacity: 0 });
 
-  // Global navigation handler for cinematic transitions
-  const handleNavClick = useCallback((e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    e.preventDefault();
-    window.dispatchEvent(new CustomEvent('nav-route-clicked', { detail: href }));
-  }, []);
+  // Timecode state
+  const [displayTimecode, setDisplayTimecode] = useState('00:00:01');
+  const [isTimecodeUpdating, setIsTimecodeUpdating] = useState(false);
+
+  // Scene number scramble (preserved from original)
+  const [displaySceneNumber, setDisplaySceneNumber] = useState('SC.01');
 
   // Refs
-  const navRef = useRef<HTMLElement>(null);
-  const brandRef = useRef<HTMLAnchorElement>(null);
-  const navLinksRef = useRef<HTMLUListElement>(null);
-  const linkRefs = useRef<(HTMLAnchorElement | null)[]>([]);
+  const plateRef = useRef<HTMLDivElement>(null);
+  const navItemRefs = useRef<(HTMLElement | null)[]>([]);
+  const prevSectionRef = useRef<string>('hero');
 
-  // --- Reduced motion detection ---
+  // Global navigation handler for cinematic transitions (preserved)
+  const handleNavClick = useCallback((e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>, href: string, section: string) => {
+    e.preventDefault();
+    
+    // If it's a hash link on current page, smooth scroll
+    if (href.startsWith('/#')) {
+      const targetEl = document.querySelector(`[data-nav-section="${section}"]`);
+      if (targetEl) {
+        targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        setIsMobileStripOpen(false);
+        setIsExpanded(false);
+        return;
+      }
+    }
+    
+    // Otherwise dispatch event for page transitions
+    window.dispatchEvent(new CustomEvent('nav-route-clicked', { detail: href }));
+    setIsMobileStripOpen(false);
+    setIsExpanded(false);
+  }, []);
+
+  // --- Reduced motion detection (preserved) ---
   useEffect(() => {
     const mql = window.matchMedia('(prefers-reduced-motion: reduce)');
     setReducedMotion(mql.matches);
@@ -80,7 +127,7 @@ export default function Navbar() {
     return () => mql.removeEventListener('change', handler);
   }, []);
 
-  // --- Scroll listener with progress interpolation ---
+  // --- Scroll listener with progress interpolation (preserved) ---
   useEffect(() => {
     const heroHeight = typeof window !== 'undefined' ? window.innerHeight * 0.6 : 500;
     const onScroll = () => {
@@ -93,64 +140,148 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  // --- Lock body scroll when mobile menu is open ---
+  // --- Scroll-based section detection (replaces IntersectionObserver) ---
+  // Picks whichever section's top edge is closest to the viewport top.
   useEffect(() => {
-    document.body.style.overflow = isMobileOpen ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
-  }, [isMobileOpen]);
+    if (pathname !== '/') return;
 
-  // --- Determine active index from route ---
-  useEffect(() => {
-    const routeIndex = NAV_LINKS.findIndex(l => l.href === pathname);
-    if (routeIndex >= 0) {
-      setActiveIndex(routeIndex);
-    } else if (pathname === '/') {
-      setActiveIndex('brand');
-    } else {
-      setActiveIndex(null);
-    }
-  }, [pathname]);
+    const detectSection = () => {
+      const sections = document.querySelectorAll('[data-nav-section]');
+      if (sections.length === 0) return;
 
-  // --- IntersectionObserver for scroll-based section detection ---
-  useEffect(() => {
-    if (pathname !== '/') return; // Only on home page
+      let bestSection = 'hero';
+      let bestDistance = Infinity;
+      const viewportMiddle = window.innerHeight * 0.35; // bias toward upper third
 
-    const sections = document.querySelectorAll('[data-nav-section]');
-    if (sections.length === 0) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            const sectionName = (entry.target as HTMLElement).dataset.navSection;
-            const idx = NAV_LINKS.findIndex(l => l.section === sectionName);
-            if (idx >= 0) {
-              setActiveIndex(idx);
-            }
+      sections.forEach(el => {
+        const rect = el.getBoundingClientRect();
+        // Section is "active" if its top is above the viewport middle
+        // and it's the closest one to that line
+        if (rect.top <= viewportMiddle && rect.bottom > 0) {
+          const distance = Math.abs(rect.top - viewportMiddle);
+          if (rect.top <= viewportMiddle && distance < bestDistance) {
+            bestDistance = distance;
+            bestSection = (el as HTMLElement).dataset.navSection || 'hero';
           }
         }
-      },
-      { threshold: 0.4, rootMargin: '-10% 0px -50% 0px' }
-    );
+      });
 
-    sections.forEach(el => observer.observe(el));
-    return () => observer.disconnect();
+      // Fallback: if scrolled to very top, it's hero
+      if (window.scrollY < 100) {
+        bestSection = 'hero';
+      }
+
+      setActiveSection(bestSection);
+    };
+
+    window.addEventListener('scroll', detectSection, { passive: true });
+    // Run once on mount to set initial state
+    detectSection();
+
+    return () => window.removeEventListener('scroll', detectSection);
   }, [pathname]);
 
-  // --- Loader completion listener ---
+  // --- Section change transition animation ---
   useEffect(() => {
-    // Check if loader has already completed (no loader on this page)
+    if (activeSection === prevSectionRef.current) return;
+    
+    const prevSection = prevSectionRef.current;
+    prevSectionRef.current = activeSection;
+
+    if (reducedMotion) {
+      setDisplaySection(activeSection);
+      setDisplayTimecode(SECTION_TIMECODES[activeSection] || '00:00:00');
+      return;
+    }
+
+    // 1. Trigger sweep
+    setIsSweeping(true);
+
+    // 2. Exit current text
+    setSectionTransitionState('exit');
+
+    // 3. After exit, swap text and enter
+    const t1 = setTimeout(() => {
+      setDisplaySection(activeSection);
+      setSectionTransitionState('enter');
+      
+      // Trigger timecode scramble
+      setIsTimecodeUpdating(true);
+      scrambleTimecode(activeSection);
+      
+      // Trigger scene number scramble
+      scrambleSceneNumber(activeSection);
+    }, 150);
+
+    // 4. Settle to visible
+    const t2 = setTimeout(() => {
+      setSectionTransitionState('visible');
+    }, 300);
+
+    // 5. End sweep
+    const t3 = setTimeout(() => {
+      setIsSweeping(false);
+    }, 500);
+
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+    };
+  }, [activeSection, reducedMotion]);
+
+  // --- Timecode scramble ---
+  const scrambleTimecode = useCallback((section: string) => {
+    const target = SECTION_TIMECODES[section] || '00:00:00';
+    let frame = 0;
+    const totalFrames = 8;
+    const digits = '0123456789';
+
+    const interval = setInterval(() => {
+      frame++;
+      if (frame >= totalFrames) {
+        setDisplayTimecode(target);
+        setIsTimecodeUpdating(false);
+        clearInterval(interval);
+        return;
+      }
+      const scrambled = target.replace(/\d/g, () =>
+        digits[Math.floor(Math.random() * digits.length)]
+      );
+      setDisplayTimecode(scrambled);
+    }, 45);
+  }, []);
+
+  // --- Scene number scramble (preserved from original) ---
+  const scrambleSceneNumber = useCallback((section: string) => {
+    const idx = NAV_SECTIONS.findIndex(s => s.section === section);
+    const target = idx >= 0 ? NAV_SECTIONS[idx].scene : 'SC.01';
+    let frame = 0;
+    const totalFrames = 6;
+    const chars = '0123456789';
+
+    const interval = setInterval(() => {
+      frame++;
+      if (frame >= totalFrames) {
+        setDisplaySceneNumber(target);
+        clearInterval(interval);
+        return;
+      }
+      const scrambled = target.replace(/\d/g, () =>
+        chars[Math.floor(Math.random() * chars.length)]
+      );
+      setDisplaySceneNumber(scrambled);
+    }, 50);
+  }, []);
+
+  // --- Loader completion listener (preserved) ---
+  useEffect(() => {
     const alreadyComplete = !document.querySelector('[class*="loaderOverlay"]');
     if (alreadyComplete) {
-      // No loader present — show navbar immediately
       setLoaderDone(true);
       setAssembled(true);
-      setShowDivider(true);
-      setDividerDrawn(true);
-      setShowLinks(true);
-      setShowMarks(true);
-      setShowScene(true);
-      setShowActiveBeam(true);
+      setShowBrand(true);
+      setShowPlate(true);
       return;
     }
 
@@ -162,57 +293,39 @@ export default function Navbar() {
     return () => window.removeEventListener('cinema-loader-complete', handleLoaderComplete);
   }, []);
 
-  // --- Assembly animation sequence ---
+  // --- Assembly animation sequence (preserved + adapted) ---
   useEffect(() => {
     if (!loaderDone || assembled) return;
 
     if (reducedMotion) {
-      // Skip animation, show everything immediately
-      setShowDivider(true);
-      setDividerDrawn(true);
-      setShowLinks(true);
-      setShowMarks(true);
-      setShowScene(true);
-      setShowActiveBeam(true);
+      setShowBrand(true);
+      setShowPlate(true);
       setAssembled(true);
       return;
     }
 
-    // Staggered assembly: logo is already visible
-    // divider → links → beam sweeps to section → marks → scene indicator
-    const t1 = setTimeout(() => { setShowDivider(true); }, 100);
-    const t2 = setTimeout(() => { setDividerDrawn(true); }, 150);
-    const t3 = setTimeout(() => { setShowLinks(true); }, 250);
-    const t4 = setTimeout(() => { setShowActiveBeam(true); }, 500);
-    const t5 = setTimeout(() => { setShowMarks(true); }, 600);
-    const t6 = setTimeout(() => { setShowScene(true); }, 700);
-    const t7 = setTimeout(() => { setAssembled(true); }, 900);
+    const t1 = setTimeout(() => { setShowBrand(true); }, 100);
+    const t2 = setTimeout(() => { setShowPlate(true); }, 350);
+    const t3 = setTimeout(() => { setAssembled(true); }, 800);
 
-    return () => { [t1, t2, t3, t4, t5, t6, t7].forEach(clearTimeout); };
+    return () => { [t1, t2, t3].forEach(clearTimeout); };
   }, [loaderDone, assembled, reducedMotion]);
 
-  // --- Beam property interpolation based on scroll ---
-  const beamBlur = lerp(14, 6, scrollProgress);
-  const beamWidthMult = lerp(1.6, 1.2, scrollProgress);
-  const beamPeakOpacity = lerp(0.30, 0.40, scrollProgress);
+  // --- Beam property interpolation based on scroll (preserved) ---
+  const beamBlur = lerp(12, 6, scrollProgress);
+  const beamWidthMult = lerp(1.5, 1.2, scrollProgress);
+  const beamPeakOpacity = lerp(0.20, 0.30, scrollProgress);
 
-  // --- Active beam positioning ---
+  // --- Active beam positioning (preserved, adapted for plate) ---
   const computeBeamPosition = useCallback((
-    targetIndex: number | 'brand' | null,
+    targetIndex: number | null,
     widthMult: number
   ): React.CSSProperties | null => {
     if (targetIndex === null) return null;
-    const container = navRef.current;
+    const container = plateRef.current;
     if (!container) return null;
 
-    let targetEl: HTMLElement | null = null;
-
-    if (targetIndex === 'brand') {
-      targetEl = brandRef.current;
-    } else {
-      targetEl = linkRefs.current[targetIndex] ?? null;
-    }
-
+    const targetEl = navItemRefs.current[targetIndex] ?? null;
     if (!targetEl) return null;
 
     const containerRect = container.getBoundingClientRect();
@@ -227,142 +340,99 @@ export default function Navbar() {
     };
   }, []);
 
-  // Update active beam when activeIndex, scroll, or assembly changes
-  useEffect(() => {
-    if (!showActiveBeam) {
-      setActiveConeStyle({ opacity: 0 });
-      return;
-    }
-    const raf = requestAnimationFrame(() => {
-      const style = computeBeamPosition(activeIndex, beamWidthMult);
-      if (style) {
-        setActiveConeStyle({
-          ...style,
-          opacity: 1,
-          '--beam-blur': `${beamBlur}px`,
-          '--beam-peak': `${beamPeakOpacity}`,
-        } as React.CSSProperties);
-      } else {
-        setActiveConeStyle({ opacity: 0 });
-      }
-    });
-    return () => cancelAnimationFrame(raf);
-  }, [activeIndex, beamWidthMult, beamBlur, beamPeakOpacity, showActiveBeam, computeBeamPosition]);
+  // Active beam tracking (Removed: Only hover glow is shown now)
+  const activeNavIndex = NAV_SECTIONS.findIndex(s => s.section === activeSection);
 
-  // Resize handler for active beam
-  useEffect(() => {
-    const handleResize = () => {
-      if (!showActiveBeam) return;
-      const style = computeBeamPosition(activeIndex, beamWidthMult);
-      if (style) {
-        setActiveConeStyle({
-          ...style,
-          opacity: 1,
-          '--beam-blur': `${beamBlur}px`,
-          '--beam-peak': `${beamPeakOpacity}`,
-        } as React.CSSProperties);
-      }
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [activeIndex, beamWidthMult, beamBlur, beamPeakOpacity, showActiveBeam, computeBeamPosition]);
-
-  // --- Hover beam positioning ---
+  // Hover beam positioning
   const updateHoverCone = useCallback((index: number | null) => {
-    // Don't reposition if null or active (CSS classes handle visibility)
-    if (index === null || index === activeIndex) return;
-
+    if (index === null || index === activeNavIndex) return;
     const style = computeBeamPosition(index, 1.3);
     if (style) {
       setHoverConeStyle(style);
     }
-  }, [activeIndex, computeBeamPosition]);
+  }, [activeNavIndex, computeBeamPosition]);
 
   useEffect(() => {
     updateHoverCone(hoverIndex);
   }, [hoverIndex, updateHoverCone]);
 
+  // Resize handler
   useEffect(() => {
-    const handleResize = () => updateHoverCone(hoverIndex);
+    const handleResize = () => {
+      updateHoverCone(hoverIndex);
+    };
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, [hoverIndex, updateHoverCone]);
 
-  // --- Scene indicator scramble effect ---
-  const [displayScene, setDisplayScene] = useState('');
-  const activeScene = typeof activeIndex === 'number'
-    ? NAV_LINKS[activeIndex]?.scene ?? ''
-    : '';
+  // --- Hover expand/collapse ---
+  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  const handlePlateMouseEnter = useCallback(() => {
+    if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+    setIsExpanded(true);
+  }, []);
+
+  const handlePlateMouseLeave = useCallback(() => {
+    hoverTimeoutRef.current = setTimeout(() => {
+      setIsExpanded(false);
+      setHoverIndex(null);
+    }, 150);
+  }, []);
+
+  // --- Mobile: tap plate to toggle strip ---
+  const handlePlateTap = useCallback(() => {
+    // Only on mobile
+    if (window.innerWidth > 768) return;
+    setIsMobileStripOpen(prev => !prev);
+  }, []);
+
+  // Close mobile strip on outside click
   useEffect(() => {
-    if (!activeScene) { setDisplayScene(''); return; }
-    if (reducedMotion) { setDisplayScene(activeScene); return; }
-
-    let frame = 0;
-    const totalFrames = 6;
-    const chars = '0123456789';
-
-    const interval = setInterval(() => {
-      frame++;
-      if (frame >= totalFrames) {
-        setDisplayScene(activeScene);
-        clearInterval(interval);
-        return;
+    if (!isMobileStripOpen) return;
+    const handleClick = (e: MouseEvent) => {
+      const strip = document.querySelector(`.${styles.mobileSceneStrip}`);
+      const plate = plateRef.current;
+      if (strip && !strip.contains(e.target as Node) && plate && !plate.contains(e.target as Node)) {
+        setIsMobileStripOpen(false);
       }
-      const scrambled = activeScene.replace(/\d/g, () =>
-        chars[Math.floor(Math.random() * chars.length)]
-      );
-      setDisplayScene(scrambled);
-    }, 50);
+    };
+    document.addEventListener('click', handleClick, { capture: true });
+    return () => document.removeEventListener('click', handleClick, { capture: true });
+  }, [isMobileStripOpen]);
 
-    return () => clearInterval(interval);
-  }, [activeScene, reducedMotion]);
+  // Section name for display
+  const activeSectionData = NAV_SECTIONS.find(s => s.section === displaySection);
+  const sectionLabel = activeSectionData?.label?.toUpperCase() || 'HERO';
+
+  // Section transition class
+  const sectionNameClass = sectionTransitionState === 'exit'
+    ? styles.sectionNameExit
+    : sectionTransitionState === 'enter'
+    ? styles.sectionNameEnter
+    : styles.sectionNameVisible;
 
   return (
     <header
       className={`${styles.header} ${isScrolled ? styles.scrolled : ''}`}
       role="banner"
     >
-      <nav className={styles.nav} ref={navRef} aria-label="Main navigation">
-        {/* --- Registration Marks --- */}
-        <div
-          className={`${styles.registrationMark} ${styles.registrationLeft} ${
-            !showMarks ? styles.assembleHidden : styles.assembleFade
-          }`}
-          aria-hidden="true"
-        />
-        <div
-          className={`${styles.registrationMark} ${styles.registrationRight} ${
-            !showMarks ? styles.assembleHidden : styles.assembleFade
-          }`}
-          aria-hidden="true"
-        />
-
-        {/* --- Active Projection Cone --- */}
-        <div
-          className={styles.projectionCone}
-          style={activeConeStyle}
-          aria-hidden="true"
-        />
-
-        {/* --- Hover Projection Cone --- */}
-        <div
-          className={`${styles.hoverCone} ${
-            hoverIndex !== null && hoverIndex !== activeIndex
-              ? styles.hoverVisible
-              : styles.hoverFadeOut
-          }`}
-          style={hoverConeStyle}
-          aria-hidden="true"
-        />
-
-        {/* --- Brand Block: The Studio Mark --- */}
+      <nav 
+        className={`${styles.nav} ${
+          activeSection && activeSection !== 'hero' ? styles[`theme${activeSection.charAt(0).toUpperCase() + activeSection.slice(1)}`] || '' : ''
+        }`}
+        aria-label="Main navigation"
+      >
+        {/* ============================================================
+            LEFT: ACM Brand — Always visible
+            ============================================================ */}
         <Link
           href="/"
-          className={styles.brandBlock}
-          ref={brandRef}
+          className={`${styles.brandBlock} ${
+            !showBrand ? styles.assembleHidden : styles.assembleFade
+          }`}
           aria-label="ACM NIT SURAT — Home"
-          onClick={(e) => handleNavClick(e, '/')}
+          onClick={(e) => handleNavClick(e, '/', 'hero')}
         >
           <svg viewBox="0 0 200 200" className={styles.brandLogo} aria-hidden="true">
             <defs>
@@ -395,140 +465,154 @@ export default function Navbar() {
           </div>
         </Link>
 
-        {/* --- Divider --- */}
-        <div
-          className={`${styles.divider} ${
-            !showDivider ? styles.assembleHidden : styles.assembleFade
-          } ${!dividerDrawn ? styles.dividerDraw : styles.dividerDrawIn}`}
-          aria-hidden="true"
-        />
-
-        {/* --- Navigation Links --- */}
-        <ul
-          className={`${styles.navLinks} ${
-            !showLinks ? styles.assembleHidden : styles.assembleFade
+        {/* ============================================================
+            RIGHT: NOW SHOWING Plate — Cinematic scene indicator
+            ============================================================ */}
+        <div className={styles.plateWrapper}>
+          <div
+            ref={plateRef}
+          className={`${styles.plate} ${isExpanded ? styles.expanded : ''} ${
+            !showPlate ? styles.plateAssembleHidden : styles.plateAssembleFade
           }`}
-          ref={navLinksRef}
+          onMouseEnter={handlePlateMouseEnter}
+          onMouseLeave={handlePlateMouseLeave}
+          onClick={handlePlateTap}
+          role="navigation"
+          aria-label="Scene indicator"
         >
-          {NAV_LINKS.map((link, i) => {
-            const isActive = activeIndex === i;
-            return (
-              <li key={link.href} className={styles.navItem}>
-                <Link
-                  href={link.href}
-                  className={`${styles.navLink} ${isActive ? styles.active : ''}`}
-                  ref={(el) => { linkRefs.current[i] = el; }}
+          {/* Registration marks */}
+          <div className={`${styles.registrationMark} ${styles.registrationLeft}`} aria-hidden="true" />
+          <div className={`${styles.registrationMark} ${styles.registrationRight}`} aria-hidden="true" />
+
+          {/* Hover beam cone (visible in expanded state on hover) */}
+          <div
+            className={`${styles.hoverCone} ${
+              hoverIndex !== null && hoverIndex !== activeNavIndex
+                ? styles.hoverVisible
+                : styles.hoverFadeOut
+            }`}
+            style={hoverConeStyle}
+            aria-hidden="true"
+          />
+
+          {/* Film grain texture overlay */}
+          <div className={styles.plateGrain} aria-hidden="true" />
+
+          {/* Ambient projection sweep — periodic light pass */}
+          <div className={styles.plateAmbientSweep} aria-hidden="true" />
+
+          {/* Projection sweep — amber light pass on section change */}
+          <div
+            className={`${styles.projectionSweep} ${isSweeping ? styles.projectionSweepActive : ''}`}
+            aria-hidden="true"
+          />
+
+          {/* Dust motes drifting through projection light */}
+          <div className={styles.plateDustField} aria-hidden="true">
+            <span className={`${styles.plateDustMote} ${styles.plateDustMote1}`} />
+            <span className={`${styles.plateDustMote} ${styles.plateDustMote2}`} />
+            <span className={`${styles.plateDustMote} ${styles.plateDustMote3}`} />
+            <span className={`${styles.plateDustMote} ${styles.plateDustMote4}`} />
+            <span className={`${styles.plateDustMote} ${styles.plateDustMote5}`} />
+          </div>
+
+          {/* --- Collapsed content: SC.02 · NOW SHOWING — ABOUT · 00:02:18 --- */}
+          <div className={styles.plateContent}>
+            <span className={styles.sceneNumber}>{displaySceneNumber}</span>
+            <span className={styles.nowShowingLabel}>NOW SHOWING</span>
+            <span className={styles.separator}>—</span>
+            <span className={`${styles.sectionName} ${sectionNameClass}`}>
+              {sectionLabel}
+            </span>
+            <span className={`${styles.timecode} ${isTimecodeUpdating ? styles.timecodeUpdating : ''}`}>
+              {displayTimecode}
+            </span>
+          </div>
+
+          {/* --- Expanded content: Navigation items --- */}
+          <div className={styles.navItemsContainer}>
+            {NAV_SECTIONS.map((item, i) => {
+              const isActive = item.section === activeSection;
+              return (
+                <a
+                  key={item.section}
+                  href={item.href}
+                  ref={(el) => { navItemRefs.current[i] = el; }}
+                  className={`${styles.navItem} ${isActive ? styles.navItemActive : ''}`}
                   onMouseEnter={() => setHoverIndex(i)}
                   onMouseLeave={() => setHoverIndex(null)}
-                  onClick={(e) => {
-                    handleNavClick(e, link.href);
-                    setIsMobileOpen(false);
-                  }}
+                  onClick={(e) => handleNavClick(e, item.href, item.section)}
                 >
-                  {/* Scene Indicator */}
-                  <span
-                    className={`${styles.sceneIndicator} ${
-                      !showScene ? styles.assembleHidden : ''
-                    }`}
-                    aria-hidden="true"
-                  >
-                    {isActive ? displayScene : link.scene}
-                  </span>
+                  <span className={styles.navItemScene}>{item.scene}</span>
+                  <span className={styles.navItemLabel}>{item.label}</span>
 
-                  {link.label}
 
-                  {/* Active dust — subtle, always in active beam */}
-                  <span className={styles.activeDustField} aria-hidden="true">
-                    <span className={`${styles.activeDustMote} ${styles.activeDustMote1}`} />
-                    <span className={`${styles.activeDustMote} ${styles.activeDustMote2}`} />
-                    <span className={`${styles.activeDustMote} ${styles.activeDustMote3}`} />
-                  </span>
-
-                  {/* Hover dust — more visible, on non-active hover */}
+                  {/* Hover dust */}
                   <span className={styles.hoverDustField} aria-hidden="true">
                     <span className={`${styles.hoverDustMote} ${styles.hoverDustMote1}`} />
                     <span className={`${styles.hoverDustMote} ${styles.hoverDustMote2}`} />
                     <span className={`${styles.hoverDustMote} ${styles.hoverDustMote3}`} />
-                    <span className={`${styles.hoverDustMote} ${styles.hoverDustMote4}`} />
-                    <span className={`${styles.hoverDustMote} ${styles.hoverDustMote5}`} />
                   </span>
+                </a>
+              );
+            })}
+            {/* Join Us — last item */}
+            <a
+              href="/join"
+              className={`${styles.navItem} ${styles.navItemJoin}`}
+              ref={(el) => { navItemRefs.current[NAV_SECTIONS.length] = el; }}
+              onMouseEnter={() => setHoverIndex(NAV_SECTIONS.length)}
+              onMouseLeave={() => setHoverIndex(null)}
+              onClick={(e) => {
+                e.preventDefault();
+                window.dispatchEvent(new CustomEvent('nav-route-clicked', { detail: '/join' }));
+                setIsExpanded(false);
+              }}
+            >
+              <span className={styles.navItemScene}>&nbsp;</span>
+              <span className={styles.navItemLabel}>Join Us</span>
+            </a>
+          </div>
+        </div>
 
-                  {/* Registration tick */}
-                  <span className={styles.registrationTick} aria-hidden="true" />
-                </Link>
-              </li>
+        {/* Hover hint — positioned absolutely below plate */}
+        <span className={styles.hoverHint} aria-hidden="true">
+          hover to navigate
+        </span>
+      </div>
+
+        {/* ============================================================
+            MOBILE: Horizontal scrollable scene strip
+            ============================================================ */}
+        <div className={`${styles.mobileSceneStrip} ${isMobileStripOpen ? styles.mobileStripOpen : ''}`}>
+          {NAV_SECTIONS.map((item) => {
+            const isActive = item.section === activeSection;
+            return (
+              <a
+                key={item.section}
+                href={item.href}
+                className={`${styles.mobileSceneItem} ${isActive ? styles.mobileSceneActive : ''}`}
+                onClick={(e) => handleNavClick(e, item.href, item.section)}
+              >
+                <span className={styles.mobileSceneCode}>{item.scene}</span>
+                <span className={styles.mobileSceneLabel}>{item.label}</span>
+              </a>
             );
           })}
-        </ul>
-
-        {/* --- Actions --- */}
-        <div className={`${styles.actions} ${
-          !showLinks ? styles.assembleHidden : styles.assembleFade
-        }`}>
-          <Link href="/join" className={styles.joinBtn}>Join Us</Link>
-
-          <button
-            className={`${styles.mobileToggle} ${isMobileOpen ? styles.open : ''}`}
-            onClick={() => setIsMobileOpen(!isMobileOpen)}
-            aria-label={isMobileOpen ? 'Close menu' : 'Open menu'}
-            aria-expanded={isMobileOpen}
+          <a
+            href="/join"
+            className={styles.mobileSceneItem}
+            onClick={(e) => {
+              e.preventDefault();
+              window.dispatchEvent(new CustomEvent('nav-route-clicked', { detail: '/join' }));
+              setIsMobileStripOpen(false);
+            }}
           >
-            <div className={styles.hamburger}>
-              <span />
-              <span />
-              <span />
-            </div>
-          </button>
+            <span className={styles.mobileSceneCode}>&nbsp;</span>
+            <span className={styles.mobileSceneLabel}>Join</span>
+          </a>
         </div>
       </nav>
-
-      {/* ============================================================
-          MOBILE MENU — "The Screening Room"
-          ============================================================ */}
-      <div
-        className={`${styles.mobileMenu} ${isMobileOpen ? styles.mobileOpen : ''}`}
-        aria-hidden={!isMobileOpen}
-      >
-        <div className={styles.mobileBeam} aria-hidden="true" />
-        <div className={styles.mobileCenterMark} aria-hidden="true" />
-
-        <ul className={styles.mobileNavLinks}>
-          {NAV_LINKS.map((link, i) => {
-            const isActive = activeIndex === i;
-            return (
-              <li
-                key={link.href}
-                className={styles.mobileNavItem}
-                style={{ transitionDelay: isMobileOpen ? `${0.15 + i * 0.08}s` : '0s' }}
-              >
-                <Link
-                  href={link.href}
-                  className={`${styles.mobileNavLink} ${isActive ? styles.active : ''}`}
-                  onClick={(e) => {
-                    handleNavClick(e, link.href);
-                    setIsMobileOpen(false);
-                  }}
-                >
-                  <span className={styles.mobileScene}>{link.scene}</span>
-                  {link.label}
-                </Link>
-              </li>
-            );
-          })}
-          <li
-            className={styles.mobileNavItem}
-            style={{ transitionDelay: isMobileOpen ? `${0.15 + NAV_LINKS.length * 0.08}s` : '0s' }}
-          >
-            <Link
-              href="/join"
-              className={`${styles.mobileNavLink} ${styles.mobileJoinLink}`}
-              onClick={() => setIsMobileOpen(false)}
-            >
-              Join Us
-            </Link>
-          </li>
-        </ul>
-      </div>
     </header>
   );
 }

@@ -32,6 +32,14 @@ export default function ClapperboardSVG({
   colorTheme = 'blue1'
 }: ClapperboardSVGProps) {
   const [isHovered, setIsHovered] = useState(false);
+  const [takeCount, setTakeCount] = useState(parseInt(take, 10) || 1);
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    setTakeCount(prev => prev + 1);
+  };
+
+  const displayTake = takeCount.toString().padStart(2, '0');
 
   // Clapper stick rotation states:
   // Hidden: 45deg (wide open)
@@ -63,7 +71,7 @@ export default function ClapperboardSVG({
     <div
       className={className}
       onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseLeave={handleMouseLeave}
       style={{ width: 360, height: 280 }}
     >
       <svg
@@ -152,7 +160,7 @@ export default function ClapperboardSVG({
             fill="rgba(255,255,255,0.5)"
             transform="rotate(-1, 200, 175)"
           >
-            TAKE: {take}
+            TAKE: {displayTake}
           </text>
 
           {/* Field labels — monospace, mimicking printed labels */}

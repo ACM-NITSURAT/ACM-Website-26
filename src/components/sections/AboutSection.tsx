@@ -28,13 +28,11 @@ import FlashingGrid from './FlashingGrid';
    TIMELINE DATA
    ============================================================ */
 const TIMELINE_DATA = [
-  { year: '2008', title: 'Founded', desc: 'Started with 12 members and one shared idea: build things worth staying up for.' },
-  { year: '2011', title: 'First Hackathon', desc: '3 teams, one all-nighter, and the first taste of what this community could become.' },
-  { year: '2014', title: 'ICPC Qualified', desc: 'First time anyone from NIT Surat qualified for ICPC Regionals.' },
-  { year: '2017', title: '100 Members', desc: 'Crossed our first major membership milestone.' },
-  { year: '2019', title: 'DotSlash Born', desc: 'Our flagship hackathon held for the first time.' },
-  { year: '2021', title: 'Pandemic Resilience', desc: 'Moved entirely online. Never missed a beat.' },
-  { year: '2024', title: '500+ Members', desc: "Now NIT Surat's largest and most active tech chapter." },
+  { year: '2005', title: 'Founded', desc: 'The ACM Student Chapter at SVNIT was established, becoming a hub for computing enthusiasts to collaborate and learn.' },
+  { year: '2016', title: 'Inception Launched', desc: 'Our flagship competitive programming contest began, setting the stage for algorithmic excellence.' },
+  { year: '2019', title: 'DotSlash Born', desc: 'The inaugural 30-hour national-level hackathon, "DotSlash: Root to Ideas", was successfully organized.' },
+  { year: '2020', title: 'Pandemic Resilience', desc: 'Transitioned to online contests like Inception 5.0 and the ACM Summer Challenge without missing a beat.' },
+  { year: '2024', title: 'Continuing the Legacy', desc: "Consistently hosting nationwide events like Epiphany, and staying true to our motto: 'Building technology. Building people.'" },
 ];
 
 /* ============================================================
@@ -235,9 +233,10 @@ export default function AboutSection() {
             <p className={styles.eyebrow}>SC. 06 — THE FULL STORY</p>
             <h2 className={styles.heading}>ABOUT ACM SVNIT</h2>
             <p className={styles.missionParagraph}>
-              ACM SVNIT is NIT Surat&apos;s oldest and most active student tech chapter — a community
-              of builders, competitors, and creators who&apos;ve been showing up since 2008. We
-              don&apos;t just talk about technology. We build it, compete with it, and ship it.
+              The ACM Student Chapter at SVNIT is a prominent technical student organization affiliated with
+              the world&apos;s largest computing society. Founded in 2005, we have served as a hub for computing
+              enthusiasts to collaborate, learn, and grow for nearly two decades. We don&apos;t just talk about
+              technology. We build it, compete with it, and ship it.
             </p>
             <div
               className={`${styles.titleRule} ${isVisible('block1') ? styles.titleRuleVisible : ''}`}
@@ -271,8 +270,9 @@ export default function AboutSection() {
             <p className={styles.eyebrow}>SC. 07 — THE OBJECTIVE</p>
             <h2 className={styles.heading}>OUR MISSION</h2>
             <p className={styles.missionParagraph}>
-              Our mission is to foster a culture of continuous learning, innovation, and collaboration
-              among students. We exist to bridge the gap between academic theory and real-world execution.
+              Our mission is to enhance the coding culture at SVNIT by fostering an environment of learning,
+              sharing, and productivity. Guided by our motto — &quot;Building technology. Building people.&quot; — we
+              focus on both technical skill development and personal growth.
             </p>
             <div
               className={`${styles.titleRule} ${isVisible('block1b') ? styles.titleRuleVisible : ''}`}
@@ -292,8 +292,9 @@ export default function AboutSection() {
             <p className={styles.eyebrow}>SC. 08 — THE FUTURE</p>
             <h2 className={styles.heading}>OUR VISION</h2>
             <p className={styles.missionParagraph}>
-              We envision a community where every individual has the resources,
-              mentorship, and opportunities to build impactful technology and solve real-world problems.
+              We envision a community where every individual has the resources, mentorship, and opportunities
+              to tackle challenges in the field of computing, participate in global standards, and bring their
+              most ambitious ideas to life.
             </p>
             <div
               className={`${styles.titleRule} ${isVisible('block1c') ? styles.titleRuleVisible : ''}`}
@@ -405,9 +406,9 @@ export default function AboutSection() {
 
           <div className={styles.quoteRule} />
           <p className={styles.quoteText}>
-            &ldquo;We don&apos;t recruit. We recognise.&rdquo;
+            &ldquo;Building technology. Building people.&rdquo;
           </p>
-          <p className={styles.quoteAttribution}>— ACM SVNIT, Since 2008</p>
+          <p className={styles.quoteAttribution}>— ACM SVNIT, Since 2005</p>
         </div>
       </div>
     </section>

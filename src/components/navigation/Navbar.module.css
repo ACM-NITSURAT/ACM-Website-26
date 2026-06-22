@@ -1,71 +1,790 @@
 /* ============================================================
-   Navbar — Living Projection System
+   Navbar — "NOW SHOWING" Cinematic Scene Indicator
    
-   "The projector is always running."
+   Split layout:
+   LEFT:  ACM Brand (always visible, persistent identity)
+   RIGHT: NOW SHOWING plate (cinematic scene indicator)
    
-   A cinematic navigation that continuously guides the viewer.
-   The navbar is the visual representation of where the 
-   projector's attention currently is.
+   The plate is a physical artifact from the projector ecosystem.
+   Brushed metal. Projection reflections. Dust. Timecode.
    
-   Dual Beam System:
-   1. Active Beam — Always on, tracks current section
-   2. Hover Beam  — Secondary, dimmer, potential destination
-   
-   Performance: Only animates transform, opacity, filter.
+   Performance: Only animates transform, opacity, filter, width.
    ============================================================ */
 
-/* --- Header Shell --- */
+/* --- Header Shell — full width, holds both brand + plate --- */
 .header {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   z-index: 100;
-  padding: 24px 0;
+  padding: 18px 0;
+  display: flex;
+  align-items: center;
+  pointer-events: none; /* pass-through — children get pointer events */
   transition:
-    padding 0.5s cubic-bezier(0.25, 1, 0.5, 1),
-    background-color 0.5s cubic-bezier(0.25, 1, 0.5, 1),
-    backdrop-filter 0.5s cubic-bezier(0.25, 1, 0.5, 1),
-    border-color 0.5s ease;
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.35) 0%, transparent 100%);
-  border-bottom: 1px solid transparent;
+    padding 0.5s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .header.scrolled {
   padding: 12px 0;
-  background: rgba(6, 6, 10, 0.92);
-  backdrop-filter: blur(16px) saturate(150%);
-  -webkit-backdrop-filter: blur(16px) saturate(150%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
 }
 
-/* --- Inner Nav Container --- */
+/* --- Inner Container — positions brand left, plate right --- */
 .nav {
+  --theme-main: 255, 200, 120;
+  --theme-light: 255, 220, 160;
+  --theme-glow: 255, 240, 200;
   position: relative;
-  max-width: 1320px;
+  width: 100%;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 0 48px;
+  padding: 0 32px;
   display: flex;
   align-items: center;
-  gap: 0;
+  justify-content: space-between;
+  gap: 24px;
 }
 
 /* ============================================================
-   FILM REGISTRATION MARKS
+   BRAND BLOCK — Always visible. The studio mark.
+   Left side. Never hidden. Never animated away.
+   ============================================================ */
+.brandBlock {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  position: relative;
+  z-index: 10;
+  pointer-events: auto;
+  transition: filter 0.4s ease;
+  flex-shrink: 0;
+}
+
+.brandBlock:hover {
+  filter: drop-shadow(0 0 20px rgba(var(--theme-glow), 0.15));
+}
+
+.brandBlock:hover .brandName {
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.08);
+}
+
+.brandLogo {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  transition: width 0.5s cubic-bezier(0.25, 1, 0.5, 1),
+              height 0.5s cubic-bezier(0.25, 1, 0.5, 1),
+              filter 0.4s ease;
+}
+
+.brandBlock:hover .brandLogo {
+  filter: brightness(1.1);
+}
+
+.header.scrolled .brandLogo {
+  width: 32px;
+  height: 32px;
+}
+
+.brandText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.brandName {
+  color: #ffffff;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  line-height: 1;
+  transition: text-shadow 0.4s ease;
+}
+
+.brandSubtitle {
+  color: rgba(255, 255, 255, 0.35);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 8.5px;
+  font-weight: 400;
+  letter-spacing: 3.5px;
+  text-transform: uppercase;
+  line-height: 1;
+  transition: color 0.4s ease;
+}
+
+.brandBlock:hover .brandSubtitle {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+/* ============================================================
+   NOW SHOWING PLATE — The cinematic scene indicator.
+   Right side. Floating metal plate artifact.
+   A physical piece of the projection system.
+   ============================================================ */
+.plateWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.plate {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 44px;
+  pointer-events: auto;
+  cursor: default;
+  overflow: hidden;
+
+  /* --- Brushed metal surface — dual-direction scratches + grain --- */
+  background:
+    /* Primary diagonal hairline scratches */
+    repeating-linear-gradient(
+      115deg,
+      transparent 0px,
+      transparent 1.5px,
+      rgba(255, 255, 255, 0.01) 1.5px,
+      rgba(255, 255, 255, 0.01) 2px
+    ),
+    /* Secondary cross-hatching (perpendicular) */
+    repeating-linear-gradient(
+      -65deg,
+      transparent 0px,
+      transparent 3px,
+      rgba(255, 255, 255, 0.004) 3px,
+      rgba(255, 255, 255, 0.004) 3.5px
+    ),
+    /* Base metal — warm charcoal gradient */
+    linear-gradient(
+      180deg,
+      rgba(20, 19, 28, 0.95) 0%,
+      rgba(14, 13, 20, 0.97) 50%,
+      rgba(12, 11, 18, 0.98) 100%
+    );
+
+  /* --- Multi-layer border for machined edge depth + glowing theme border --- */
+  border: 1px solid rgba(var(--theme-main), 0.2);
+  box-shadow:
+    /* Inner warm ambient glow */
+    inset 0 1px 0 0 rgba(var(--theme-light), 0.03),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.02),
+    /* Tight shadow */
+    0 1px 3px rgba(0, 0, 0, 0.4),
+    /* Medium shadow */
+    0 4px 12px rgba(0, 0, 0, 0.35),
+    /* Far diffuse shadow */
+    0 12px 36px rgba(0, 0, 0, 0.25),
+    /* Subtle theme glow */
+    0 0 12px rgba(var(--theme-main), 0.12);
+
+  border-radius: 6px;
+  backdrop-filter: blur(24px) saturate(150%);
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
+
+  transition:
+    box-shadow 0.45s cubic-bezier(0.25, 1, 0.5, 1),
+    border-color 0.45s ease;
+}
+
+/* Plate hover glow — projection system responds */
+.plate:hover {
+  border-color: rgba(var(--theme-light), 0.3);
+  box-shadow:
+    inset 0 1px 0 0 rgba(var(--theme-light), 0.06),
+    inset 0 0 0 1px rgba(var(--theme-light), 0.03),
+    0 1px 3px rgba(0, 0, 0, 0.4),
+    0 4px 12px rgba(0, 0, 0, 0.35),
+    0 12px 36px rgba(0, 0, 0, 0.25),
+    0 0 24px rgba(var(--theme-light), 0.18);
+}
+
+.header.scrolled .plate {
+  box-shadow:
+    inset 0 1px 0 0 rgba(var(--theme-light), 0.02),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.03),
+    0 2px 12px rgba(0, 0, 0, 0.6),
+    0 12px 40px rgba(0, 0, 0, 0.4);
+}
+
+.header.scrolled .plate:hover {
+  box-shadow:
+    inset 0 1px 0 0 rgba(var(--theme-light), 0.05),
+    inset 0 0 0 1px rgba(var(--theme-light), 0.04),
+    0 2px 12px rgba(0, 0, 0, 0.6),
+    0 12px 40px rgba(0, 0, 0, 0.4),
+    0 0 60px rgba(var(--theme-main), 0.05);
+}
+
+/* --- Projection reflection: breathing warm glow along top edge --- */
+.plate::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 5%;
+  right: 5%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(var(--theme-light), 0.08) 15%,
+    rgba(var(--theme-main), 0.2) 35%,
+    rgba(var(--theme-main), 0.25) 50%,
+    rgba(var(--theme-main), 0.2) 65%,
+    rgba(var(--theme-light), 0.08) 85%,
+    transparent 100%
+  );
+  z-index: 5;
+  animation: plateReflectionBreathe 4s ease-in-out infinite;
+}
+
+.plate:hover::before {
+  animation: plateReflectionBreathe 3s ease-in-out infinite;
+}
+
+@keyframes plateReflectionBreathe {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.9; }
+}
+
+/* --- Rivets — machined mounting points --- */
+.plate::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow:
+    /* Left rivet + highlight */
+    0 0 0 0.5px rgba(255, 255, 255, 0.08),
+    0 -0.5px 0 0 rgba(255, 255, 255, 0.04),
+    /* Right rivet + highlight */
+    calc(100% - 27px) 0 0 0.5px rgba(255, 255, 255, 0.08),
+    calc(100% - 27px) -0.5px 0 0 rgba(255, 255, 255, 0.04),
+    calc(100% - 27px) 0 0 0 rgba(255, 255, 255, 0.05);
+  transform: translateY(-50%);
+  z-index: 5;
+  pointer-events: none;
+}
+
+/* --- Film grain overlay on plate surface --- */
+.plateGrain {
+  position: absolute;
+  inset: 0;
+  border-radius: 6px;
+  opacity: 0.35;
+  pointer-events: none;
+  z-index: 2;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.4'/%3E%3C/svg%3E");
+  background-size: 100px 100px;
+  mix-blend-mode: overlay;
+}
+
+/* --- Ambient projection sweep — periodic light pass --- */
+.plateAmbientSweep {
+  position: absolute;
+  top: 0;
+  left: -80px;
+  width: 60px;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(var(--theme-glow), 0.03) 30%,
+    rgba(var(--theme-light), 0.06) 50%,
+    rgba(var(--theme-glow), 0.03) 70%,
+    transparent 100%
+  );
+  z-index: 3;
+  pointer-events: none;
+  animation: ambientSweep 8s ease-in-out infinite;
+  animation-delay: 2s;
+}
+
+@keyframes ambientSweep {
+  0%, 85%, 100% { transform: translateX(0); opacity: 0; }
+  5% { opacity: 0.8; }
+  40% { opacity: 1; }
+  50% { transform: translateX(600px); opacity: 0.3; }
+  55% { opacity: 0; }
+}
+
+/* ============================================================
+   PLATE CONTENT — Collapsed state
+   Shows: SC.02 · NOW SHOWING — ABOUT · 00:02:18
+   ============================================================ */
+.plateContent {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 0 24px;
+  height: 100%;
+  white-space: nowrap;
+  position: relative;
+  z-index: 3;
+  overflow: hidden;
+}
+
+/* --- Scene number: SC.02 --- */
+.sceneNumber {
+  font-family: var(--font-geist-mono), 'Courier New', monospace;
+  font-size: 8px;
+  font-weight: 500;
+  letter-spacing: 2px;
+  color: rgba(var(--theme-main), 0.5);
+  text-transform: uppercase;
+  margin-right: 12px;
+  flex-shrink: 0;
+  transition: color 0.3s ease;
+  min-width: 36px;
+}
+
+/* --- "NOW SHOWING" label --- */
+.nowShowingLabel {
+  font-family: var(--font-geist-mono), 'Courier New', monospace;
+  font-size: 7.5px;
+  font-weight: 400;
+  letter-spacing: 2.5px;
+  color: rgba(255, 255, 255, 0.25);
+  text-transform: uppercase;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+/* --- Em dash separator --- */
+.separator {
+  color: rgba(255, 255, 255, 0.12);
+  margin-right: 8px;
+  font-size: 10px;
+  flex-shrink: 0;
+}
+
+/* --- Section name: ABOUT --- */
+.sectionName {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 2.5px;
+  color: rgba(255, 255, 255, 0.88);
+  text-transform: uppercase;
+  flex-shrink: 0;
+  position: relative;
+  text-shadow: 0 0 20px rgba(var(--theme-glow), 0.08);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+/* Section name transition states */
+.sectionNameExit {
+  opacity: 0;
+  transform: translateY(-3px);
+}
+
+.sectionNameEnter {
+  opacity: 0;
+  transform: translateY(3px);
+}
+
+.sectionNameVisible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* --- Film timecode: 00:02:18 --- */
+.timecode {
+  font-family: var(--font-geist-mono), 'Courier New', monospace;
+  font-size: 7px;
+  font-weight: 400;
+  letter-spacing: 1.5px;
+  color: rgba(var(--theme-main), 0.3);
+  padding-left: 12px;
+  margin-left: 12px;
+  flex-shrink: 0;
+  border-left: 1px solid rgba(255, 255, 255, 0.04);
+  height: 18px;
+  display: flex;
+  align-items: center;
+  transition: color 0.4s ease;
+}
+
+.timecodeUpdating {
+  color: rgba(var(--theme-main), 0.55);
+}
+
+/* --- "hover to navigate" hint --- */
+.hoverHint {
+  position: absolute;
+  bottom: -16px;
+  right: 0;
+  font-family: var(--font-geist-mono), 'Courier New', monospace;
+  font-size: 6.5px;
+  font-weight: 400;
+  letter-spacing: 2px;
+  color: rgba(255, 255, 255, 0.0);
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: color 0.6s ease 0.8s;
+  cursor: default;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Show hint on plate hover (only in collapsed state) */
+.plate:hover + .hoverHint {
+  color: rgba(255, 255, 255, 0.18);
+}
+
+/* Hide hint when expanded */
+.plate.expanded + .hoverHint {
+  color: rgba(255, 255, 255, 0.0);
+  transition: color 0.1s ease;
+}
+
+/* ============================================================
+   PROJECTION SWEEP — Horizontal amber light pass
+   Triggered on section change. Crosses the plate.
+   ============================================================ */
+.projectionSweep {
+  position: absolute;
+  top: 0;
+  left: -60px;
+  width: 60px;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(var(--theme-light), 0.06) 30%,
+    rgba(var(--theme-main), 0.12) 50%,
+    rgba(var(--theme-light), 0.06) 70%,
+    transparent 100%
+  );
+  z-index: 4;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.projectionSweepActive {
+  opacity: 1;
+  animation: sweepAcross 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@keyframes sweepAcross {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(calc(100% + 120px));
+    opacity: 0;
+  }
+}
+
+/* ============================================================
+   PLATE DUST — Dust motes drifting through the projection light.
+   Five motes: varied size, speed, trajectory, and brightness.
+   Part of the projector ecosystem.
+   ============================================================ */
+.plateDustField {
+  position: absolute;
+  inset: -6px;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 6;
+  opacity: 0.7;
+}
+
+.plateDustMote {
+  position: absolute;
+  border-radius: 50%;
+  will-change: transform;
+}
+
+/* Mote 1 — medium, steady drift */
+.plateDustMote1 {
+  width: 1.5px;
+  height: 1.5px;
+  background: rgba(255, 248, 230, 0.5);
+  box-shadow: 0 0 2px rgba(255, 248, 230, 0.2);
+  top: 25%;
+  left: -5%;
+  animation: plateDrift1 9s linear infinite;
+}
+
+/* Mote 2 — tiny, slow, high path */
+.plateDustMote2 {
+  width: 1px;
+  height: 1px;
+  background: rgba(255, 248, 230, 0.35);
+  top: 15%;
+  left: -10%;
+  animation: plateDrift2 14s linear infinite;
+  animation-delay: -4s;
+}
+
+/* Mote 3 — larger, dimmer, low path */
+.plateDustMote3 {
+  width: 2px;
+  height: 2px;
+  background: rgba(255, 248, 230, 0.25);
+  box-shadow: 0 0 3px rgba(255, 248, 230, 0.1);
+  top: 65%;
+  left: -8%;
+  animation: plateDrift3 10s linear infinite;
+  animation-delay: -2s;
+}
+
+/* Mote 4 — bright sparkle, fast, mid-path */
+.plateDustMote4 {
+  width: 1px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 0 4px rgba(var(--theme-glow), 0.4);
+  top: 42%;
+  left: -3%;
+  animation: plateDrift4 6s linear infinite;
+  animation-delay: -1s;
+}
+
+/* Mote 5 — ghost, very slow, near bottom */
+.plateDustMote5 {
+  width: 2.5px;
+  height: 2.5px;
+  background: rgba(255, 248, 230, 0.12);
+  top: 75%;
+  left: -12%;
+  animation: plateDrift5 16s linear infinite;
+  animation-delay: -7s;
+}
+
+@keyframes plateDrift1 {
+  0%   { transform: translate(0, 0); opacity: 0; }
+  8%   { opacity: 0.7; }
+  85%  { opacity: 0.5; }
+  100% { transform: translate(500px, -10px); opacity: 0; }
+}
+
+@keyframes plateDrift2 {
+  0%   { transform: translate(0, 0); opacity: 0; }
+  12%  { opacity: 0.4; }
+  50%  { transform: translate(250px, 6px); }
+  88%  { opacity: 0.3; }
+  100% { transform: translate(520px, 2px); opacity: 0; }
+}
+
+@keyframes plateDrift3 {
+  0%   { transform: translate(0, 0) scale(1); opacity: 0; }
+  15%  { opacity: 0.35; }
+  50%  { transform: translate(220px, -5px) scale(0.7); }
+  80%  { opacity: 0.2; }
+  100% { transform: translate(480px, -3px) scale(0.4); opacity: 0; }
+}
+
+@keyframes plateDrift4 {
+  0%   { transform: translate(0, 0) scale(0.5); opacity: 0; }
+  5%   { opacity: 0.9; }
+  15%  { opacity: 0.5; transform: translate(80px, -2px) scale(1); }
+  40%  { opacity: 0.8; }
+  90%  { opacity: 0.3; }
+  100% { transform: translate(420px, -6px) scale(0.3); opacity: 0; }
+}
+
+@keyframes plateDrift5 {
+  0%   { transform: translate(0, 0); opacity: 0; }
+  10%  { opacity: 0.15; }
+  50%  { transform: translate(300px, 3px); opacity: 0.12; }
+  90%  { opacity: 0.08; }
+  100% { transform: translate(560px, 5px); opacity: 0; }
+}
+
+/* ============================================================
+   EXPANDED STATE — Hover reveals navigation items
+   Plate widens horizontally (max ~450px). Height unchanged.
+   Mechanical unfolding — like a control panel revealing switches.
+   ============================================================ */
+.navItemsContainer {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  height: 100%;
+  overflow: hidden;
+  /* Collapsed: zero width, items hidden */
+  max-width: 0;
+  opacity: 0;
+  transition:
+    max-width 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.2s ease;
+  padding: 0;
+  border-left: 0px solid rgba(255, 255, 255, 0.0);
+}
+
+.plate.expanded .navItemsContainer {
+  max-width: 440px;
+  opacity: 1;
+  padding: 0 14px 0 14px;
+  border-left: 1px solid rgba(255, 255, 255, 0.06);
+  transition:
+    max-width 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.35s ease 0.12s,
+    padding 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    border-left 0.3s ease 0.15s;
+}
+
+/* Collapsed content hides when expanded */
+.plate.expanded .plateContent {
+  max-width: 0;
+  opacity: 0;
+  padding: 0;
+  overflow: hidden;
+  transition:
+    max-width 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.12s ease,
+    padding 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.plateContent {
+  transition:
+    max-width 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.3s ease 0.18s,
+    padding 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  max-width: 500px;
+}
+
+/* --- Individual nav item --- */
+.navItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 0 16px;
+  height: 100%;
+  cursor: pointer;
+  position: relative;
+  text-decoration: none;
+  border: none;
+  background: none;
+  transition: background 0.3s ease;
+}
+
+/* Engraved divider between items — slightly more visible */
+.navItem + .navItem {
+  border-left: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Scene code above label */
+.navItemScene {
+  font-family: var(--font-geist-mono), 'Courier New', monospace;
+  font-size: 7px;
+  font-weight: 400;
+  letter-spacing: 1.5px;
+  color: rgba(var(--theme-main), 0.2);
+  text-transform: uppercase;
+  line-height: 1;
+  transition: color 0.3s ease;
+}
+
+.navItemLabel {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 2.5px;
+  color: rgba(255, 255, 255, 0.38);
+  text-transform: uppercase;
+  line-height: 1;
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+/* --- Hover: projection light focuses on this scene --- */
+.navItem:hover .navItemLabel {
+  color: rgba(255, 255, 255, 0.92);
+  text-shadow: 0 0 12px rgba(var(--theme-glow), 0.1);
+}
+
+.navItem:hover .navItemScene {
+  color: rgba(var(--theme-main), 0.55);
+}
+
+/* Localized projection highlight on hover — warm amber focus */
+.navItem::before {
+  content: '';
+  position: absolute;
+  inset: 4px 0;
+  border-radius: 4px;
+  background: radial-gradient(
+    ellipse 100% 120% at 50% 30%,
+    rgba(var(--theme-main), 0.0) 0%,
+    transparent 100%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease, background 0.3s ease;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.navItem:hover::before {
+  background: radial-gradient(
+    ellipse 100% 120% at 50% 30%,
+    rgba(var(--theme-main), 0.07) 0%,
+    rgba(var(--theme-main), 0.02) 60%,
+    transparent 100%
+  );
+  opacity: 1;
+}
+
+/* --- Active item: the projector is focused here --- */
+.navItem.navItemActive .navItemLabel {
+  color: rgba(255, 255, 255, 0.95);
+  text-shadow: 0 0 18px rgba(var(--theme-glow), 0.18);
+}
+.navItem.navItemActive .navItemScene {
+  color: rgba(var(--theme-main), 0.85);
+  text-shadow: 0 0 8px rgba(var(--theme-glow), 0.2);
+}
+
+/* Bottom indicator line for active item */
+.navItem.navItemActive::after {
+  content: '';
+  position: absolute;
+  bottom: 6px;
+  left: 25%;
+  right: 25%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(var(--theme-main), 0.35) 50%,
+    transparent 100%
+  );
+  border-radius: 1px;
+}
+
+/* --- Join Us item (last) --- */
+.navItemJoin .navItemLabel {
+  color: rgba(var(--theme-main), 0.6);
+  font-weight: 600;
+}
+
+.navItemJoin:hover .navItemLabel {
+  color: rgba(var(--theme-main), 0.9);
+  text-shadow: 0 0 12px rgba(var(--theme-main), 0.2);
+}
+
+/* ============================================================
+   REGISTRATION MARKS — Film frame alignment marks
    ============================================================ */
 .registrationMark {
   position: absolute;
   top: 50%;
-  width: 12px;
-  height: 12px;
-  transform: translateY(-50%) rotate(0deg);
-  opacity: 0.07;
+  width: 10px;
+  height: 10px;
+  transform: translateY(-50%);
+  opacity: 0.05;
   pointer-events: none;
-  transition:
-    opacity 0.5s ease,
-    transform 0.5s cubic-bezier(0.25, 1, 0.5, 1),
-    left 0.5s cubic-bezier(0.25, 1, 0.5, 1),
-    right 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+  z-index: 5;
 }
 
 .registrationMark::before,
@@ -91,201 +810,36 @@
   transform: translateX(-50%);
 }
 
-.registrationLeft { left: 16px; }
-.registrationRight { right: 16px; }
+.registrationLeft { left: 4px; }
+.registrationRight { right: 4px; }
 
-.header.scrolled .registrationLeft {
-  transform: translateY(-50%) rotate(3deg);
-  left: 20px;
-}
 
-.header.scrolled .registrationRight {
-  transform: translateY(-50%) rotate(-3deg);
-  right: 20px;
-}
 
 /* ============================================================
-   BRAND BLOCK — "The Studio Mark"
-   ============================================================ */
-.brandBlock {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  text-decoration: none;
-  position: relative;
-  z-index: 10;
-  transition: filter 0.4s ease;
-  flex-shrink: 0;
-}
-
-.brandBlock:hover {
-  filter: drop-shadow(0 0 16px rgba(255, 240, 200, 0.12));
-}
-
-.brandLogo {
-  width: 40px;
-  height: 40px;
-  flex-shrink: 0;
-  transition: width 0.5s cubic-bezier(0.25, 1, 0.5, 1),
-              height 0.5s cubic-bezier(0.25, 1, 0.5, 1);
-}
-
-.header.scrolled .brandLogo {
-  width: 34px;
-  height: 34px;
-}
-
-.brandText {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.brandName {
-  color: #ffffff;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 17px;
-  font-weight: 800;
-  letter-spacing: 0.5px;
-  line-height: 1;
-}
-
-.brandSubtitle {
-  color: rgba(255, 255, 255, 0.35);
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 8.5px;
-  font-weight: 400;
-  letter-spacing: 3.5px;
-  text-transform: uppercase;
-  line-height: 1;
-}
-
-/* ============================================================
-   DIVIDER
-   ============================================================ */
-.divider {
-  width: 1px;
-  height: 28px;
-  background: rgba(255, 255, 255, 0.08);
-  margin: 0 32px;
-  flex-shrink: 0;
-  transition: height 0.5s cubic-bezier(0.25, 1, 0.5, 1);
-}
-
-.header.scrolled .divider {
-  height: 22px;
-}
-
-/* ============================================================
-   NAVIGATION LINKS — Title Card Credits
-   ============================================================ */
-.navLinks {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  position: relative;
-  z-index: 10;
-  flex: 1;
-}
-
-.navItem {
-  position: relative;
-}
-
-.navLink {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0;
-  color: rgba(255, 255, 255, 0.42);
-  text-decoration: none;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 2.5px;
-  text-transform: uppercase;
-  padding: 10px 18px;
-  transition: color 0.25s ease;
-}
-
-.navLink:hover {
-  color: rgba(255, 255, 255, 0.72);
-}
-
-.navLink.active {
-  color: rgba(255, 255, 255, 0.95);
-  text-shadow: 0 0 20px rgba(255, 240, 200, 0.2);
-}
-
-/* ============================================================
-   ACTIVE PROJECTION CONE — "The Projector's Current Focus"
-   Always on. Tracks current section. The beam physically sweeps
-   between links with cinematic easing.
-   
-   Beam properties adapt to scroll state:
-   - Hero: wider, softer, atmospheric (projector finding focus)
-   - Scrolled: narrower, sharper, precise (focus achieved)
-   
-   Properties driven by inline JS via CSS custom properties.
-   ============================================================ */
-.projectionCone {
-  position: absolute;
-  top: -24px;
-  left: 0;
-  width: 0;
-  height: calc(100% + 40px);
-  pointer-events: none;
-  z-index: 0;
-  background: radial-gradient(
-    ellipse 100% 100% at 50% 0%,
-    rgba(255, 245, 225, var(--beam-peak, 0.32)) 0%,
-    rgba(255, 240, 210, calc(var(--beam-peak, 0.32) * 0.55)) 35%,
-    rgba(255, 235, 200, calc(var(--beam-peak, 0.32) * 0.2)) 65%,
-    transparent 100%
-  );
-  filter: blur(var(--beam-blur, 12px));
-  mix-blend-mode: screen;
-  /* Cinematic sweep — the beam physically travels */
-  transition:
-    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
-    width 0.55s cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 0.4s ease;
-}
-
-.header.scrolled .projectionCone {
-  top: -12px;
-}
-
-/* ============================================================
-   HOVER PROJECTION CONE — "Potential Destination"
-   Secondary, dimmer, faster. Shows where you COULD go.
-   Does NOT appear when hovering the active link.
+   HOVER CONE — Secondary, dimmer beam
    ============================================================ */
 .hoverCone {
   position: absolute;
-  top: -24px;
+  top: -20px;
   left: 0;
   width: 0;
-  height: calc(100% + 40px);
+  height: calc(100% + 36px);
   pointer-events: none;
   z-index: 0;
   background: radial-gradient(
     ellipse 100% 100% at 50% 0%,
-    rgba(255, 245, 225, 0.16) 0%,
-    rgba(255, 240, 210, 0.08) 40%,
+    rgba(var(--theme-glow), 0.12) 0%,
+    rgba(255, 240, 210, 0.06) 40%,
     transparent 70%
   );
-  filter: blur(14px);
+  filter: blur(12px);
   mix-blend-mode: screen;
   opacity: 0;
   transition:
     transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
     width 0.35s cubic-bezier(0.22, 1, 0.36, 1),
     opacity 0.15s ease;
+  border-radius: 0 0 50% 50%;
 }
 
 .hoverCone.hoverVisible {
@@ -300,32 +854,9 @@
     opacity 0.35s ease;
 }
 
-.header.scrolled .hoverCone {
-  top: -12px;
-  filter: blur(8px);
-  background: radial-gradient(
-    ellipse 90% 100% at 50% 0%,
-    rgba(255, 245, 225, 0.20) 0%,
-    rgba(255, 240, 210, 0.10) 35%,
-    transparent 65%
-  );
-}
 
-/* ============================================================
-   ACTIVE DUST — Barely visible. Always in the active beam.
-   3 subtle particles. The user should NOT consciously notice.
-   ============================================================ */
-.activeDustField {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-  z-index: 1;
-  opacity: 0;
-  transition: opacity 0.5s ease;
-}
 
-.navLink.active .activeDustField {
+.navItem.navItemActive .activeDustField {
   opacity: 1;
 }
 
@@ -388,9 +919,7 @@
 }
 
 /* ============================================================
-   HOVER DUST — More visible. "Light is revealing something."
-   5 particles, visible only on hover of NON-ACTIVE links.
-   Fade in and out with the hover beam.
+   HOVER DUST — More visible on non-active hover
    ============================================================ */
 .hoverDustField {
   position: absolute;
@@ -402,12 +931,11 @@
   transition: opacity 0.2s ease;
 }
 
-.navLink:hover .hoverDustField {
+.navItem:hover .hoverDustField {
   opacity: 1;
 }
 
-/* Don't show hover dust on active link — active dust is enough */
-.navLink.active .hoverDustField {
+.navItem.navItemActive .hoverDustField {
   opacity: 0;
 }
 
@@ -446,24 +974,6 @@
   opacity: 0.8;
 }
 
-.hoverDustMote4 {
-  width: 3px;
-  height: 3px;
-  top: 70%;
-  left: 20%;
-  animation: hoverDrift4 3.8s ease-in-out infinite;
-  animation-delay: -0.5s;
-}
-
-.hoverDustMote5 {
-  width: 1.5px;
-  height: 1.5px;
-  top: 40%;
-  left: 70%;
-  animation: hoverDrift5 4.8s ease-in-out infinite;
-  animation-delay: -2.1s;
-}
-
 @keyframes hoverDrift1 {
   0%   { transform: translate(0, 0); opacity: 0; }
   15%  { opacity: 1; }
@@ -488,338 +998,60 @@
   100% { transform: translate(-2px, -10px) scale(0.5); opacity: 0; }
 }
 
-@keyframes hoverDrift4 {
-  0%   { transform: translate(0, 0); opacity: 0; }
-  30%  { opacity: 1; }
-  60%  { transform: translate(8px, -12px); opacity: 1; }
-  100% { transform: translate(15px, -20px); opacity: 0; }
-}
-
-@keyframes hoverDrift5 {
-  0%   { transform: translate(0, 0); opacity: 0; }
-  25%  { opacity: 1; }
-  50%  { transform: translate(5px, -5px); opacity: 1; }
-  100% { transform: translate(12px, -10px); opacity: 0; }
-}
-
 /* ============================================================
-   REGISTRATION TICK — Tiny frame mark below active link
+   SECTION COLOR THEMES — The plate adapts to its environment.
+   Hero = warm amber projection light.
+   About = ACM blue (#2563eb) technical grid light.
+   Future sections will add their own themes.
    ============================================================ */
-.registrationTick {
-  position: absolute;
-  bottom: 2px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 5px;
-  height: 1px;
-  background: rgba(255, 255, 255, 0.1);
-  opacity: 0;
-  transition: opacity 0.3s ease 0.15s;
-  pointer-events: none;
-}
 
-.navLink.active .registrationTick {
-  opacity: 1;
-}
+/* Hero section — warm amber (default, no extra class needed) */
+
+
 
 /* ============================================================
-   SCENE INDICATOR — "SC. 01"
-   ============================================================ */
-.sceneIndicator {
-  position: absolute;
-  top: -2px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-family: var(--font-geist-mono), 'Courier New', monospace;
-  font-size: 7.5px;
-  font-weight: 400;
-  letter-spacing: 1.5px;
-  color: rgba(255, 255, 255, 0.22);
-  white-space: nowrap;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  text-transform: uppercase;
-}
-
-.navLink.active .sceneIndicator {
-  opacity: 1;
-}
-
-/* ============================================================
-   ACTIONS — Right side
-   ============================================================ */
-.actions {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  z-index: 10;
-  margin-left: auto;
-}
-
-.joinBtn {
-  color: rgba(255, 255, 255, 0.85);
-  text-decoration: none;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 2.5px;
-  text-transform: uppercase;
-  padding: 10px 24px;
-  border-radius: 40px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
-}
-
-.joinBtn:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.18);
-  color: #ffffff;
-}
-
-/* ============================================================
-   MOBILE TOGGLE
+   MOBILE — Horizontal scrollable scene strip
    ============================================================ */
 .mobileToggle {
   display: none;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 8px;
-  z-index: 110;
-  position: relative;
 }
 
-.hamburger {
-  position: relative;
-  width: 26px;
-  height: 18px;
-}
-
-.hamburger span {
-  position: absolute;
-  left: 50%;
-  height: 1.5px;
-  background-color: rgba(255, 255, 255, 0.8);
-  border-radius: 2px;
-  transition:
-    transform 0.4s cubic-bezier(0.25, 1, 0.5, 1),
-    opacity 0.3s ease,
-    width 0.3s cubic-bezier(0.25, 1, 0.5, 1),
-    top 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-}
-
-.hamburger span:nth-child(1) {
-  top: 0px;
-  width: 16px;
-  transform: translateX(-50%);
-}
-.hamburger span:nth-child(2) {
-  top: 8px;
-  width: 26px;
-  transform: translateX(-50%);
-}
-.hamburger span:nth-child(3) {
-  top: 16px;
-  width: 16px;
-  transform: translateX(-50%);
-}
-
-.mobileToggle.open .hamburger span:nth-child(1) {
-  top: 8px;
-  width: 22px;
-  transform: translateX(-50%) rotate(45deg);
-}
-.mobileToggle.open .hamburger span:nth-child(2) {
-  opacity: 0;
-  width: 0;
-}
-.mobileToggle.open .hamburger span:nth-child(3) {
-  top: 8px;
-  width: 22px;
-  transform: translateX(-50%) rotate(-45deg);
-}
-
-/* ============================================================
-   MOBILE MENU — "The Screening Room"
-   ============================================================ */
-.mobileMenu {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100vh;
-  height: 100dvh;
-  background: rgba(4, 4, 8, 0.98);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  z-index: 90;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.45s cubic-bezier(0.25, 1, 0.5, 1);
-}
-
-.mobileMenu.mobileOpen {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.mobileBeam {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 1px;
-  height: 0;
-  background: linear-gradient(
-    to bottom,
-    rgba(255, 245, 225, 0.5) 0%,
-    rgba(255, 240, 200, 0.15) 40%,
-    rgba(255, 235, 190, 0.03) 80%,
-    transparent 100%
-  );
-  box-shadow: 0 0 30px 4px rgba(255, 240, 200, 0.03);
-  transition: height 0.7s cubic-bezier(0.25, 1, 0.5, 1) 0.15s;
-  z-index: 0;
-}
-
-.mobileMenu.mobileOpen .mobileBeam {
-  height: 100%;
-}
-
-.mobileCenterMark {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 20px;
-  height: 20px;
-  transform: translate(-50%, -50%);
-  opacity: 0;
-  transition: opacity 0.5s ease 0.6s;
-  pointer-events: none;
-}
-
-.mobileMenu.mobileOpen .mobileCenterMark {
-  opacity: 0.04;
-}
-
-.mobileCenterMark::before,
-.mobileCenterMark::after {
-  content: '';
-  position: absolute;
-  background: rgba(255, 255, 255, 0.9);
-}
-
-.mobileCenterMark::before {
-  top: 50%;
-  left: 0;
-  width: 100%;
-  height: 1px;
-  transform: translateY(-50%);
-}
-
-.mobileCenterMark::after {
-  left: 50%;
-  top: 0;
-  width: 1px;
-  height: 100%;
-  transform: translateX(-50%);
-}
-
-.mobileNavLinks {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  gap: 36px;
-  z-index: 1;
-}
-
-.mobileNavItem {
-  opacity: 0;
-  transform: translateY(16px);
-  transition:
-    opacity 0.45s ease,
-    transform 0.45s cubic-bezier(0.25, 1, 0.5, 1);
-}
-
-.mobileMenu.mobileOpen .mobileNavItem {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.mobileNavLink {
-  color: rgba(255, 255, 255, 0.5);
-  text-decoration: none;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 1.6rem;
-  font-weight: 300;
-  letter-spacing: 5px;
-  text-transform: uppercase;
-  transition: color 0.3s ease, text-shadow 0.3s ease;
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-}
-
-.mobileNavLink:hover,
-.mobileNavLink.active {
-  color: rgba(255, 255, 255, 0.92);
-  text-shadow: 0 0 24px rgba(255, 240, 200, 0.2);
-}
-
-.mobileScene {
-  font-family: var(--font-geist-mono), 'Courier New', monospace;
-  font-size: 8px;
-  font-weight: 400;
-  letter-spacing: 2px;
-  color: rgba(255, 255, 255, 0.18);
+/* Mobile scene strip container (inside the plate) */
+.mobileSceneStrip {
   display: none;
 }
 
-.mobileNavLink.active .mobileScene {
-  display: block;
-}
-
-.mobileJoinLink {
-  font-size: 1rem !important;
-  font-weight: 400 !important;
-  letter-spacing: 3px !important;
-  padding: 14px 36px;
-  border-radius: 40px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
 /* ============================================================
-   NAVBAR ASSEMBLY ANIMATION
+   ASSEMBLY ANIMATION — Post-loader reveal
    ============================================================ */
 .assembleHidden {
   opacity: 0 !important;
+  transform: translateY(-8px);
 }
 
 .assembleFade {
-  transition: opacity 0.45s cubic-bezier(0.25, 1, 0.5, 1) !important;
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity 0.5s cubic-bezier(0.25, 1, 0.5, 1),
+    transform 0.5s cubic-bezier(0.25, 1, 0.5, 1) !important;
 }
 
-.dividerDraw {
-  transform-origin: top center;
-  transform: scaleY(0);
+.plateAssembleHidden {
+  opacity: 0 !important;
+  transform: translateY(-12px) scale(0.96);
 }
 
-.dividerDrawIn {
-  transform: scaleY(1);
-  transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1) !important;
+.plateAssembleFade {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition:
+    opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1),
+    transform 0.6s cubic-bezier(0.25, 1, 0.5, 1) !important;
 }
 
 /* ============================================================
-   REDUCED MOTION — Respect user preference
+   REDUCED MOTION
    ============================================================ */
 @media (prefers-reduced-motion: reduce) {
   .projectionCone,
@@ -828,8 +1060,17 @@
   }
 
   .activeDustField,
-  .hoverDustField {
+  .hoverDustField,
+  .plateDustField {
     display: none !important;
+  }
+
+  .plate {
+    transition-duration: 0.01s !important;
+  }
+
+  .projectionSweepActive {
+    animation: none !important;
   }
 
   .header {
@@ -840,31 +1081,212 @@
 /* ============================================================
    RESPONSIVE
    ============================================================ */
-@media (max-width: 860px) {
+@media (max-width: 768px) {
   .nav {
-    padding: 0 24px;
+    padding: 0 16px;
   }
 
-  .navLinks,
-  .joinBtn,
-  .divider {
+  .brandLogo {
+    width: 32px;
+    height: 32px;
+  }
+
+  .header.scrolled .brandLogo {
+    width: 28px;
+    height: 28px;
+  }
+
+  .brandName { font-size: 15px; }
+  .brandSubtitle { font-size: 7.5px; letter-spacing: 3px; }
+
+  /* Hide desktop expanded nav items on mobile */
+  .navItemsContainer {
+    display: none !important;
+  }
+
+  /* Plate: slightly narrower */
+  .plate {
+    height: 40px;
+  }
+
+  .plateContent {
+    padding: 0 16px;
+  }
+
+  .nowShowingLabel {
+    display: none; /* Hide "NOW SHOWING" text, just show scene + name */
+  }
+
+  .separator {
     display: none;
   }
 
-  .mobileToggle {
-    display: block;
+  /* Mobile scene strip */
+  .mobileSceneStrip {
+    display: none; /* shown via JS toggle */
+    position: fixed;
+    top: 58px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 99;
+    pointer-events: auto;
+
+    /* Same metal plate aesthetic */
+    background:
+      repeating-linear-gradient(
+        115deg,
+        transparent 0px,
+        transparent 1.5px,
+        rgba(255, 255, 255, 0.008) 1.5px,
+        rgba(255, 255, 255, 0.008) 2px
+      ),
+      linear-gradient(
+        180deg,
+        rgba(18, 18, 26, 0.96) 0%,
+        rgba(12, 12, 18, 0.98) 100%
+      );
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 6px;
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, 0.02),
+      0 4px 16px rgba(0, 0, 0, 0.5),
+      0 12px 40px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(20px) saturate(140%);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+
+    max-width: 90vw;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+
+    /* Smooth reveal */
+    opacity: 0;
+    transform: translateX(-50%) translateY(-8px);
+    transition:
+      opacity 0.3s cubic-bezier(0.25, 1, 0.5, 1),
+      transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
   }
 
-  .registrationLeft { left: 8px; }
-  .registrationRight { right: 8px; }
+  .mobileSceneStrip::-webkit-scrollbar {
+    display: none;
+  }
 
-  .header.scrolled .registrationLeft { left: 12px; }
-  .header.scrolled .registrationRight { right: 12px; }
+  .mobileSceneStrip.mobileStripOpen {
+    display: flex;
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .mobileSceneItem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 10px 18px;
+    flex-shrink: 0;
+    cursor: pointer;
+    text-decoration: none;
+    background: none;
+    border: none;
+    position: relative;
+  }
+
+  .mobileSceneItem + .mobileSceneItem {
+    border-left: 1px solid rgba(255, 255, 255, 0.04);
+  }
+
+  .mobileSceneCode {
+    font-family: var(--font-geist-mono), 'Courier New', monospace;
+    font-size: 7px;
+    font-weight: 400;
+    letter-spacing: 1.5px;
+    color: rgba(255, 255, 255, 0.18);
+    text-transform: uppercase;
+    line-height: 1;
+  }
+
+  .mobileSceneLabel {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    color: rgba(255, 255, 255, 0.4);
+    text-transform: uppercase;
+    line-height: 1;
+  }
+
+  .mobileSceneItem.mobileSceneActive .mobileSceneCode {
+    color: rgba(var(--theme-main), 0.6);
+  }
+
+  .mobileSceneItem.mobileSceneActive .mobileSceneLabel {
+    color: rgba(255, 255, 255, 0.95);
+    text-shadow: 0 0 12px rgba(var(--theme-glow), 0.15);
+  }
+
+  /* Warm projection reflection on top of strip */
+  .mobileSceneStrip::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 10%;
+    right: 10%;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(var(--theme-light), 0.12) 30%,
+      rgba(var(--theme-main), 0.18) 50%,
+      rgba(var(--theme-light), 0.12) 70%,
+      transparent 100%
+    );
+    z-index: 5;
+  }
 }
 
-@media (max-width: 480px) {
-  .brandName { font-size: 15px; }
-  .brandSubtitle { font-size: 7.5px; letter-spacing: 3px; }
-  .brandLogo { width: 34px; height: 34px; }
-  .header.scrolled .brandLogo { width: 30px; height: 30px; }
+@media (max-width: 420px) {
+  .brandName { font-size: 14px; }
+  .brandSubtitle { font-size: 7px; letter-spacing: 2.5px; }
+  .brandLogo { width: 28px; height: 28px; }
+  .header.scrolled .brandLogo { width: 26px; height: 26px; }
+
+  .sceneNumber {
+    font-size: 7px;
+    margin-right: 8px;
+  }
+
+  .sectionName {
+    font-size: 10px;
+    letter-spacing: 2px;
+  }
+
+  .timecode {
+    font-size: 6.5px;
+  }
+}
+
+/* ============================================================
+   THEMES
+   ============================================================ */
+.themeAbout {
+  --theme-main: 96, 165, 255;
+  --theme-light: 160, 200, 255;
+  --theme-glow: 220, 240, 255;
+}
+.themeEvents {
+  --theme-main: 216, 140, 255;
+  --theme-light: 235, 180, 255;
+  --theme-glow: 250, 230, 255;
+}
+.themeProjects {
+  --theme-main: 100, 230, 180;
+  --theme-light: 150, 250, 210;
+  --theme-glow: 220, 255, 240;
+}
+.themeTeam {
+  --theme-main: 255, 140, 80;
+  --theme-light: 255, 180, 130;
+  --theme-glow: 255, 230, 210;
 }
