@@ -38,6 +38,7 @@ type AudioNodes = {
 
 let audioNodes: AudioNodes | null = null;
 let isInitialized = false;
+let currentMasterVolume = 1;
 
 // ---- Helpers ----
 
@@ -62,7 +63,7 @@ export function initAudio(): boolean {
     const ctx = new AudioCtx();
 
     const master = ctx.createGain();
-    master.gain.value = 0;
+    master.gain.value = currentMasterVolume;
     master.connect(ctx.destination);
 
     audioNodes = {
@@ -577,7 +578,9 @@ export function playRevealSwell(): void {
 // 9. ACCELERATION WHIR — reel speeding up on "Explore"
 // ================================================================
 export function playAccelerationWhir(duration: number = 1.8): void {
+  if (!audioNodes && !initAudio()) return;
   if (!audioNodes) return;
+  
   const { ctx, master } = audioNodes;
   const t = ctx.currentTime;
 
@@ -640,7 +643,9 @@ export function playAccelerationWhir(duration: number = 1.8): void {
 // 10. LIGHT FLASH — subtle, mature cinematic flash
 // ================================================================
 export function playLightFlash(): void {
+  if (!audioNodes && !initAudio()) return;
   if (!audioNodes) return;
+
   const { ctx, master } = audioNodes;
   const t = ctx.currentTime;
 
@@ -706,18 +711,19 @@ export function playLightFlash(): void {
 // ================================================================
 
 export function setMasterVolume(volume: number): void {
+  currentMasterVolume = Math.max(0, Math.min(1, volume));
   if (!audioNodes) return;
   const { ctx, master } = audioNodes;
   master.gain.cancelScheduledValues(ctx.currentTime);
+  master.gain.setValueAtTime(master.gain.value, ctx.currentTime);
   master.gain.linearRampToValueAtTime(
-    Math.max(0, Math.min(1, volume)),
+    currentMasterVolume,
     ctx.currentTime + 0.05
   );
 }
 
 export function getMasterVolume(): number {
-  if (!audioNodes) return 1;
-  return audioNodes.master.gain.value;
+  return currentMasterVolume;
 }
 
 export function disposeAudio(): void {

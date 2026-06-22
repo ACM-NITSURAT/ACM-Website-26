@@ -32,9 +32,9 @@
 
 /* --- Inner Container — positions brand left, plate right --- */
 .nav {
-  --theme-main: 255, 200, 120;
-  --theme-light: 255, 220, 160;
-  --theme-glow: 255, 240, 200;
+  --theme-main: 75, 165, 228;
+  --theme-light: 100, 190, 255;
+  --theme-glow: 140, 220, 255;
   position: relative;
   width: 100%;
   max-width: 1400px;
@@ -1271,9 +1271,9 @@
    THEMES
    ============================================================ */
 .themeAbout {
-  --theme-main: 96, 165, 255;
-  --theme-light: 160, 200, 255;
-  --theme-glow: 220, 240, 255;
+  --theme-main: 37, 99, 235;
+  --theme-light: 96, 165, 250;
+  --theme-glow: 191, 219, 254;
 }
 .themeEvents {
   --theme-main: 216, 140, 255;

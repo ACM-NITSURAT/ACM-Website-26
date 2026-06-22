@@ -69,6 +69,24 @@ export default function CinemaLoader({ children }: CinemaLoaderProps) {
   const [isWaitingForAssets, setIsWaitingForAssets] = useState(false);
   const assetsLoadedRef = useRef(false);
 
+  // Check sessionStorage after hydration to prevent hydration mismatch
+  useEffect(() => {
+    const shouldSkip = sessionStorage.getItem('cinema-loaded') === '1';
+    if (shouldSkip) {
+      setLoaderState('hidden');
+      
+      // Restore audio preference
+      const isMuted = sessionStorage.getItem('cinema-audio-muted') === 'true';
+      if (isMuted) {
+        setMasterVolume(0);
+      } else {
+        setMasterVolume(1);
+      }
+      
+      window.dispatchEvent(new CustomEvent('cinema-loader-complete'));
+    }
+  }, []);
+
   const handleSkip = useCallback(() => {
     if (hasSkippedRef.current) return;
     hasSkippedRef.current = true;
@@ -89,6 +107,7 @@ export default function CinemaLoader({ children }: CinemaLoaderProps) {
       const next = !prev;
       isMutedRef.current = next;
       setMasterVolume(next ? 0 : 1);
+      sessionStorage.setItem('cinema-audio-muted', next ? 'true' : 'false');
       return next;
     });
   }, []);
@@ -96,6 +115,7 @@ export default function CinemaLoader({ children }: CinemaLoaderProps) {
   const handleEnterWithSound = useCallback(() => {
     setIsMuted(false);
     isMutedRef.current = false;
+    sessionStorage.setItem('cinema-audio-muted', 'false');
     initAudio();
     resumeAudio();
     setLoaderState('playing');
@@ -104,6 +124,7 @@ export default function CinemaLoader({ children }: CinemaLoaderProps) {
   const handleEnterSilently = useCallback(() => {
     setIsMuted(true);
     isMutedRef.current = true;
+    sessionStorage.setItem('cinema-audio-muted', 'true');
     initAudio();
     resumeAudio();
     setMasterVolume(0);
@@ -640,6 +661,7 @@ export default function CinemaLoader({ children }: CinemaLoaderProps) {
       // Complete — notify navbar to begin assembly
       tl.call(() => {
         setLoaderState('complete');
+        sessionStorage.setItem('cinema-loaded', '1');
         window.dispatchEvent(new CustomEvent('cinema-loader-complete'));
       }, [], 4.70);
     });

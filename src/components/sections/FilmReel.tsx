@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef } from 'react';
+import React, { useRef, useMemo } from 'react';
 import { motion, useScroll, useVelocity, useSpring, useAnimationFrame, useMotionValue, useTransform } from 'framer-motion';
 import styles from './HeroSection.module.css';
 
@@ -29,7 +29,7 @@ interface FilmReelProps {
   transitionState?: 'idle' | 'accel1' | 'accel2' | 'accel3' | 'flash' | 'intro' | 'reverseFlash' | 'reverseFlashHero';
 }
 
-export default function FilmReel({ 
+function FilmReel({ 
   className, 
   atmosphereOpacity, 
   transitionState = 'idle',
@@ -40,24 +40,23 @@ export default function FilmReel({
   const CX = 250;
   const CY = 250;
   
-  // 6 Classic Reel Cutouts
-  const cutoutCount = 6;
-  const cutouts = Array.from({ length: cutoutCount }, (_, i) => {
-    const angle = i * 60; // 360 / 6
-    const rad = angle * Math.PI / 180;
-    // R = Distance from center, r = Radius of cutout hole
-    const R = 135; 
-    const r = 58;  
-    
-    // Use .toFixed(4) to prevent Server/Client hydration mismatches 
-    // due to floating point math differences in Node vs Browser
-    return {
-      angle,
-      cx: Number((CX + R * Math.cos(rad)).toFixed(4)),
-      cy: Number((CY + R * Math.sin(rad)).toFixed(4)),
-      r
-    };
-  });
+  // Memoize cutout geometry — only recomputed if component remounts
+  const cutouts = useMemo(() => {
+    const cutoutCount = 6;
+    return Array.from({ length: cutoutCount }, (_, i) => {
+      const angle = i * 60;
+      const rad = angle * Math.PI / 180;
+      const R = 135; 
+      const r = 58;  
+      
+      return {
+        angle,
+        cx: Number((CX + R * Math.cos(rad)).toFixed(4)),
+        cy: Number((CY + R * Math.sin(rad)).toFixed(4)),
+        r
+      };
+    });
+  }, []);
 
   /* ==========================================
      PHYSICS & MOTION STATE
@@ -357,3 +356,5 @@ export default function FilmReel({
     </div>
   );
 }
+
+export default React.memo(FilmReel);

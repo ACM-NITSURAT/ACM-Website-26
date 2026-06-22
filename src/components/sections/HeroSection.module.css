@@ -51,7 +51,8 @@
   right: 0;
   height: 200px;
   background: linear-gradient(to top, #070707 0%, transparent 100%);
-  z-index: 50; /* Above the atmosphere to fade it out */
+  z-index: 50;
+  /* Above the atmosphere to fade it out */
   pointer-events: none;
 }
 
@@ -100,12 +101,39 @@
 }
 
 .heroBgBlue {
-  filter: hue-rotate(180deg) saturate(2.2) brightness(1.4);
+  filter: brightness(1.5) saturate(1.5) contrast(1.1);
+}
+
+.heroBgBlue::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 100% 100% at 50% 50%, rgba(75, 165, 228, 0.25) 0%, rgba(75, 165, 228, 0.05) 45%, transparent 80%);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  animation: centerFlare 2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes centerFlare {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  20% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  100% {
+    opacity: 0.8;
+    transform: scale(1.1);
+  }
 }
 
 .blueLightTransition {
   transition: filter 2s cubic-bezier(0.16, 1, 0.3, 1);
-  filter: hue-rotate(180deg) saturate(2.2) brightness(1.4);
+  filter: brightness(1.5) saturate(1.5) contrast(1.1);
 }
 
 /* Film Grain — Barely visible, cinematic texture */
@@ -168,8 +196,8 @@
   position: absolute;
   inset: 0;
   background: radial-gradient(ellipse 120% 100% at 25% 35%,
-      rgba(255, 190, 120, 0.04) 0%,
-      rgba(255, 170, 80, 0.015) 30%,
+      rgba(120, 190, 255, 0.04) 0%,
+      rgba(80, 170, 255, 0.015) 30%,
       transparent 70%);
   mix-blend-mode: screen;
   animation: farDrift 45s ease-in-out infinite alternate;
@@ -208,15 +236,15 @@
   inset: 0;
   background: conic-gradient(from 90deg at 0% 0%,
       transparent 0deg,
-      rgba(255, 230, 150, 0.05) 12deg,
+      rgba(150, 230, 255, 0.05) 12deg,
       transparent 20deg,
-      rgba(255, 220, 130, 0.16) 30deg,
+      rgba(130, 220, 255, 0.16) 30deg,
       /* Main, brightest beam pointing diagonally */
       transparent 40deg,
-      rgba(255, 210, 120, 0.07) 50deg,
+      rgba(120, 210, 255, 0.07) 50deg,
       /* Secondary lower beam */
       transparent 65deg,
-      rgba(255, 200, 110, 0.02) 80deg,
+      rgba(110, 200, 255, 0.02) 80deg,
       transparent 100deg,
       transparent 360deg);
   /* The rays should dissolve smoothly into the atmosphere */
@@ -241,9 +269,9 @@
   /* Elongated ellipse flows from the upper-left source across the
      space to naturally envelop the reel on the right. */
   background: radial-gradient(ellipse 140% 75% at 30% 40%,
-      rgba(255, 205, 120, 0.18) 0%,
-      rgba(255, 190, 90, 0.08) 35%,
-      rgba(255, 175, 70, 0.03) 65%,
+      rgba(120, 205, 255, 0.18) 0%,
+      rgba(90, 190, 255, 0.08) 35%,
+      rgba(70, 175, 255, 0.03) 65%,
       transparent 85%);
   mix-blend-mode: screen;
 }
@@ -253,9 +281,9 @@
   position: absolute;
   inset: 0;
   background: radial-gradient(ellipse 80% 80% at 0% 0%,
-      rgba(255, 220, 150, 0.35) 0%,
-      rgba(255, 200, 110, 0.15) 20%,
-      rgba(255, 180, 80, 0.05) 45%,
+      rgba(150, 220, 255, 0.35) 0%,
+      rgba(110, 200, 255, 0.15) 20%,
+      rgba(80, 180, 255, 0.05) 45%,
       transparent 70%);
   mix-blend-mode: screen;
 }
@@ -267,8 +295,8 @@
   background:
     /* Wide warm scatter stretched to encompass the reel */
     radial-gradient(ellipse 150% 110% at 25% 40%,
-      rgba(255, 200, 130, 0.035) 0%,
-      rgba(255, 190, 110, 0.015) 45%,
+      rgba(130, 200, 255, 0.035) 0%,
+      rgba(110, 190, 255, 0.015) 45%,
       transparent 85%),
     /* Very faint cool environmental fill from opposite side (lower-right)
        This prevents single-source artificial feel */
@@ -286,9 +314,9 @@
   /* Conic from upper-left — the beam has a soft angular shape */
   background: conic-gradient(from 210deg at 25% 30%,
       transparent 0deg,
-      rgba(255, 210, 150, 0.03) 20deg,
-      rgba(255, 200, 130, 0.05) 45deg,
-      rgba(255, 210, 150, 0.03) 70deg,
+      rgba(150, 210, 255, 0.03) 20deg,
+      rgba(130, 200, 255, 0.05) 45deg,
+      rgba(150, 210, 255, 0.03) 70deg,
       transparent 100deg,
       transparent 360deg);
   /* Fade out as you move away from the source */
@@ -317,7 +345,7 @@
   inset: 0;
   will-change: transform;
   /* Atmospheric softness — light rays in air are never sharp */
-  filter: blur(10px);
+  filter: blur(6px);
   /* Mask: rays fade from visibility near beam center outward */
   -webkit-mask-image: radial-gradient(ellipse 85% 85% at 40% 45%,
       black 0%,
@@ -343,9 +371,9 @@
 .rayLayer1 {
   background: conic-gradient(from 200deg at 28% 35%,
       transparent 0deg,
-      rgba(255, 220, 170, 0.06) 12deg,
-      rgba(255, 210, 150, 0.09) 28deg,
-      rgba(255, 220, 170, 0.04) 45deg,
+      rgba(170, 220, 255, 0.06) 12deg,
+      rgba(150, 210, 255, 0.09) 28deg,
+      rgba(170, 220, 255, 0.04) 45deg,
       transparent 65deg,
       transparent 360deg);
   animation: swayRays1 18s ease-in-out infinite alternate;
@@ -355,9 +383,9 @@
 .rayLayer2 {
   background: conic-gradient(from 215deg at 30% 38%,
       transparent 0deg,
-      rgba(255, 200, 130, 0.05) 18deg,
-      rgba(255, 215, 160, 0.08) 38deg,
-      rgba(255, 200, 130, 0.03) 55deg,
+      rgba(130, 200, 255, 0.05) 18deg,
+      rgba(160, 215, 255, 0.08) 38deg,
+      rgba(130, 200, 255, 0.03) 55deg,
       transparent 75deg,
       transparent 360deg);
   animation: swayRays2 25s ease-in-out infinite alternate;
@@ -367,9 +395,9 @@
 .rayLayer3 {
   background: conic-gradient(from 195deg at 26% 32%,
       transparent 0deg,
-      rgba(255, 230, 190, 0.035) 8deg,
-      rgba(255, 215, 150, 0.06) 35deg,
-      rgba(255, 230, 190, 0.025) 60deg,
+      rgba(190, 230, 255, 0.035) 8deg,
+      rgba(150, 215, 255, 0.06) 35deg,
+      rgba(190, 230, 255, 0.025) 60deg,
       transparent 80deg,
       transparent 360deg);
   animation: swayRays3 32s ease-in-out infinite alternate;
@@ -415,8 +443,8 @@
   position: absolute;
   inset: 0;
   background: radial-gradient(ellipse 100% 80% at 40% 45%,
-      rgba(255, 200, 140, 0.025) 0%,
-      rgba(255, 190, 120, 0.008) 40%,
+      rgba(140, 200, 255, 0.025) 0%,
+      rgba(120, 190, 255, 0.008) 40%,
       transparent 70%);
   mix-blend-mode: screen;
   animation: midDrift 30s ease-in-out infinite alternate;
@@ -472,8 +500,8 @@
   z-index: 5;
   /* Above reel (z-index 1) */
   background: radial-gradient(ellipse 90% 80% at 38% 43%,
-      rgba(255, 210, 150, 0.03) 0%,
-      rgba(255, 200, 130, 0.01) 35%,
+      rgba(150, 210, 255, 0.03) 0%,
+      rgba(130, 200, 255, 0.01) 35%,
       transparent 65%);
   mix-blend-mode: screen;
   pointer-events: none;
@@ -646,8 +674,8 @@
   letter-spacing: -0.03em;
   text-transform: uppercase;
   text-shadow:
-    0 4px 32px rgba(255, 210, 150, 0.15),
-    0 2px 8px rgba(255, 210, 150, 0.05);
+    0 4px 32px rgba(150, 210, 255, 0.15),
+    0 2px 8px rgba(150, 210, 255, 0.05);
 }
 
 .headlineLine:last-child {
@@ -701,23 +729,23 @@
 }
 
 .heroCtaActive {
-  box-shadow: 0 0 24px rgba(201, 168, 76, 0.4);
-  border-color: rgba(201, 168, 76, 0.8);
+  box-shadow: 0 0 24px rgba(75, 165, 228, 0.4);
+  border-color: rgba(75, 165, 228, 0.8);
   color: #fff;
   animation: buttonPulse 800ms ease-out forwards;
 }
 
 @keyframes buttonPulse {
   0% {
-    box-shadow: 0 0 0 rgba(201, 168, 76, 0);
+    box-shadow: 0 0 0 rgba(75, 165, 228, 0);
   }
 
   50% {
-    box-shadow: 0 0 24px rgba(201, 168, 76, 0.6);
+    box-shadow: 0 0 24px rgba(75, 165, 228, 0.6);
   }
 
   100% {
-    box-shadow: 0 0 32px rgba(201, 168, 76, 0.8);
+    box-shadow: 0 0 32px rgba(75, 165, 228, 0.8);
   }
 }
 
@@ -803,11 +831,11 @@
   background:
     /* A: Key Light Wash — warm directional wash from the upper-left projector */
     linear-gradient(140deg,
-      rgba(255, 225, 150, 0.6) 0%,
+      rgba(150, 225, 255, 0.6) 0%,
       /* Brightest projection illumination on upper-left face */
-      rgba(255, 210, 120, 0.25) 35%,
+      rgba(120, 210, 255, 0.25) 35%,
       /* Smooth, gradual falloff across the center */
-      rgba(255, 190, 90, 0.05) 55%,
+      rgba(90, 190, 255, 0.05) 55%,
       /* Fading into neutral metallic grey */
       transparent 70%,
       rgba(0, 0, 0, 0.6) 100%
@@ -840,25 +868,27 @@
   border-radius: 50%;
   pointer-events: none;
   z-index: 11;
+  mix-blend-mode: color-dodge;
+  filter: drop-shadow(0 0 12px rgba(180, 240, 255, 0.6)) brightness(1.2);
   transition: filter 2s cubic-bezier(0.16, 1, 0.3, 1);
   background: conic-gradient(from 210deg at 50% 50%,
       transparent 0deg,
-      rgba(255, 230, 120, 0.05) 45deg,
-      rgba(255, 240, 140, 0.15) 75deg,
-      rgba(255, 245, 160, 0.5) 92deg,
+      rgba(75, 165, 228, 0.05) 45deg,
+      rgba(100, 190, 255, 0.15) 75deg,
+      rgba(140, 220, 255, 0.5) 92deg,
       /* Approaching hotspot */
-      rgba(255, 255, 180, 0.95) 100deg,
+      rgba(180, 240, 255, 0.95) 100deg,
       /* Hotspot core start */
-      rgba(255, 255, 210, 1.0) 103deg,
-      /* Peak start (Bright light yellow) */
-      rgba(255, 255, 210, 1.0) 107deg,
+      rgba(230, 250, 255, 1.0) 103deg,
+      /* Peak start (Bright ice blue) */
+      rgba(230, 250, 255, 1.0) 107deg,
       /* Peak end (10:30) */
-      rgba(255, 255, 180, 0.95) 110deg,
+      rgba(180, 240, 255, 0.95) 110deg,
       /* Hotspot core end */
-      rgba(255, 245, 160, 0.4) 120deg,
+      rgba(140, 220, 255, 0.4) 120deg,
       /* Receding */
-      rgba(255, 240, 140, 0.15) 135deg,
-      rgba(255, 230, 120, 0.0) 160deg,
+      rgba(100, 190, 255, 0.15) 135deg,
+      rgba(75, 165, 228, 0.0) 160deg,
       transparent 180deg,
       transparent 360deg);
   /* The SVG rim is at r=218 to 236. 
@@ -1169,11 +1199,10 @@
    ============================================================ */
 
 .lightningOverlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   pointer-events: none;
   z-index: 100;
   /* Glow filter for the entire SVG */

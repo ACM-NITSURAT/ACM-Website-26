@@ -73,9 +73,10 @@ export default function HeroSection({ onExploreClick, isTransitioning, transitio
       if (timestamp - lastDraw < 40) return;
       lastDraw = timestamp;
 
-      if (!ctaRef.current) return;
+      if (!ctaRef.current || !containerRef.current) return;
 
       const ctaRect = ctaRef.current.getBoundingClientRect();
+      const containerRect = containerRef.current.getBoundingClientRect();
       const hub = document.querySelector('[data-reel-hub]');
       if (!hub) return;
 
@@ -86,16 +87,16 @@ export default function HeroSection({ onExploreClick, isTransitioning, transitio
       // Determine layout based on horizontal positioning
       // If the Reel (hub) is to the right of the CTA button (Desktop)
       if (hubRect.left > ctaRect.right - 40) {
-        startX = ctaRect.right; // Right center
-        startY = ctaRect.top + ctaRect.height / 2;
+        startX = ctaRect.right - containerRect.left; // Right center
+        startY = ctaRect.top + ctaRect.height / 2 - containerRect.top;
       } else {
         // If they are stacked vertically (Mobile)
-        startX = ctaRect.left + ctaRect.width / 2; // Top center
-        startY = ctaRect.top;
+        startX = ctaRect.left + ctaRect.width / 2 - containerRect.left; // Top center
+        startY = ctaRect.top - containerRect.top;
       }
 
-      const endX = hubRect.left + hubRect.width / 2;
-      const endY = hubRect.top + hubRect.height / 2;
+      const endX = hubRect.left + hubRect.width / 2 - containerRect.left;
+      const endY = hubRect.top + hubRect.height / 2 - containerRect.top;
 
       const dx = endX - startX;
       const dy = endY - startY;
@@ -171,8 +172,31 @@ export default function HeroSection({ onExploreClick, isTransitioning, transitio
         const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
         if (!AudioContextClass) return;
 
-        const ctx = new AudioContextClass();
-        audioCtxRef.current = ctx;
+        // Reuse existing context if it exists and isn't closed, otherwise create a new one
+        let ctx = audioCtxRef.current;
+        if (!ctx || ctx.state === 'closed') {
+          ctx = new AudioContextClass();
+          audioCtxRef.current = ctx;
+        }
+
+        // If the browser blocked autoplay (e.g. user reloaded and hasn't clicked yet)
+        // Add a one-time click listener to resume it the moment they interact
+        if (ctx.state === 'suspended') {
+          const resumeAudio = () => {
+            if (ctx && ctx.state === 'suspended') {
+              ctx.resume();
+            }
+            window.removeEventListener('click', resumeAudio);
+            window.removeEventListener('touchstart', resumeAudio);
+          };
+          window.addEventListener('click', resumeAudio);
+          window.addEventListener('touchstart', resumeAudio);
+        }
+
+        // Disconnect old gain node if it exists to prevent overlapping sounds
+        if (gainNodeRef.current) {
+          gainNodeRef.current.disconnect();
+        }
 
         const masterGain = ctx.createGain();
         masterGain.gain.value = 0; // Start at 0 for fade in
@@ -183,16 +207,16 @@ export default function HeroSection({ onExploreClick, isTransitioning, transitio
         const hum1 = ctx.createOscillator();
         hum1.type = 'sawtooth';
         hum1.frequency.value = 120;
-        
+
         // Slightly detuned hum to create a "throbbing" electric phase effect
         const hum2 = ctx.createOscillator();
         hum2.type = 'sawtooth';
         hum2.frequency.value = 121;
-        
+
         // Lowpass filter: High enough to hear the "buzz" texture, low enough to not be harsh
         const filter = ctx.createBiquadFilter();
         filter.type = 'lowpass';
-        filter.frequency.value = 900; 
+        filter.frequency.value = 900;
 
         hum1.connect(filter);
         hum2.connect(filter);
@@ -202,7 +226,6 @@ export default function HeroSection({ onExploreClick, isTransitioning, transitio
         hum2.start();
 
         // Fade in gradually over 1.2 seconds so it swells up like a machine powering on
-        // rather than hitting the user suddenly
         masterGain.gain.setValueAtTime(0, ctx.currentTime);
         masterGain.gain.linearRampToValueAtTime(0.06, ctx.currentTime + 1.2);
 
@@ -214,23 +237,30 @@ export default function HeroSection({ onExploreClick, isTransitioning, transitio
       if (audioCtxRef.current && gainNodeRef.current) {
         const ctx = audioCtxRef.current;
         const gain = gainNodeRef.current;
+
+        // Cancel any ongoing fade-ins and start fading out from current value
+        gain.gain.cancelScheduledValues(ctx.currentTime);
         gain.gain.setValueAtTime(gain.gain.value, ctx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+
+        // Disconnect after fade out, but keep the context alive for future hovers
         setTimeout(() => {
-          if (ctx.state !== 'closed') ctx.close();
-          audioCtxRef.current = null;
-        }, 300);
+          gain.disconnect();
+          gainNodeRef.current = null;
+        }, 350);
       }
     }
+  }, [isTransitioning]);
 
+  // Dedicated unmount cleanup for the AudioContext
+  useEffect(() => {
     return () => {
-      // Cleanup on unmount
       if (audioCtxRef.current && audioCtxRef.current.state !== 'closed') {
         audioCtxRef.current.close();
         audioCtxRef.current = null;
       }
     };
-  }, [isTransitioning]);
+  }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => setSceneEstablished(true), 50);
@@ -265,7 +295,7 @@ export default function HeroSection({ onExploreClick, isTransitioning, transitio
      that never feels frozen or mathematically perfect.
      ========================================== */
   const time = useMotionValue(0);
-  
+
   const breathOpacity = useTransform(time, t => {
     const thermalPulse = Math.sin(t / 2000) * 0.3;      // ±30% slow thermal
     const electricalFlicker = Math.sin(t / 160) * 0.04;  // ±4% medium
@@ -279,7 +309,7 @@ export default function HeroSection({ onExploreClick, isTransitioning, transitio
     const secondaryWobble = Math.cos(t / 1200) * 1.5;
     return (primaryDrift + secondaryWobble) + "%";
   });
-  
+
   const breathY = useTransform(time, t => {
     const primaryDrift = Math.cos(t / 2800) * 5;
     const secondaryWobble = Math.sin(t / 1500) * 1.2;
@@ -291,10 +321,10 @@ export default function HeroSection({ onExploreClick, isTransitioning, transitio
   });
 
   return (
-    <section 
-      ref={containerRef} 
-      className={styles.hero} 
-      id="hero" 
+    <section
+      ref={containerRef}
+      className={styles.hero}
+      id="hero"
       data-nav-section="hero"
     >
       {/* ========================================
@@ -304,24 +334,24 @@ export default function HeroSection({ onExploreClick, isTransitioning, transitio
         {/* Foundational layers */}
         <div className={styles.heroFilmGrain} aria-hidden="true" />
         <div className={styles.heroVignette} aria-hidden="true" />
-        
+
         {/* Atmosphere scales on scroll to simulate widening beam */}
-        <motion.div 
-          className={`${styles.heroAtmosphereSystem} ${sceneEstablished ? styles.sceneEstablished : ''}`} 
+        <motion.div
+          className={`${styles.heroAtmosphereSystem} ${sceneEstablished ? styles.sceneEstablished : ''}`}
           style={{ scale: glowScale }}
-          aria-hidden="true" 
+          aria-hidden="true"
         >
           {/* Depth Band 1: Far Atmosphere — slowest drift (CSS animated) */}
           <div className={styles.farAtmosphere} />
 
           {/* Rhythm Container: breathes and drifts together
               Simulates projection lamp instability */}
-          <motion.div 
-            className={styles.atmosphereRhythmContainer} 
-            style={{ 
-              opacity: breathOpacity, 
-              x: breathX, 
-              y: breathY 
+          <motion.div
+            className={styles.atmosphereRhythmContainer}
+            style={{
+              opacity: breathOpacity,
+              x: breathX,
+              y: breathY
             }}
           >
             {/* Projection Beam — off-screen source illumination */}
@@ -366,9 +396,9 @@ export default function HeroSection({ onExploreClick, isTransitioning, transitio
           MAIN CONTENT CONTAINER
           ======================================== */}
       <div className={`${styles.heroInner} ${transitionState === 'accel3' ? styles.heroShake : ''} ${transitionState === 'flash' || transitionState === 'intro' ? styles.hidden : ''}`}>
-        
+
         {/* --- Left: Content Block --- */}
-        <motion.div 
+        <motion.div
           className={styles.heroContent}
           style={{ opacity: contentOpacity, y: contentY }}
         >
@@ -380,9 +410,9 @@ export default function HeroSection({ onExploreClick, isTransitioning, transitio
           </div>
 
           <h1 className={styles.heroHeadline}>
-            <span className={styles.headlineLine}>BUILD THE</span>
-            <span className={styles.headlineLine}>NEXT</span>
-            <span className={styles.headlineLine}>FRAME</span>
+            <span className={styles.headlineLine}>ADVANCING</span>
+            <span className={styles.headlineLine}>COMPUTING</span>
+            <span className={styles.headlineLine}>PROFESSION</span>
           </h1>
 
           <div className={styles.heroDivider} aria-hidden="true" />
@@ -391,17 +421,17 @@ export default function HeroSection({ onExploreClick, isTransitioning, transitio
             A community of builders, innovators, and problem-solvers shaping what comes next.
           </p>
 
-          <motion.a 
+          <motion.a
             ref={ctaRef}
-            href="#about" 
+            href="#about"
             className={`${styles.heroCta} ${isTransitioning ? styles.heroCtaActive : ''}`}
             onClick={(e) => {
               e.preventDefault();
               if (onExploreClick && !isTransitioning) onExploreClick();
             }}
-            whileHover={!isTransitioning ? { 
-              boxShadow: "0 0 32px rgba(255, 200, 100, 0.15), inset 0 1px 0 rgba(255, 240, 200, 0.15)",
-              borderColor: "rgba(255, 210, 140, 0.3)",
+            whileHover={!isTransitioning ? {
+              boxShadow: "0 0 32px rgba(100, 200, 255, 0.15), inset 0 1px 0 rgba(255, 240, 200, 0.15)",
+              borderColor: "rgba(140, 210, 255, 0.3)",
               backgroundColor: "rgba(255, 255, 255, 0.04)"
             } : undefined}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
@@ -413,9 +443,9 @@ export default function HeroSection({ onExploreClick, isTransitioning, transitio
               </div>
             ) : (
               <>
-                <svg 
+                <svg
                   className={styles.ctaIcon}
-                  viewBox="0 0 24 24" 
+                  viewBox="0 0 24 24"
                   fill="currentColor"
                   aria-hidden="true"
                 >
@@ -428,7 +458,7 @@ export default function HeroSection({ onExploreClick, isTransitioning, transitio
         </motion.div>
 
         {/* --- Right: Film Reel --- */}
-        <motion.div 
+        <motion.div
           className={styles.heroReelSide}
           style={{ y: reelY }}
         >
@@ -438,8 +468,8 @@ export default function HeroSection({ onExploreClick, isTransitioning, transitio
       </div>
 
       {/* Scroll Indicator */}
-      <motion.div 
-        className={styles.scrollIndicator} 
+      <motion.div
+        className={styles.scrollIndicator}
         style={{ opacity: scrollIndicatorOpacity }}
         aria-hidden="true"
       >
@@ -452,26 +482,24 @@ export default function HeroSection({ onExploreClick, isTransitioning, transitio
           <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <filter id="electricityGlow" x="-50%" y="-50%" width="200%" height="200%">
-                <feGaussianBlur stdDeviation="6" result="blur1" />
-                <feGaussianBlur stdDeviation="15" result="blur2" />
-                <feGaussianBlur stdDeviation="30" result="blur3" />
+                <feGaussianBlur stdDeviation="4" result="blur1" />
+                <feGaussianBlur stdDeviation="12" result="blur2" />
                 <feMerge>
-                  <feMergeNode in="blur3" />
                   <feMergeNode in="blur2" />
                   <feMergeNode in="blur1" />
                   <feMergeNode in="SourceGraphic" />
                 </feMerge>
               </filter>
             </defs>
-            
+
             {/* Main Arc */}
             <path className={styles.lightningGlow} d={lightningPaths.main} />
             <path className={styles.lightningCoreSecondary} d={lightningPaths.main} />
             <path className={styles.lightningCore} d={lightningPaths.main} />
-            
+
             {/* Microscopic sparks hugging the beam */}
             {lightningPaths.sparks.map((spark, i) => (
-              <circle key={i} cx={spark.cx} cy={spark.cy} r={spark.r} fill="#ffffff" opacity={spark.opacity} filter="url(#electricityGlow)" />
+              <circle key={i} cx={spark.cx} cy={spark.cy} r={spark.r} fill="#ffffff" opacity={spark.opacity} />
             ))}
           </svg>
         )}

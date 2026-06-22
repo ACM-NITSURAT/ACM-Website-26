@@ -97,6 +97,8 @@ export default function CinematicDust() {
 
     let particles: Particle[] = [];
     let animationFrameId: number;
+    let lastFrameTime = 0;
+    const FRAME_INTERVAL = 1000 / 30; // 30fps cap
 
     // Particle counts by class
     const ATMOSPHERIC_COUNT = 50;
@@ -104,9 +106,41 @@ export default function CinematicDust() {
     const LARGE_COUNT = 7;
     const HERO_COUNT = 3;
 
+    // Pre-rendered sprite cache for different particle sizes
+    const spriteCache = new Map<string, HTMLCanvasElement>();
+
+    const getSprite = (size: number, r: number, g: number, b: number, alpha: number): HTMLCanvasElement => {
+      // Quantize to reduce cache entries
+      const qSize = Math.round(size * 2) / 2;
+      const qAlpha = Math.round(alpha * 20) / 20;
+      const key = `${qSize}-${r}-${g}-${b}-${qAlpha}`;
+      
+      let sprite = spriteCache.get(key);
+      if (!sprite) {
+        const dim = Math.ceil(qSize * 2 + 4);
+        sprite = document.createElement('canvas');
+        sprite.width = dim;
+        sprite.height = dim;
+        const sctx = sprite.getContext('2d')!;
+        sctx.beginPath();
+        sctx.arc(dim / 2, dim / 2, qSize, 0, Math.PI * 2);
+        sctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${qAlpha.toFixed(2)})`;
+        sctx.fill();
+        spriteCache.set(key, sprite);
+        
+        // Limit cache size
+        if (spriteCache.size > 200) {
+          const firstKey = spriteCache.keys().next().value;
+          if (firstKey) spriteCache.delete(firstKey);
+        }
+      }
+      return sprite;
+    };
+
     const resize = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
+      spriteCache.clear(); // Clear sprites on resize
       initParticles();
     };
 
@@ -190,12 +224,24 @@ export default function CinematicDust() {
       }
     };
 
-    const draw = () => {
+    const draw = (timestamp: number) => {
+      animationFrameId = requestAnimationFrame(draw);
+
+      // Skip if tab is not visible
+      if (document.hidden) return;
+
+      // Throttle to 30fps
+      const elapsed = timestamp - lastFrameTime;
+      if (elapsed < FRAME_INTERVAL) return;
+      lastFrameTime = timestamp - (elapsed % FRAME_INTERVAL);
+
       const w = canvas.width;
       const h = canvas.height;
       ctx.clearRect(0, 0, w, h);
 
-      particles.forEach((p) => {
+      for (let pi = 0; pi < particles.length; pi++) {
+        const p = particles[pi];
+
         // Brownian micro-turbulence — makes particles feel suspended, not sliding
         p.turbPhase += p.turbSpeed;
         p.turbX = Math.sin(p.turbPhase) * 0.3;
@@ -221,39 +267,32 @@ export default function CinematicDust() {
         const twinkle = 0.4 + 0.6 * Math.sin(p.phase);
 
         // Final alpha = base × illumination × twinkle
-        // Illumination is the key multiplier — particles outside the beam vanish
         const alpha = p.baseAlpha * illumination * twinkle;
 
         // Skip invisible particles
-        if (alpha < 0.005) return;
+        if (alpha < 0.005) continue;
 
         // Color: warm near beam center, cooler at edges
         const warmFactor = illumination;
         const r = 255;
-        const g = Math.round(210 + warmFactor * 30); // 210-240
-        const b = Math.round(160 + (1 - warmFactor) * 60); // 160-220
+        const g = Math.round(210 + warmFactor * 30);
+        const b = Math.round(160 + (1 - warmFactor) * 60);
 
-        // Draw
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha.toFixed(3)})`;
-        ctx.fill();
+        // Draw using pre-rendered sprite
+        const sprite = getSprite(p.size, r, g, b, alpha);
+        ctx.drawImage(sprite, p.x - sprite.width / 2, p.y - sprite.height / 2);
 
         // Hero particles get a subtle glow
         if (p.particleClass === 3 && alpha > 0.15) {
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.size * 3, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(255, 230, 190, ${(alpha * 0.15).toFixed(3)})`;
-          ctx.fill();
+          const glowSprite = getSprite(p.size * 3, 255, 230, 190, alpha * 0.15);
+          ctx.drawImage(glowSprite, p.x - glowSprite.width / 2, p.y - glowSprite.height / 2);
         }
-      });
-
-      animationFrameId = requestAnimationFrame(draw);
+      }
     };
 
     window.addEventListener('resize', resize);
     resize();
-    draw();
+    animationFrameId = requestAnimationFrame(draw);
 
     return () => {
       window.removeEventListener('resize', resize);
