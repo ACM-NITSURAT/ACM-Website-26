@@ -1,7 +1,14 @@
 import { NextResponse, type NextRequest } from 'next/server';
-import { FieldValue, Timestamp } from 'firebase-admin/firestore';
+import { FieldValue } from 'firebase-admin/firestore';
 import adminDb from '@/lib/firebase-admin/firestore';
 import { requirePermission } from '@/server/guard';
+import {
+  validateEventDates,
+  validatePrizes,
+  validateTeamConfig,
+  VALID_STATUSES,
+  VALID_TYPES,
+} from '@/server/event-validators';
 import type { Event } from '@/schema/event';
 
 const COLLECTION = 'events';
@@ -51,6 +58,21 @@ export async function POST(request: NextRequest) {
     }
   }
 
+  // Enum validation
+  const status = body.status ?? 'upcoming';
+  if (!VALID_STATUSES.includes(status)) return NextResponse.json({ error: 'Invalid status value.' }, { status: 400 });
+  if (!VALID_TYPES.includes(body.type as Event['type'])) return NextResponse.json({ error: 'Invalid type value.' }, { status: 400 });
+
+  // Business logic validation
+  const dateErr = validateEventDates(status, body.startDate, body.endDate);
+  if (dateErr) return NextResponse.json({ error: dateErr }, { status: 422 });
+
+  const prizeErr = validatePrizes(body.prizeMoney, body.prizeMoneyDistribution);
+  if (prizeErr) return NextResponse.json({ error: prizeErr }, { status: 422 });
+
+  const teamErr = validateTeamConfig(body.isTeamEvent, body.minTeamMembers, body.maxTeamMembers, body.isFemaleMandatory, body.minFemaleRequired);
+  if (teamErr) return NextResponse.json({ error: teamErr }, { status: 422 });
+
   // Generate doc ID (random hash via Firestore auto-ID)
   const docRef = adminDb.collection(COLLECTION).doc();
   const id = docRef.id;
@@ -66,16 +88,14 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const now = Timestamp.now();
-
   const event: Omit<Event, 'id'> = {
     slug,
-    eventName:          body.eventName as string,
-    eventDescription:   body.eventDescription as string,
-    status:             body.status ?? 'upcoming',
+    eventName:          (body.eventName as string).trim(),
+    eventDescription:   (body.eventDescription as string).trim(),
+    status,
     eventThumbnail:     body.eventThumbnail ?? '',
     type:               body.type as Event['type'],
-    location:           body.location as string,
+    location:           (body.location as string).trim(),
     tags:               body.tags ?? [],
     isOpenToAll:        body.isOpenToAll ?? false,
     unregisteredForm:   body.unregisteredForm ?? false,

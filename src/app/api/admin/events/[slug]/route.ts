@@ -1,6 +1,13 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import adminDb from '@/lib/firebase-admin/firestore';
 import { requirePermission } from '@/server/guard';
+import {
+  validateEventDates,
+  validatePrizes,
+  validateTeamConfig,
+  VALID_STATUSES,
+  VALID_TYPES,
+} from '@/server/event-validators';
 import type { Event } from '@/schema/event';
 
 const COLLECTION = 'events';
@@ -71,6 +78,27 @@ export async function PATCH(
 
   // Strip read-only/server-managed fields
   const { id: _id, creationDate: _cd, totalParticipants: _tp, totalTeams: _tt, ...updates } = body as Partial<Event>;
+
+  // Enum validation for any provided fields
+  if (updates.status && !VALID_STATUSES.includes(updates.status)) {
+    return NextResponse.json({ error: 'Invalid status value.' }, { status: 400 });
+  }
+  if (updates.type && !VALID_TYPES.includes(updates.type)) {
+    return NextResponse.json({ error: 'Invalid type value.' }, { status: 400 });
+  }
+
+  // Merge with existing doc data for cross-field validation
+  const existing = (await doc.ref.get()).data() as Partial<Event>;
+  const merged = { ...existing, ...updates };
+
+  const dateErr = validateEventDates(merged.status, merged.startDate, merged.endDate);
+  if (dateErr) return NextResponse.json({ error: dateErr }, { status: 422 });
+
+  const prizeErr = validatePrizes(merged.prizeMoney, merged.prizeMoneyDistribution);
+  if (prizeErr) return NextResponse.json({ error: prizeErr }, { status: 422 });
+
+  const teamErr = validateTeamConfig(merged.isTeamEvent, merged.minTeamMembers, merged.maxTeamMembers, merged.isFemaleMandatory, merged.minFemaleRequired);
+  if (teamErr) return NextResponse.json({ error: teamErr }, { status: 422 });
 
   // If slug is being changed, validate uniqueness
   if (updates.slug !== undefined) {
