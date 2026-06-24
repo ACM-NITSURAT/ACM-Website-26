@@ -828,7 +828,12 @@
   }
 
   .block4 {
-    padding: 100px 0;
+    padding: 160px 0 80px;
+  }
+
+  .groupPhotoWrapper {
+    top: 35%;
+    width: 200%;
   }
 
   .bgTypography {

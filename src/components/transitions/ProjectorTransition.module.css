@@ -43,7 +43,8 @@
 }
 
 .cinematicFlashActive {
-  animation: projectorFlashAnim 500ms cubic-bezier(0.4, 0, 1, 1) forwards;
+  /* Using easeOutQuart for a fast burst that smooths out beautifully */
+  animation: projectorFlashAnim 500ms cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
 @keyframes projectorFlashAnim {
@@ -51,15 +52,11 @@
     transform: translate(-50%, -50%) scale(0); 
     opacity: 0;
   }
-  10% {
+  20% {
     opacity: 1;
   }
-  60% { 
-    transform: translate(-50%, -50%) scale(1); 
-    opacity: 1; 
-  }
   100% { 
-    transform: translate(-50%, -50%) scale(1.2); 
+    transform: translate(-50%, -50%) scale(1.5); 
     opacity: 0; 
   }
 }
@@ -80,8 +77,7 @@
 
 @keyframes whiteoutAnim {
   0% { opacity: 0; }
-  30% { opacity: 0; }
-  60% { opacity: 1; }
+  50% { opacity: 1; }
   100% { opacity: 0; }
 }
 

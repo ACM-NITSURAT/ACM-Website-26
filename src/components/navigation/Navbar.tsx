@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import styles from './Navbar.module.css';
 
@@ -462,6 +463,18 @@ export default function Navbar() {
           <div className={styles.brandText}>
             <span className={styles.brandName}>ACM</span>
             <span className={styles.brandSubtitle}>NIT SURAT</span>
+          </div>
+
+          <div className={styles.brandDivider} aria-hidden="true" />
+
+          <div className={styles.brandLogoSvnit}>
+            <Image 
+              src="/NIT_Surat_Logo.svg.png" 
+              alt="SVNIT Logo" 
+              width={34} 
+              height={34} 
+              className={styles.svnitImg}
+            />
           </div>
         </Link>
 

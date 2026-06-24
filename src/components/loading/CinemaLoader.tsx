@@ -58,6 +58,9 @@ export default function CinemaLoader({ children }: CinemaLoaderProps) {
   const logoSvgRef = useRef<AcmLogoSvgHandle>(null);
   const skipBtnRef = useRef<HTMLButtonElement>(null);
   const muteBtnRef = useRef<HTMLButtonElement>(null);
+  const loadingBarRef = useRef<HTMLDivElement>(null);
+  const curtainTopRef = useRef<HTMLDivElement>(null);
+  const curtainBottomRef = useRef<HTMLDivElement>(null);
   const projectorRef = useRef<ProjectorLightRefs>(null);
   const dustRef = useRef<DustParticlesHandle>(null);
   const timelineRef = useRef<gsap.core.Timeline | null>(null);
@@ -253,6 +256,7 @@ export default function CinemaLoader({ children }: CinemaLoaderProps) {
       const logoContainer = logoContainerRef.current;
       const skipBtn = skipBtnRef.current;
       const muteBtn = muteBtnRef.current;
+      const loadingBar = loadingBarRef.current;
       const body = projectorRef.current?.body;
       const lens = projectorRef.current?.lens;
       const beam = projectorRef.current?.beam;
@@ -617,8 +621,8 @@ export default function CinemaLoader({ children }: CinemaLoaderProps) {
         duration: 0.2, ease: 'power2.in',
       }, 4.00);
 
-      // Buttons fade
-      tl.to([skipBtn, muteBtn], {
+      // Buttons and loading bar fade out
+      tl.to([skipBtn, muteBtn, loadingBar], {
         opacity: 0, y: 8,
         duration: 0.15, ease: 'power2.in',
       }, 4.00);
@@ -640,23 +644,33 @@ export default function CinemaLoader({ children }: CinemaLoaderProps) {
         ease: 'power3.out',
       }, 4.00);
 
-      // The loading screen melts away smoothly
-      tl.to(overlay, {
-        opacity: 0,
-        duration: 0.8,
-        ease: 'power2.inOut',
-      }, 4.05);
-
-      // Fade out projector elements
-      tl.to([ambient, projection, hotspot], {
-        opacity: 0, duration: 0.3, ease: 'power1.out',
-      }, 4.15);
-      tl.to(vignette, { opacity: 0, duration: 0.3, ease: 'power1.out' }, 4.15);
-      tl.to(filmGrain, { opacity: 0, duration: 0.2 }, 4.15);
+      // Fade out projector elements right before the curtain splits
+      tl.to([ambient, projection, hotspot, vignette, filmGrain], {
+        opacity: 0, duration: 0.2, ease: 'power1.out',
+      }, 4.00);
 
       // Dust fades
-      tl.call(() => { dust?.fadeOut(); }, [], 4.10);
-      tl.to(`.${styles.dustCanvas}`, { opacity: 0, duration: 0.3 }, 4.15);
+      tl.call(() => { dust?.fadeOut(); }, [], 4.00);
+      tl.to(`.${styles.dustCanvas}`, { opacity: 0, duration: 0.2 }, 4.00);
+
+      // The Curtain Drop Reveal (Physical hardware-accelerated divs, zero lag!)
+      tl.to(curtainTopRef.current, {
+        yPercent: -100,
+        duration: 1.2,
+        ease: 'power3.inOut',
+      }, 4.05);
+
+      tl.to(curtainBottomRef.current, {
+        yPercent: 100,
+        duration: 1.2,
+        ease: 'power3.inOut',
+      }, 4.05);
+
+      // Clean up the overlay container after curtains are fully open
+      tl.to(overlay, {
+        opacity: 0,
+        duration: 0.1,
+      }, 5.25);
 
       // Complete — notify navbar to begin assembly
       tl.call(() => {
@@ -722,7 +736,9 @@ export default function CinemaLoader({ children }: CinemaLoaderProps) {
           </div>
         </div>
 
-
+        {/* Physical curtains for buttery smooth hardware-accelerated reveal */}
+        <div ref={curtainTopRef} className={styles.curtainTop} />
+        <div ref={curtainBottomRef} className={styles.curtainBottom} />
 
         <div ref={filmGrainRef} className={styles.filmGrain} />
         <div ref={vignetteRef} className={styles.vignette} />
@@ -734,7 +750,7 @@ export default function CinemaLoader({ children }: CinemaLoaderProps) {
         </div>
 
         {/* Cinematic Loading Bar */}
-        <div className={`${styles.loadingBarContainer} ${isWaitingForAssets ? styles.visible : ''}`}>
+        <div ref={loadingBarRef} className={`${styles.loadingBarContainer} ${loaderState === 'playing' ? styles.visible : ''}`}>
           <div className={styles.loadingBarTrack}>
             <div className={styles.loadingBarFill} style={{ width: `${assetsProgress}%` }} />
           </div>

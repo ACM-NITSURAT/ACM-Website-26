@@ -5,7 +5,11 @@ import CinemaLoader from "@/components/loading/CinemaLoader";
 import HeroSection from "@/components/sections/HeroSection";
 import AboutSection from "@/components/sections/AboutSection";
 import ProjectorTransition from "@/components/transitions/ProjectorTransition";
-import WalkThroughReel from "@/components/sections/WalkThroughReel";
+import dynamic from 'next/dynamic';
+
+const WalkThroughReel = dynamic(() => import('@/components/sections/WalkThroughReel'), {
+  ssr: false, // Ensures it only loads on the client when needed
+});
 import { playAccelerationWhir, playLightFlash } from "@/components/loading/ProjectorAudio";
 
 export type TransitionState = 'idle' | 'accel1' | 'accel2' | 'accel3' | 'flash' | 'intro' | 'reverseFlash' | 'reverseFlashHero';

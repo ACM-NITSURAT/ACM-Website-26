@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useMemo } from 'react';
-import { motion, useScroll, useVelocity, useSpring, useAnimationFrame, useMotionValue, useTransform } from 'framer-motion';
+import { motion, useMotionValue, useTransform, useAnimationFrame } from 'framer-motion';
 import styles from './HeroSection.module.css';
 
 /* ============================================================
@@ -21,8 +21,6 @@ import styles from './HeroSection.module.css';
 
 interface FilmReelProps {
   className?: string;
-  atmosphereOpacity?: any; // MotionValue<number>
-  isSpinningUp?: boolean;
   size?: number; // default 500
   speedMultiplier?: number; // default 1
   direction?: number; // 1 for clockwise, -1 for counter-clockwise
@@ -31,7 +29,6 @@ interface FilmReelProps {
 
 function FilmReel({ 
   className, 
-  atmosphereOpacity, 
   transitionState = 'idle',
   size,
   speedMultiplier = 1,
@@ -66,100 +63,59 @@ function FilmReel({
      It doesn't stop instantly — it coasts.
      ========================================== */
   const rotation = useMotionValue(0);
-  const time = useMotionValue(0);
   const rotateTransform = useTransform(rotation, (r) => `${r}deg`);
   const isHovered = useRef(false);
-  const currentBaseSpeed = useRef(8 * speedMultiplier); // degrees per second (360° / 45s)
+  const currentBaseSpeed = useRef(8 * speedMultiplier); // Restored to 8 deg/s (360° / 45s)
   const isBlurActive = transitionState === 'accel2' || transitionState === 'accel3';
   const isGlobalBlurActive = transitionState === 'accel3';
   const accelStartTime = useRef<number | null>(null);
 
   /* ==========================================
-     SCROLL-DRIVEN MOMENTUM
+     INTERACTIVE SCRUBBING
      
-     The reel responds to scroll velocity with physical inertia.
+     The heavy scroll-velocity effect was causing scroll lag on
+     some devices due to Framer Motion's scroll listener.
      
-     Previous values (mass:15, damping:120) were so heavy that
-     normal scrolling produced zero visible effect.
-     
-     New values:
-     - mass: 4 — heavy but responsive
-     - damping: 50 — decays over ~1-2 seconds
-     - stiffness: 40 — moderate spring tension
-     - multiplier: 0.15 — scroll produces visible acceleration
-     
-     A normal mouse wheel flick should produce a brief,
-     visible speed burst that gradually decays.
+     Replaced with an interactive Rewind effect:
+     When the user hovers over the reel, it smoothly reverses
+     direction and accelerates, like scrubbing backward through footage.
      ========================================== */
-  const { scrollY } = useScroll();
-  const scrollVelocity = useVelocity(scrollY);
-
-  const smoothVelocity = useSpring(scrollVelocity, {
-    damping: 60,
-    stiffness: 30,
-    mass: 6
-  });
 
   useAnimationFrame((t, delta) => {
     // Prevent huge delta spikes on tab switch
     const safeDelta = Math.min(delta, 100);
 
-    /* 1. Hover & Spin-up acceleration
-       If spinning up, we increment speed based on time elapsed since accel started.
-       This overrides hover. */
-    let targetBaseSpeed = (isHovered.current ? 20 : 8) * speedMultiplier;
-    let acceleration = 0.02; // Reduced from 0.04 for smoother hover transitions
+    /* 1. Hover & Spin-up acceleration */
+    // Base speed is 8 (forward). On hover, it reverses to -60 (rewind scrub)
+    let targetBaseSpeed = (isHovered.current ? -60 : 8) * speedMultiplier;
+    let acceleration = 0.03; // Smooth transition
 
-    const isAccelerating = ['accel1', 'accel2', 'accel3'].includes(transitionState);
+    const isAccelerating = ['accel1', 'accel2', 'accel3', 'flash'].includes(transitionState);
 
     if (isAccelerating) {
       if (accelStartTime.current === null) {
         accelStartTime.current = t;
       }
       const elapsed = t - accelStartTime.current;
-      
-      // Continuous smooth ease-in curve instead of sharp piecewise blocks
-      const maxSpeed = 2250; // Roughly 37.5 * 60 deg/s
+      const maxSpeed = 2250;
       const progress = Math.min(elapsed / 1800, 1);
+      // Smooth quartic easing for a deeply physical, heavy spin-up
+      const easeInQuart = progress * progress * progress * progress;
       
-      // easeInCubic provides a weighty, gradual start that builds up immense momentum
-      const easeInCubic = progress * progress * progress;
-      
-      const targetSpeed = (8 * speedMultiplier) + (maxSpeed * easeInCubic);
-      
-      // Interpolate for extreme smoothness, avoiding any immediate snaps
-      currentBaseSpeed.current += (targetSpeed - currentBaseSpeed.current) * 0.08;
+      const targetSpeed = (8 * speedMultiplier) + (maxSpeed * easeInQuart);
+      // Directly track the mathematical curve for zero-lag smooth acceleration
+      currentBaseSpeed.current = targetSpeed;
     } else {
-      accelStartTime.current = null; // Reset when idle
+      accelStartTime.current = null;
       currentBaseSpeed.current += (targetBaseSpeed - currentBaseSpeed.current) * acceleration;
     }
 
-    /* 2. Scroll momentum injection
-       smoothVelocity is pixels per second, damped by the spring.
-       Multiplied by 0.15 to convert px/s to meaningful deg/s contribution.
-       A fast scroll (~2000 px/s) → ~300 deg/s added → dramatic burst. */
-    const scrollDelta = smoothVelocity.get() * 0.15;
-
-    /* 3. Apply total rotation
-       delta is milliseconds since last frame. */
-    const moveBy = (currentBaseSpeed.current + scrollDelta) * (safeDelta / 1000) * direction;
+    /* 2. Apply total rotation (Removed scrollDelta) */
+    const moveBy = (currentBaseSpeed.current) * (safeDelta / 1000) * direction;
     rotation.set(rotation.get() + moveBy);
-    
-    /* 4. Sync global time for breathing effects */
-    time.set(t);
   });
 
-  /* 5. Sync specular brightness to atmospheric breathing
-     We map the exact atmospheric breathing curve to the specular highlight.
-     The atmosphere ranges from ~0.24 to ~0.92. 
-     We map this to 0.4 -> 1.1 for a strong metallic flash that is perfectly in sync. */
-  const localBreathOpacity = useTransform(time, t => 0.8); // Fallback
-  
-  const syncedOpacity = useTransform(
-    atmosphereOpacity || localBreathOpacity,
-    [0.24, 0.96],
-    [0.4, 1.1]
-  );
+
 
   return (
     <div 
@@ -181,10 +137,7 @@ function FilmReel({
           These layers sit stationary. As the metal geometry
           rotates beneath them, highlights slide across the surface. */}
       <div className={`${styles.filmReelFixedLighting} ${transitionState !== 'idle' ? styles.blueLightTransition : ''}`} />
-      <motion.div 
-        className={`${styles.reelRimCatchLight} ${transitionState !== 'idle' ? styles.blueLightTransition : ''}`} 
-        style={{ opacity: syncedOpacity }}
-      />
+      <div className={`${styles.reelRimCatchLight} ${transitionState !== 'idle' ? styles.blueLightTransition : ''}`} />
       <div className={styles.reelCoreShadow} />
 
       {/* The rotating reel — ONLY this spins */}

@@ -119,6 +119,30 @@
   color: rgba(255, 255, 255, 0.45);
 }
 
+.brandDivider {
+  width: 1px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 0 12px;
+}
+
+.brandLogoSvnit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.9;
+  transition: opacity 0.4s ease, filter 0.4s ease;
+}
+
+.svnitImg {
+  object-fit: contain;
+  opacity: 0.85;
+}
+
+.brandBlock:hover .svnitImg {
+  opacity: 1;
+}
+
 /* ============================================================
    NOW SHOWING PLATE — The cinematic scene indicator.
    Right side. Floating metal plate artifact.
@@ -1096,8 +1120,18 @@
     height: 28px;
   }
 
-  .brandName { font-size: 15px; }
-  .brandSubtitle { font-size: 7.5px; letter-spacing: 3px; }
+  /* Hide the text part of the logo on mobile to prevent horizontal overflow */
+  .brandText {
+    display: none;
+  }
+  
+  .brandBlock {
+    gap: 8px;
+  }
+
+  .brandDivider {
+    margin: 0 8px;
+  }
 
   /* Hide desktop expanded nav items on mobile */
   .navItemsContainer {

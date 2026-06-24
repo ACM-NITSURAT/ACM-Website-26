@@ -4,30 +4,25 @@ import React, { useRef, useState, useEffect } from 'react';
 import { motion, useScroll, useTransform, useAnimationFrame, useMotionValue } from 'framer-motion';
 import styles from './HeroSection.module.css';
 import FilmReel from './FilmReel';
-import CinematicDust from './CinematicDust';
 import { getMasterVolume } from '../loading/ProjectorAudio';
 
 /* ============================================================
-   HeroSection — "The First Frame"
+   HeroSection — "Build The Next Frame"
    
-   The hero is a projection scene, not a webpage section.
+   Reimagined: Typography-dominant, ACM identity first,
+   cinematic DNA preserved through reduced atmosphere.
    
-   A projector exists BEYOND the viewport (upper-left).
-   Its beam travels through atmospheric dust and haze,
-   illuminating a metal film reel suspended in the space.
+   Layout: CSS Grid (2-column)
+     Left (1fr): Scene indicator → Headline → Subtext → CTA
+     Right (380px): Film reel (350px) secondary focal point
+     Bottom: Legend bar with chapter facts
    
-   The user should perceive the scene first and the UI second.
+   Atmosphere: Reduced ~70%
+     Beam core + near haze + film grain + vignette
+     Single slow sinusoidal breathing (~8s cycle)
    
-   Layout: Asymmetric
-   - Left: Scene indicator, headline, divider, subtext, CTA
-   - Right: Film reel sitting inside the projection environment
-   - Background: 9-layer atmospheric depth system
-   
-   Scroll Narrative:
-   - Atmosphere evolves (warm → expanded, color shift)
-   - Reel gains momentum + parallax (lingers as text exits)
-   - Content yields focus (opacity 1→0, Y 0→-60px)
-   - Projection beam expands (scale 1→1.3)
+   ACM Evidence: Blueprint-style annotations
+     DOTSLASH '25, 200+ MEMBERS, AI/WEB/CP/DESIGN, etc.
    ============================================================ */
 
 import { TransitionState } from '@/app/page';
@@ -37,6 +32,8 @@ export interface HeroSectionProps {
   isTransitioning?: boolean;
   transitionState?: TransitionState;
 }
+
+const DUST_MOTE_COUNT = 14;
 
 export default function HeroSection({ onExploreClick, isTransitioning, transitionState }: HeroSectionProps = {}) {
   const containerRef = useRef<HTMLElement>(null);
@@ -69,7 +66,7 @@ export default function HeroSection({ onExploreClick, isTransitioning, transitio
     const drawLightning = (timestamp: number) => {
       animationFrameId = requestAnimationFrame(drawLightning);
 
-      // Throtte to ~24fps for choppy electrical feel
+      // Throttle to ~24fps for choppy electrical feel
       if (timestamp - lastDraw < 40) return;
       lastDraw = timestamp;
 
@@ -85,13 +82,13 @@ export default function HeroSection({ onExploreClick, isTransitioning, transitio
       let startY: number;
 
       // Determine layout based on horizontal positioning
-      // If the Reel (hub) is to the right of the CTA button (Desktop)
       if (hubRect.left > ctaRect.right - 40) {
-        startX = ctaRect.right - containerRect.left; // Right center
+        // Desktop: reel is to the right of CTA
+        startX = ctaRect.right - containerRect.left;
         startY = ctaRect.top + ctaRect.height / 2 - containerRect.top;
       } else {
-        // If they are stacked vertically (Mobile)
-        startX = ctaRect.left + ctaRect.width / 2 - containerRect.left; // Top center
+        // Mobile: stacked vertically
+        startX = ctaRect.left + ctaRect.width / 2 - containerRect.left;
         startY = ctaRect.top - containerRect.top;
       }
 
@@ -109,26 +106,22 @@ export default function HeroSection({ onExploreClick, isTransitioning, transitio
 
         for (let i = 1; i <= segments; i++) {
           const t = i / segments;
-
           const tx = startX + dx * t;
           const ty = startY + dy * t;
-
           const spread = Math.sin(t * Math.PI) * spreadMultiplier;
           const offsetX = (Math.random() - 0.5) * spread;
           const offsetY = (Math.random() - 0.5) * spread;
 
           currentX = tx + offsetX;
           currentY = ty + offsetY;
-
           path += `L ${currentX},${currentY} `;
 
-          // Generate 1-3 tiny sparks around this segment node
           const numSparks = Math.floor(Math.random() * 3) + 1;
           for (let j = 0; j < numSparks; j++) {
             sparks.push({
-              cx: currentX + (Math.random() - 0.5) * 25, // Hug the beam tightly
+              cx: currentX + (Math.random() - 0.5) * 25,
               cy: currentY + (Math.random() - 0.5) * 25,
-              r: Math.random() * 1.5 + 0.5, // Tiny radius: 0.5px to 2px
+              r: Math.random() * 1.5 + 0.5,
               opacity: Math.random() * 0.8 + 0.2
             });
           }
@@ -166,21 +159,17 @@ export default function HeroSection({ onExploreClick, isTransitioning, transitio
   useEffect(() => {
     if (isTransitioning) {
       try {
-        // Respect the global "Enter Silently" mute state
         if (getMasterVolume() === 0) return;
 
-        const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+        const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
         if (!AudioContextClass) return;
 
-        // Reuse existing context if it exists and isn't closed, otherwise create a new one
         let ctx = audioCtxRef.current;
         if (!ctx || ctx.state === 'closed') {
           ctx = new AudioContextClass();
           audioCtxRef.current = ctx;
         }
 
-        // If the browser blocked autoplay (e.g. user reloaded and hasn't clicked yet)
-        // Add a one-time click listener to resume it the moment they interact
         if (ctx.state === 'suspended') {
           const resumeAudio = () => {
             if (ctx && ctx.state === 'suspended') {
@@ -193,27 +182,25 @@ export default function HeroSection({ onExploreClick, isTransitioning, transitio
           window.addEventListener('touchstart', resumeAudio);
         }
 
-        // Disconnect old gain node if it exists to prevent overlapping sounds
         if (gainNodeRef.current) {
           gainNodeRef.current.disconnect();
         }
 
         const masterGain = ctx.createGain();
-        masterGain.gain.value = 0; // Start at 0 for fade in
+        masterGain.gain.value = 0;
         masterGain.connect(ctx.destination);
         gainNodeRef.current = masterGain;
 
-        // 120Hz AC mains hum (First harmonic, much more audible on laptop speakers than 60Hz)
+        // 120Hz AC mains hum
         const hum1 = ctx.createOscillator();
         hum1.type = 'sawtooth';
         hum1.frequency.value = 120;
 
-        // Slightly detuned hum to create a "throbbing" electric phase effect
+        // Slightly detuned for throbbing phase effect
         const hum2 = ctx.createOscillator();
         hum2.type = 'sawtooth';
         hum2.frequency.value = 121;
 
-        // Lowpass filter: High enough to hear the "buzz" texture, low enough to not be harsh
         const filter = ctx.createBiquadFilter();
         filter.type = 'lowpass';
         filter.frequency.value = 900;
@@ -225,7 +212,6 @@ export default function HeroSection({ onExploreClick, isTransitioning, transitio
         hum1.start();
         hum2.start();
 
-        // Fade in gradually over 1.2 seconds so it swells up like a machine powering on
         masterGain.gain.setValueAtTime(0, ctx.currentTime);
         masterGain.gain.linearRampToValueAtTime(0.06, ctx.currentTime + 1.2);
 
@@ -233,17 +219,14 @@ export default function HeroSection({ onExploreClick, isTransitioning, transitio
         console.warn("Web Audio API not supported", e);
       }
     } else {
-      // Fade out and close
       if (audioCtxRef.current && gainNodeRef.current) {
         const ctx = audioCtxRef.current;
         const gain = gainNodeRef.current;
 
-        // Cancel any ongoing fade-ins and start fading out from current value
         gain.gain.cancelScheduledValues(ctx.currentTime);
         gain.gain.setValueAtTime(gain.gain.value, ctx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
 
-        // Disconnect after fade out, but keep the context alive for future hovers
         setTimeout(() => {
           gain.disconnect();
           gainNodeRef.current = null;
@@ -252,7 +235,7 @@ export default function HeroSection({ onExploreClick, isTransitioning, transitio
     }
   }, [isTransitioning]);
 
-  // Dedicated unmount cleanup for the AudioContext
+  // Unmount cleanup for AudioContext
   useEffect(() => {
     return () => {
       if (audioCtxRef.current && audioCtxRef.current.state !== 'closed') {
@@ -262,6 +245,7 @@ export default function HeroSection({ onExploreClick, isTransitioning, transitio
     };
   }, []);
 
+  // Scene establishment timer
   useEffect(() => {
     const timer = setTimeout(() => setSceneEstablished(true), 50);
     return () => clearTimeout(timer);
@@ -278,42 +262,41 @@ export default function HeroSection({ onExploreClick, isTransitioning, transitio
   const contentOpacity = useTransform(scrollYProgress, [0.1, 0.7], [1, 0]);
   const contentY = useTransform(scrollYProgress, [0.1, 0.7], [0, -60]);
   const reelY = useTransform(scrollYProgress, [0, 0.8], [0, 20]);
-  const glowScale = useTransform(scrollYProgress, [0, 0.8], [1, 1.3]);
-  const atmosphereEvolution = useTransform(scrollYProgress, [0.3, 0.9], [0, 0.06]);
   const scrollIndicatorOpacity = useTransform(scrollYProgress, [0, 0.08], [1, 0]);
 
   /* ==========================================
-     PROJECTION INSTABILITY — "The projector is running"
+     SCROLL-DRIVEN VISUAL EVOLUTION
      
-     Multi-frequency breathing creates organic, non-repeating variation.
+     The projector progressively reveals atmosphere
+     and information as the user scrolls.
      
-     Slow thermal pulse (~12s) — lamp temperature cycling
-     Medium flicker (~1.6s) — electrical variation
-     Fast micro-jitter (~0.25s) — mechanical vibration
+     0%:   Clean, dark — minimal grid
+     15%:  Grid lines begin appearing
+     30%:  Atmosphere warms — projector fully engaged
+     50%:  Scan line sweeps through
+     70%:  Everything gracefully fades with content
+     ========================================== */
+  // Grid lines progressively reveal
+  const gridRevealOpacity = useTransform(scrollYProgress, [0, 0.15, 0.35, 0.7], [0, 0.4, 0.6, 0]);
+  // Atmosphere warms — color temperature shift
+  const atmosphereWarmth = useTransform(scrollYProgress, [0, 0.2, 0.5, 0.75], [0, 0.04, 0.08, 0]);
+  // Scan line vertical sweep position
+  const scanLineY = useTransform(scrollYProgress, [0.1, 0.55], ['0%', '100%']);
+  const scanLineOpacity = useTransform(scrollYProgress, [0.1, 0.15, 0.5, 0.55], [0, 0.6, 0.6, 0]);
+  // Beam core intensifies with scroll
+  const beamIntensity = useTransform(scrollYProgress, [0, 0.25, 0.5, 0.75], [1, 1.3, 1.5, 0.8]);
+
+  /* ==========================================
+     PROJECTION BREATHING — Simplified
      
-     Combined, these produce a living, unstable light source
-     that never feels frozen or mathematically perfect.
+     Single slow sinusoidal pulse (~8s cycle).
+     Creates the feeling of a living projection
+     without the GPU cost of multi-frequency oscillation.
      ========================================== */
   const time = useMotionValue(0);
 
   const breathOpacity = useTransform(time, t => {
-    const thermalPulse = Math.sin(t / 2000) * 0.3;      // ±30% slow thermal
-    const electricalFlicker = Math.sin(t / 160) * 0.04;  // ±4% medium
-    const mechanicalJitter = Math.cos(t / 250) * 0.025 + Math.sin(t / 800) * 0.015; // ±4% fast
-    return 0.58 + thermalPulse + electricalFlicker + mechanicalJitter;
-  });
-
-  // Micro beam drift — the projection isn't perfectly stable
-  const breathX = useTransform(time, t => {
-    const primaryDrift = Math.sin(t / 3500) * 5;
-    const secondaryWobble = Math.cos(t / 1200) * 1.5;
-    return (primaryDrift + secondaryWobble) + "%";
-  });
-
-  const breathY = useTransform(time, t => {
-    const primaryDrift = Math.cos(t / 2800) * 5;
-    const secondaryWobble = Math.sin(t / 1500) * 1.2;
-    return (primaryDrift + secondaryWobble) + "%";
+    return 0.85 + Math.sin(t / 4000) * 0.15;
   });
 
   useAnimationFrame((t) => {
@@ -328,79 +311,80 @@ export default function HeroSection({ onExploreClick, isTransitioning, transitio
       data-nav-section="hero"
     >
       {/* ========================================
-          ATMOSPHERE SYSTEM — The Projection Environment
+          BACKGROUND — Scroll-driven visual evolution
           ======================================== */}
       <div className={`${styles.heroBg} ${isTransitioning ? styles.heroBgBlue : ''}`}>
-        {/* Foundational layers */}
+        {/* Alive, filled technical video background */}
+        <div className={styles.heroVideoWrapper} aria-hidden="true">
+          <video
+            key="/hero-bg4.mp4"
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="auto"
+            className={styles.heroVideo}
+          >
+            <source src="/hero-bg4.webm" type="video/webm" />
+            <source src="/hero-bg4.mp4" type="video/mp4" />
+          </video>
+        </div>
+
         <div className={styles.heroFilmGrain} aria-hidden="true" />
         <div className={styles.heroVignette} aria-hidden="true" />
 
-        {/* Atmosphere scales on scroll to simulate widening beam */}
+        {/* Scroll-revealed grid lines — progressive structure */}
         <motion.div
-          className={`${styles.heroAtmosphereSystem} ${sceneEstablished ? styles.sceneEstablished : ''}`}
-          style={{ scale: glowScale }}
-          aria-hidden="true"
-        >
-          {/* Depth Band 1: Far Atmosphere — slowest drift (CSS animated) */}
-          <div className={styles.farAtmosphere} />
-
-          {/* Rhythm Container: breathes and drifts together
-              Simulates projection lamp instability */}
-          <motion.div
-            className={styles.atmosphereRhythmContainer}
-            style={{
-              opacity: breathOpacity,
-              x: breathX,
-              y: breathY
-            }}
-          >
-            {/* Projection Beam — off-screen source illumination */}
-            <div className={`${styles.projectionBeam} ${transitionState === 'accel1' ? styles.lightSurge : ''}`}>
-              <div className={styles.projectionSourceRays} />
-              <div className={styles.beamCore} />
-              <div className={styles.beamFlare} />
-              <div className={styles.beamScatter} />
-              <div className={styles.beamEdge} />
-            </div>
-
-            {/* Volumetric Rays — revealed by atmosphere */}
-            <div className={styles.volumetricRays}>
-              <div className={styles.rayLayer1} />
-              <div className={styles.rayLayer2} />
-              <div className={styles.rayLayer3} />
-            </div>
-
-            {/* Depth Band 2: Mid Atmosphere (CSS animated) */}
-            <div className={styles.midAtmosphere} />
-
-            {/* Cinematic Dust — hierarchical particles */}
-            <div className={styles.dustContainer}>
-              <CinematicDust />
-            </div>
-          </motion.div>
-        </motion.div>
-
-        {/* Depth Band 3: Near Atmosphere / Foreground Haze
-            Sits above reel z-index to create depth */}
-        <div className={`${styles.nearAtmosphere} ${sceneEstablished ? styles.sceneEstablished : ''}`} />
-
-        {/* Atmosphere Evolution — scroll-driven color shift */}
-        <motion.div
-          className={styles.heroAtmosphereEvolution}
-          style={{ opacity: atmosphereEvolution }}
+          className={styles.scrollGrid}
+          style={{ opacity: gridRevealOpacity }}
           aria-hidden="true"
         />
+
+        {/* Beam core — intensifies with scroll */}
+        <motion.div
+          className={`${styles.heroAtmosphere} ${sceneEstablished ? styles.sceneEstablished : ''}`}
+          style={{ opacity: breathOpacity, scale: beamIntensity }}
+          aria-hidden="true"
+        >
+          <div className={`${styles.beamCore} ${transitionState === 'accel1' ? styles.lightSurge : ''}`} />
+        </motion.div>
+
+        {/* Atmosphere warmth — scroll-driven color temperature shift */}
+        <motion.div
+          className={styles.atmosphereWarmth}
+          style={{ opacity: atmosphereWarmth }}
+          aria-hidden="true"
+        />
+
+        {/* Scan line — cinematic horizontal sweep */}
+        <motion.div
+          className={styles.scanLine}
+          style={{ top: scanLineY, opacity: scanLineOpacity }}
+          aria-hidden="true"
+        />
+
+        {/* Near haze — thin foreground atmosphere */}
+        <div className={`${styles.nearHaze} ${sceneEstablished ? styles.sceneEstablished : ''}`} />
       </div>
 
       {/* ========================================
-          MAIN CONTENT CONTAINER
+          CSS DUST MOTES — Lightweight replacement
+          ======================================== */}
+      <div className={styles.dustField} aria-hidden="true">
+        {Array.from({ length: DUST_MOTE_COUNT }, (_, i) => (
+          <div key={i} className={`${styles.dustMote} ${styles[`dustMote${i + 1}`]}`} />
+        ))}
+      </div>
+
+      {/* ========================================
+          MAIN CONTENT — Strict CSS Grid layout
           ======================================== */}
       <div className={`${styles.heroInner} ${transitionState === 'accel3' ? styles.heroShake : ''} ${transitionState === 'flash' || transitionState === 'intro' ? styles.hidden : ''}`}>
 
-        {/* --- Left: Content Block --- */}
+        {/* --- Left Column: Content Block --- */}
         <motion.div
           className={styles.heroContent}
-          style={{ opacity: contentOpacity, y: contentY }}
+          style={{ opacity: contentOpacity }}
         >
           <div className={styles.sceneIndicator}>
             <span className={styles.sceneDot} />
@@ -410,9 +394,15 @@ export default function HeroSection({ onExploreClick, isTransitioning, transitio
           </div>
 
           <h1 className={styles.heroHeadline}>
-            <span className={styles.headlineLine}>ADVANCING</span>
-            <span className={styles.headlineLine}>COMPUTING</span>
-            <span className={styles.headlineLine}>PROFESSION</span>
+            <span className={styles.headlineLine}>
+              <span className={styles.headlineWord} data-text="SHAPE">SHAPE</span>{' '}
+              <span className={styles.headlineWord} data-text="THE">THE</span>
+            </span>
+            <span className={styles.headlineLine}>
+              <span className={styles.headlineWord} data-text="FUTURE">FUTURE</span>{' '}
+              <span className={styles.headlineWord} data-text="OF">OF</span>
+            </span>
+            <span className={`${styles.headlineLine} ${styles.headlineWord} ${styles.headlineAccent}`} data-text="COMPUTING">COMPUTING</span>
           </h1>
 
           <div className={styles.heroDivider} aria-hidden="true" />
@@ -457,13 +447,57 @@ export default function HeroSection({ onExploreClick, isTransitioning, transitio
           </motion.a>
         </motion.div>
 
-        {/* --- Right: Film Reel --- */}
+        {/* --- Right Column: Film Reel --- */}
         <motion.div
           className={styles.heroReelSide}
-          style={{ y: reelY }}
         >
-          {/* The Actual Reel Component */}
+          {/* Deep ambient occlusion to ground the reel against the video background */}
+          <div className={styles.reelEnvironmentShadow} aria-hidden="true" />
+
           <FilmReel transitionState={transitionState} />
+        </motion.div>
+
+        {/* --- Technical Readout HUD --- */}
+        <motion.div className={styles.heroHud} style={{ opacity: contentOpacity }}>
+          <div className={styles.hudBlock}>
+            <span className={styles.hudLabel}>DOMAINS</span>
+            <div className={styles.hudList}>
+              <span>AI</span><span className={styles.hudDot}>·</span>
+              <span>WEB</span><span className={styles.hudDot}>·</span>
+              <span>CP</span><span className={styles.hudDot}>·</span>
+              <span>DESIGN</span>
+            </div>
+          </div>
+
+          <div className={styles.hudBlock}>
+            <span className={styles.hudLabel}>TELEMETRY</span>
+            <div className={styles.hudList}>
+              <span>200+ MEMBERS</span><span className={styles.hudDot}>·</span>
+              <span>12+ EVENTS</span>
+            </div>
+          </div>
+
+          <div className={styles.hudBlock}>
+            <span className={styles.hudLabel}>NEXT EVENT</span>
+            <span className={styles.hudValueAccent}>DOTSLASH &apos;25</span>
+            <span className={styles.hudValue}>48-HR HACKATHON</span>
+          </div>
+        </motion.div>
+
+        {/* --- Legend Bar --- */}
+        <motion.div className={styles.legendBar} style={{ opacity: contentOpacity }}>
+          <div className={styles.legendPin}>
+            <span>Est. 2008</span>
+            <span className={styles.legendSep}>·</span>
+            <span>NIT Surat</span>
+          </div>
+          <div className={styles.legendPin}>
+            <span>Builders</span>
+            <span className={styles.legendSep}>·</span>
+            <span>Innovators</span>
+            <span className={styles.legendSep}>·</span>
+            <span>Creators</span>
+          </div>
         </motion.div>
       </div>
 
@@ -476,7 +510,7 @@ export default function HeroSection({ onExploreClick, isTransitioning, transitio
         <div className={styles.scrollLine} />
       </motion.div>
 
-      {/* Electricity Arc Overlay */}
+      {/* Lightning Arc Overlay */}
       <div className={`${styles.lightningOverlay} ${lightningPaths ? styles.active : ''}`}>
         {lightningPaths && (
           <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
