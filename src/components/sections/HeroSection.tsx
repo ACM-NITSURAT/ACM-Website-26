@@ -425,7 +425,7 @@ export default function HeroSection({ onExploreClick, isTransitioning, transitio
               backgroundColor: "rgba(255, 255, 255, 0.04)"
             } : undefined}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            style={{ pointerEvents: isTransitioning ? 'none' : 'auto' }}
+            style={{ pointerEvents: isTransitioning ? 'none' : 'auto', position: 'relative' }}
           >
             {isTransitioning ? (
               <div className={styles.loadingDots}>
