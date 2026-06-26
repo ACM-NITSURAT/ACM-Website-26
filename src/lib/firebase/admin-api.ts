@@ -58,3 +58,10 @@ export async function updateEvent(slug: string, data: Partial<Event>): Promise<E
 export async function deleteEvent(slug: string): Promise<void> {
   await apiFetch(`/api/admin/events/${slug}`, { method: 'DELETE' });
 }
+
+export async function toggleFormOpen(slug: string, isFormOpen: boolean): Promise<Event & { id: string }> {
+  return apiFetch(`/api/admin/events/${slug}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ isFormOpen }),
+  });
+}

@@ -55,6 +55,9 @@ export function middleware(request: NextRequest) {
   // If onboarding is already done, nothing to gate
   if (onboardingComplete) return NextResponse.next();
 
+  // Admin routes: allow all /admin/* paths (protected by their own layout guard)
+  if (pathname.startsWith('/admin')) return NextResponse.next();
+
   // If path is in the allowlist, let it through
   if ((ONBOARDING_ALLOWLIST as readonly string[]).includes(pathname)) {
     return NextResponse.next();

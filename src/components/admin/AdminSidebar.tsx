@@ -100,7 +100,7 @@ export default function AdminSidebar() {
         bg-zinc-950
         transition-all duration-200 ease-out
         ${expanded ? 'w-52' : 'w-14'}
-        min-h-screen flex-shrink-0 z-40
+        flex-shrink-0 z-40
       `}
     >
       {/* Logo mark */}

@@ -53,6 +53,9 @@ export interface IndividualParticipant extends ParticipantBase {
   firstName: string;
   lastName: string;
   rollNumber: string;
+
+  /** Gender of the individual participant. Used for diversity constraint checks. */
+  gender: 'male' | 'female' | 'other';
 }
 
 // ── Team registration ─────────────────────────────────────────────────────────

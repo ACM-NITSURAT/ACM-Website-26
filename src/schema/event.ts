@@ -100,6 +100,16 @@ export interface Event {
    * All three keys are always present; set a position to `0` if unused.
    */
   prizeMoneyDistribution: PrizeMoneyDistribution;
+
+  /**
+   * Controls whether the public registration form is currently accepting
+   * submissions. Admins toggle this from the event detail page.
+   * Defaults to `false` on event creation — must be explicitly opened.
+   *
+   * The registration API enforces this: submissions are rejected with 403
+   * when `isFormOpen === false`, regardless of event status.
+   */
+  isFormOpen: boolean;
 }
 
 /** Prize breakdown across the top three positions. Values are in INR (₹). */

@@ -116,6 +116,7 @@ export async function POST(request: NextRequest) {
       secondPrize: 0,
       thirdPrize: 0,
     },
+    isFormOpen:         false,  // must be explicitly opened by admin
   };
 
   await docRef.set(event);

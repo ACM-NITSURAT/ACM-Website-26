@@ -15,3 +15,12 @@
  * Only has any effect when DEV_MODE=false.
  */
 export const EARLY_REJECT = false;
+
+/**
+ * Fixed display dimensions for event thumbnail images.
+ * All thumbnails are rendered at exactly these dimensions with object-cover.
+ * Change here to update everywhere event thumbnails appear.
+ */
+export const EVENT_THUMBNAIL_WIDTH       = 1280;  // px
+export const EVENT_THUMBNAIL_HEIGHT      = 720;   // px — 16:9
+export const EVENT_THUMBNAIL_ASPECT_RATIO = `${EVENT_THUMBNAIL_WIDTH} / ${EVENT_THUMBNAIL_HEIGHT}`;
