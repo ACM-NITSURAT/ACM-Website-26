@@ -5,7 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { getEvent, deleteEvent, toggleFormOpen } from '@/lib/firebase/admin-api';
 import type { Event } from '@/schema/event';
-import { EVENT_THUMBNAIL_ASPECT_RATIO } from '@/config';
+import { EVENT_THUMBNAIL_ASPECT_RATIO, EVENT_TYPES_WITHOUT_FORMS } from '@/config';
 import ToggleRow from '@/components/ui/ToggleRow';
 
 type EventRow = Event & { id: string };
@@ -249,14 +249,33 @@ export default function EventDetailPage() {
               See participants
             </Link>
 
-            {/* Form open/close toggle */}
-            <ToggleRow
-              checked={!!event.isFormOpen}
-              onChange={handleToggleForm}
-              label="Form is open"
-              labelOff="Form is closed"
-              loading={togglingForm}
-            />
+            {/* Form builder button + toggle — only for form-capable event types */}
+            {!EVENT_TYPES_WITHOUT_FORMS.includes(event.type) && (
+              <>
+                <Link
+                  href={`/admin/events/${slug}/form`}
+                  className="flex items-center justify-center gap-2 py-2.5 rounded-md text-sm font-medium text-zinc-200 bg-zinc-900 border border-zinc-700 hover:bg-zinc-800 hover:border-zinc-500 transition-colors"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    <polyline points="14 2 14 8 20 8" />
+                    <line x1="12" y1="18" x2="12" y2="12" />
+                    <line x1="9" y1="15" x2="15" y2="15" />
+                  </svg>
+                  {event.hasForm ? 'Edit form' : 'Create form'}
+                </Link>
+
+                {event.hasForm && (
+                  <ToggleRow
+                    checked={!!event.isFormOpen}
+                    onChange={handleToggleForm}
+                    label="Form is open"
+                    labelOff="Form is closed"
+                    loading={togglingForm}
+                  />
+                )}
+              </>
+            )}
           </div>
         </aside>
 
@@ -317,13 +336,29 @@ export default function EventDetailPage() {
               </svg>
               See participants
             </Link>
-            <ToggleRow
-              checked={!!event.isFormOpen}
-              onChange={handleToggleForm}
-              label="Form is open"
-              labelOff="Form is closed"
-              loading={togglingForm}
-            />
+            {!EVENT_TYPES_WITHOUT_FORMS.includes(event.type) && (
+              <>
+                <Link href={`/admin/events/${slug}/form`}
+                  className="flex items-center justify-center gap-2 py-2.5 rounded-md text-sm font-medium text-zinc-200 bg-zinc-900 border border-zinc-700 hover:bg-zinc-800 transition-colors">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    <polyline points="14 2 14 8 20 8" />
+                    <line x1="12" y1="18" x2="12" y2="12" />
+                    <line x1="9" y1="15" x2="15" y2="15" />
+                  </svg>
+                  {event.hasForm ? 'Edit form' : 'Create form'}
+                </Link>
+                {event.hasForm && (
+                  <ToggleRow
+                    checked={!!event.isFormOpen}
+                    onChange={handleToggleForm}
+                    label="Form is open"
+                    labelOff="Form is closed"
+                    loading={togglingForm}
+                  />
+                )}
+              </>
+            )}
           </div>
 
           {/* ── Schedule + key stats grid ── */}

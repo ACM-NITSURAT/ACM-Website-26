@@ -65,3 +65,25 @@ export async function toggleFormOpen(slug: string, isFormOpen: boolean): Promise
     body: JSON.stringify({ isFormOpen }),
   });
 }
+
+// ── Form builder ──────────────────────────────────────────────────────────────
+
+import type { EventForm } from '@/schema/form';
+
+export async function getForm(slug: string): Promise<EventForm> {
+  return apiFetch(`/api/admin/events/${slug}/form`);
+}
+
+export async function saveForm(
+  slug: string,
+  data: Pick<EventForm, 'title' | 'description' | 'fields'>,
+): Promise<void> {
+  await apiFetch(`/api/admin/events/${slug}/form`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteForm(slug: string): Promise<void> {
+  await apiFetch(`/api/admin/events/${slug}/form`, { method: 'DELETE' });
+}
