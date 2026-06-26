@@ -21,7 +21,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { getEvent, getForm, saveForm } from '@/lib/firebase/admin-api';
 import type { Event } from '@/schema/event';
 import type { FormField, FormFieldType, DropdownField, CheckboxField } from '@/schema/form';
-import { EVENT_THUMBNAIL_ASPECT_RATIO } from '@/config';
+import { EVENT_THUMBNAIL_ASPECT_RATIO, FORM_INTELLIGENT_MODE } from '@/config';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -66,13 +66,13 @@ const TYPE_HINTS: { words: string[]; type: FormFieldType }[] = [
 ];
 
 function inferType(label: string, currentType: FormFieldType): FormFieldType {
+  if (!FORM_INTELLIGENT_MODE) return currentType;
   const words = label.trim().split(/\s+/);
-  if (words.length > 4) return currentType; // only infer for short labels
+  if (words.length > 4) return currentType; // revert to user's set type beyond 4 words
   const lower = label.toLowerCase();
-  for (const hint of TYPE_HINTS) {
-    if (hint.words.some((w) => lower.includes(w))) return hint.type;
-  }
-  return currentType;
+  const matches = TYPE_HINTS.filter((h) => h.words.some((w) => lower.includes(w)));
+  if (matches.length !== 1) return currentType; // 0 or 2+ matches → revert to current
+  return matches[0].type;
 }
 
 const inputCls = 'bg-zinc-900 border border-zinc-700 rounded-md px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500 transition-colors w-full';
@@ -145,7 +145,7 @@ function FieldCard({ field, isDuplicate, autoFocus, onChange, onDuplicate, onDel
       <div className="flex items-center gap-2 px-4 pt-4 pb-3 border-b border-zinc-800">
         {/* Drag handle */}
         <button {...attributes} {...listeners} type="button"
-          className="cursor-grab active:cursor-grabbing text-zinc-600 hover:text-zinc-400 transition-colors flex-shrink-0 p-1 -ml-1"
+          className="cursor-grab active:cursor-grabbing text-zinc-300 hover:text-white transition-colors flex-shrink-0 p-1 -ml-1"
           aria-label="Drag to reorder">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <circle cx="9" cy="5" r="1" fill="currentColor" stroke="none" />
@@ -363,6 +363,7 @@ export default function FormBuilderPage() {
     // Client-side quick checks before hitting the API
     if (!title.trim()) { setSaveError('Form title is required.'); return; }
     if (fields.length === 0) { setSaveError('Add at least one field before saving.'); return; }
+    if (!fields.some((f) => f.required)) { setSaveError('At least one field must be marked as required.'); return; }
     if (duplicateIds.size > 0) { setSaveError('Fix duplicate field labels before saving.'); return; }
     const emptyLabel = fields.find((f) => !f.label.trim());
     if (emptyLabel) { setSaveError('All fields must have a label.'); return; }
@@ -428,11 +429,26 @@ export default function FormBuilderPage() {
               {event.hasForm ? 'Edit form' : 'Create form'} · {event.eventName}
             </p>
           </div>
-          {isDirty && <span className="text-xs text-amber-500 flex-shrink-0">Unsaved changes</span>}
+          {isDirty && !saveError && <span className="text-xs text-amber-500 flex-shrink-0">Unsaved changes</span>}
+          {saveError && (
+            <span className="text-xs text-red-400 flex-shrink-0 max-w-xs truncate" title={saveError}>
+              ⚠ {saveError}
+            </span>
+          )}
         </div>
-        <button onClick={handleSave} disabled={saving || duplicateIds.size > 0}
-          className="flex-shrink-0 bg-white text-zinc-900 rounded-md px-5 py-2 text-sm font-medium hover:bg-zinc-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
-          {saving ? 'Saving…' : 'Save form'}
+        <button onClick={handleSave} disabled={saving || duplicateIds.size > 0 || (!isDirty && !saveError)}
+          className={`flex-shrink-0 flex items-center gap-2 rounded-md px-5 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed ${
+            !isDirty && !saveError
+              ? 'bg-emerald-600 text-white opacity-90 cursor-default'
+              : 'bg-white text-zinc-900 hover:bg-zinc-200 disabled:opacity-50'
+          }`}>
+          {!isDirty && !saveError && (
+            <svg key="check" width="14" height="14" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="20 6 9 17 4 12" className="animate-check" />
+            </svg>
+          )}
+          {saving ? 'Saving…' : !isDirty && !saveError ? 'Form saved' : 'Save form'}
         </button>
       </div>
 
@@ -500,13 +516,6 @@ export default function FormBuilderPage() {
 
         {/* ── Add field ── */}
         <AddFieldButton onAdd={addField} />
-
-        {/* ── Save error ── */}
-        {saveError && (
-          <div className="px-4 py-3 rounded-xl border border-red-500/20 bg-red-500/10 text-sm text-red-400">
-            {saveError}
-          </div>
-        )}
 
         {/* ── Empty state hint ── */}
         {fields.length === 0 && (

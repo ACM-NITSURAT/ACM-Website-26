@@ -33,3 +33,10 @@ export const EVENT_TYPES_WITHOUT_FORMS: string[] = ['meet'];
 
 /** Maximum number of custom fields allowed in a single event form. */
 export const FORM_MAX_FIELDS = 50;
+
+/**
+ * When true, the form builder infers the field type from the label text
+ * (e.g. "Email" → email type, "Roll number" → rollNumber type).
+ * Set to false to disable entirely.
+ */
+export const FORM_INTELLIGENT_MODE = true;
