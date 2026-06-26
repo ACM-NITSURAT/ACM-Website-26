@@ -4,6 +4,9 @@ import adminDb from '@/lib/firebase-admin/firestore';
 import { verifyIdToken } from '@/lib/firebase-admin/auth';
 import type { IndividualParticipant, TeamParticipant, TeamMember } from '@/schema/participant';
 import type { Event } from '@/schema/event';
+import type { EventForm, FormResponse } from '@/schema/form';
+import { validateFormResponse } from '@/lib/form-builder/validate-response';
+import { EVENT_TYPES_WITHOUT_FORMS } from '@/config';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -79,6 +82,23 @@ export async function POST(
     );
   }
 
+  // Block registration for event types that don't support forms
+  if (EVENT_TYPES_WITHOUT_FORMS.includes(event.type)) {
+    return NextResponse.json(
+      { error: 'This event type does not support participant registration.' },
+      { status: 400 },
+    );
+  }
+
+  // Load custom form schema (if one exists) for extraFields validation later
+  const formSnap = await adminDb
+    .collection('events')
+    .doc(eventDocId)
+    .collection('form')
+    .doc('config')
+    .get();
+  const eventForm = formSnap.exists ? (formSnap.data() as EventForm) : null;
+
   // ── 3. Auth ────────────────────────────────────────────────────────────────
 
   let userId: string | null = null;
@@ -142,6 +162,12 @@ export async function POST(
     }
     if (!VALID_GENDERS.includes(gender)) {
       return NextResponse.json({ error: 'Valid gender is required (male, female, other).' }, { status: 400 });
+    }
+
+    // Validate custom form fields
+    if (eventForm) {
+      const formErr = validateFormResponse(eventForm, extraFields as FormResponse);
+      if (formErr) return NextResponse.json({ error: formErr }, { status: 422 });
     }
 
     // Female-mandatory check for individual events
@@ -231,6 +257,12 @@ export async function POST(
     }
     if (!Array.isArray(rawMembers)) {
       return NextResponse.json({ error: 'members must be an array.' }, { status: 400 });
+    }
+
+    // Validate custom form fields
+    if (eventForm) {
+      const formErr = validateFormResponse(eventForm, extraFields as FormResponse);
+      if (formErr) return NextResponse.json({ error: formErr }, { status: 422 });
     }
 
     // Normalise and validate each member

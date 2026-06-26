@@ -105,11 +105,17 @@ export interface Event {
    * Controls whether the public registration form is currently accepting
    * submissions. Admins toggle this from the event detail page.
    * Defaults to `false` on event creation — must be explicitly opened.
-   *
-   * The registration API enforces this: submissions are rejected with 403
-   * when `isFormOpen === false`, regardless of event status.
+   * Cannot be set to `true` when `hasForm === false`.
    */
   isFormOpen: boolean;
+
+  /**
+   * Whether a custom form has been created for this event.
+   * Defaults to `false`. Set to `true` when the admin saves a form via the
+   * form builder. The `isFormOpen` toggle is hidden until this is `true`.
+   * Not applicable for event types listed in `EVENT_TYPES_WITHOUT_FORMS`.
+   */
+  hasForm: boolean;
 }
 
 /** Prize breakdown across the top three positions. Values are in INR (₹). */

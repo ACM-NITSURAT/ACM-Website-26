@@ -24,3 +24,12 @@ export const EARLY_REJECT = false;
 export const EVENT_THUMBNAIL_WIDTH       = 1280;  // px
 export const EVENT_THUMBNAIL_HEIGHT      = 720;   // px — 16:9
 export const EVENT_THUMBNAIL_ASPECT_RATIO = `${EVENT_THUMBNAIL_WIDTH} / ${EVENT_THUMBNAIL_HEIGHT}`;
+
+/**
+ * Event types that do NOT support form creation or participant registration.
+ * Extend this array to block future types without touching API logic.
+ */
+export const EVENT_TYPES_WITHOUT_FORMS: string[] = ['meet'];
+
+/** Maximum number of custom fields allowed in a single event form. */
+export const FORM_MAX_FIELDS = 50;

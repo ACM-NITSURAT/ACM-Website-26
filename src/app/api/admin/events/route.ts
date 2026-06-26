@@ -117,6 +117,7 @@ export async function POST(request: NextRequest) {
       thirdPrize: 0,
     },
     isFormOpen:         false,  // must be explicitly opened by admin
+    hasForm:            false,  // set true when form is saved via form builder
   };
 
   await docRef.set(event);
