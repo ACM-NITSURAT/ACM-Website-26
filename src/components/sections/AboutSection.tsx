@@ -46,9 +46,13 @@ const PILLARS_DATA = [
     svg: (
       <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="2">
         {/* Crosshair / Target */}
-        <circle cx="50" cy="50" r="40" strokeDasharray="4 4" />
-        <circle cx="50" cy="50" r="25" />
-        <circle cx="50" cy="50" r="6" />
+        <g className={styles.animRotateSlow}>
+          <circle cx="50" cy="50" r="40" strokeDasharray="4 4" />
+        </g>
+        <g className={styles.animPulseSlow}>
+          <circle cx="50" cy="50" r="25" />
+          <circle cx="50" cy="50" r="6" />
+        </g>
         <line x1="50" y1="0" x2="50" y2="35" />
         <line x1="50" y1="65" x2="50" y2="100" />
         <line x1="0" y1="50" x2="35" y2="50" />
@@ -63,13 +67,17 @@ const PILLARS_DATA = [
     svg: (
       <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="2">
         {/* Stacked Blocks / Construction */}
-        <path d="M 50 15 L 85 30 L 50 45 L 15 30 Z" />
-        <path d="M 15 30 L 15 50 L 50 65 L 50 45" />
-        <path d="M 85 30 L 85 50 L 50 65 L 50 45" />
+        <g className={styles.animFloatTop}>
+          <path d="M 50 15 L 85 30 L 50 45 L 15 30 Z" />
+          <path d="M 15 30 L 15 50 L 50 65 L 50 45" />
+          <path d="M 85 30 L 85 50 L 50 65 L 50 45" />
+        </g>
 
-        <path d="M 50 45 L 85 60 L 50 75 L 15 60 Z" />
-        <path d="M 15 60 L 15 80 L 50 95 L 50 75" />
-        <path d="M 85 60 L 85 80 L 50 95 L 50 75" />
+        <g className={styles.animFloatBottom}>
+          <path d="M 50 45 L 85 60 L 50 75 L 15 60 Z" />
+          <path d="M 15 60 L 15 80 L 50 95 L 50 75" />
+          <path d="M 85 60 L 85 80 L 50 95 L 50 75" />
+        </g>
       </svg>
     )
   },
@@ -80,18 +88,20 @@ const PILLARS_DATA = [
     svg: (
       <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="2">
         {/* Network Nodes */}
-        <circle cx="50" cy="20" r="8" />
-        <circle cx="20" cy="65" r="8" />
-        <circle cx="80" cy="65" r="8" />
-        <circle cx="50" cy="85" r="5" />
+        <g className={styles.animPulseSlow}>
+          <circle cx="50" cy="20" r="8" />
+          <circle cx="20" cy="65" r="8" />
+          <circle cx="80" cy="65" r="8" />
+          <circle cx="50" cy="85" r="5" />
+        </g>
 
         <line x1="43" y1="26" x2="27" y2="59" />
         <line x1="57" y1="26" x2="73" y2="59" />
         <line x1="28" y1="65" x2="72" y2="65" />
 
-        <line x1="26" y1="71" x2="45" y2="83" strokeDasharray="2 2" />
-        <line x1="74" y1="71" x2="55" y2="83" strokeDasharray="2 2" />
-        <line x1="50" y1="28" x2="50" y2="80" strokeDasharray="2 2" />
+        <line x1="26" y1="71" x2="45" y2="83" className={styles.animDashFlow} strokeDasharray="2 2" />
+        <line x1="74" y1="71" x2="55" y2="83" className={styles.animDashFlow} strokeDasharray="2 2" />
+        <line x1="50" y1="28" x2="50" y2="80" className={styles.animDashFlow} strokeDasharray="2 2" />
       </svg>
     )
   },

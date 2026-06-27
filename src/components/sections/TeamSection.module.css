@@ -215,7 +215,7 @@
   border-radius: 4px;
 }
 
-.viewfinderCard:hover {
+.viewfinderCard:hover, .viewfinderCard.cardFocused {
   transform: translateY(-8px) scale(1.02);
   z-index: 10;
 }
@@ -237,7 +237,7 @@
   transition: all 500ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.viewfinderCard:hover .glassContainer {
+.viewfinderCard:hover .glassContainer, .viewfinderCard.cardFocused .glassContainer {
   border-color: rgba(56, 189, 248, 0.8);
   border-top-color: rgba(56, 189, 248, 1);
   box-shadow:
@@ -338,12 +338,12 @@
 }
 
 /* Hover: Resolve to full color */
-.viewfinderCard:hover .cardPhotoWrap::after,
-.viewfinderCard:hover .photoOverlay {
+.viewfinderCard:hover .cardPhotoWrap::after, .viewfinderCard.cardFocused .cardPhotoWrap::after,
+.viewfinderCard:hover .photoOverlay, .viewfinderCard.cardFocused .photoOverlay {
   opacity: 0;
 }
 
-.viewfinderCard:hover .cardPhoto {
+.viewfinderCard:hover .cardPhoto, .viewfinderCard.cardFocused .cardPhoto {
   /* Keep original brightness */
   filter: none;
   /* Triggers a continuous, ultra-slow zoom and pan only while hovered */
@@ -374,7 +374,7 @@
   transition: opacity 400ms ease;
 }
 
-.viewfinderCard:hover .viewfinderMarkings {
+.viewfinderCard:hover .viewfinderMarkings, .viewfinderCard.cardFocused .viewfinderMarkings {
   opacity: 1;
 }
 
@@ -450,10 +450,10 @@
 }
 
 /* Snap inward on hover */
-.viewfinderCard:hover .cropMark.tl,
-.viewfinderCard:hover .cropMark.tr,
-.viewfinderCard:hover .cropMark.bl,
-.viewfinderCard:hover .cropMark.br {
+.viewfinderCard:hover .cropMark.tl, .viewfinderCard.cardFocused .cropMark.tl,
+.viewfinderCard:hover .cropMark.tr, .viewfinderCard.cardFocused .cropMark.tr,
+.viewfinderCard:hover .cropMark.bl, .viewfinderCard.cardFocused .cropMark.bl,
+.viewfinderCard:hover .cropMark.br, .viewfinderCard.cardFocused .cropMark.br {
   transform: translate(0, 0);
 }
 
@@ -473,7 +473,7 @@
   transition: opacity 400ms ease;
 }
 
-.viewfinderCard:hover .cardHeader {
+.viewfinderCard:hover .cardHeader, .viewfinderCard.cardFocused .cardHeader {
   opacity: 1;
 }
 
@@ -523,7 +523,7 @@
   }
 }
 
-.viewfinderCard:hover .recStatus {
+.viewfinderCard:hover .recStatus, .viewfinderCard.cardFocused .recStatus {
   opacity: 1;
 }
 
@@ -547,7 +547,7 @@
   transition: opacity 500ms ease, background 500ms ease, border-color 500ms ease;
 }
 
-.viewfinderCard:hover .subjectInfo {
+.viewfinderCard:hover .subjectInfo, .viewfinderCard.cardFocused .subjectInfo {
   opacity: 1;
   background: rgba(10, 15, 30, 0.85);
   border-color: rgba(56, 189, 248, 0.4);
@@ -589,7 +589,7 @@
   z-index: 15;
 }
 
-.viewfinderCard:hover .socialShutter {
+.viewfinderCard:hover .socialShutter, .viewfinderCard.cardFocused .socialShutter {
   opacity: 1;
   max-height: 40px;
   margin-top: 4px;
@@ -755,70 +755,57 @@
 
   .viewfinderGrid {
     grid-template-columns: 1fr;
-    gap: 24px;
+    gap: 20px;
   }
 
   .viewfinderGrid>* {
     margin-top: 0 !important;
   }
 
+  /* Split layout: Photo on left, Text on right */
+  .viewfinderCard {
+    aspect-ratio: 16 / 10;
+    height: auto;
+  }
+
+  .cardPhotoWrap {
+    left: 0;
+    right: 55%;
+    margin: 0;
+    border-radius: 0;
+    -webkit-mask-image: none;
+    mask-image: none;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
   .subjectInfo {
-    padding: 24px 16px 16px;
+    top: 0;
+    bottom: 0;
+    left: 45%;
+    right: 0;
+    padding: 16px;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background: transparent !important;
+    border: none !important;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
   }
 
-  /* Larger, more tappable social icons for mobile */
-  .socialIcon {
-    width: 24px;
-    height: 24px;
-    padding: 4px;
-    /* Increases tap target without changing visual size drastically */
-    margin: -4px;
+  .subjectText {
+    align-items: center;
   }
 
+  /* Hide technical viewfinder marks on the split mobile layout as they clash */
+  .viewfinderMarkings, .cardHeader {
+    display: none;
+  }
+
+  /* Social shutter expands inline and is centered */
   .socialShutter {
-    gap: 20px;
-    /* More breathing room */
+    gap: 16px;
+    justify-content: center;
   }
 }
-
-/* ============================================================
-   TOUCH DEVICES: AUTO-HOVER ON CENTER FOCUS
-   Since mobile devices don't have hover, automatically apply 
-   the hover effects when the card is in the middle of the screen (cardFocused).
-   ============================================================ */
-@media (hover: none) and (pointer: coarse) {
-  .viewfinderCard.cardFocused {
-    border-color: rgba(37, 99, 235, 0.5);
-    box-shadow:
-      0 30px 60px rgba(0, 0, 0, 0.8),
-      0 0 30px rgba(37, 99, 235, 0.1);
-    transform: translateY(-8px) scale(1.02);
-    z-index: 10;
-  }
-
-  .viewfinderCard.cardFocused .cardPhoto {
-    filter: grayscale(0) sepia(0) hue-rotate(0deg) contrast(1.05) brightness(1.05);
-    transform: scale(1.12);
-  }
-
-  .viewfinderCard.cardFocused .viewfinderMarkings {
-    opacity: 0.8;
-  }
-
-  .viewfinderCard.cardFocused .recStatus {
-    opacity: 1;
-  }
-
-  .viewfinderCard.cardFocused .subjectName,
-  .viewfinderCard.cardFocused .subjectRole {
-    transform: translateY(0);
-  }
-
-  .viewfinderCard.cardFocused .socialShutter {
-    bottom: 24px;
-  }
-
-  .viewfinderCard.cardFocused .subjectInfo {
-    padding-bottom: 64px;
-  }
-}
+

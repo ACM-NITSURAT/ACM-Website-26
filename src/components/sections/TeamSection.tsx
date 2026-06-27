@@ -102,22 +102,28 @@ export default function TeamSection() {
     // Focus Observer (Middle of screen)
     focusObserverRef.current = new IntersectionObserver(
       (entries) => {
+        if (window.innerWidth > 1024) {
+          setFocusedBlocks(new Set());
+          return;
+        }
+
         entries.forEach((entry) => {
           const id = entry.target.getAttribute('data-block-id');
           if (!id) return;
 
           if (entry.isIntersecting) {
-            setFocusedBlocks((prev) => new Set(prev).add(id));
+            setFocusedBlocks(new Set([id])); // Only one card focused at a time
           } else {
             setFocusedBlocks((prev) => {
-              const next = new Set(prev);
-              next.delete(id);
-              return next;
+              if (prev.has(id)) {
+                return new Set();
+              }
+              return prev;
             });
           }
         });
       },
-      { rootMargin: '-30% 0px -40% 0px' } // Roughly middle 30% of viewport
+      { rootMargin: '-45% 0px -45% 0px' } // Narrower slice to ensure only one intersects at a time
     );
 
     elementsRef.current.forEach((el) => {
@@ -147,7 +153,13 @@ export default function TeamSection() {
   );
 
   const isVisible = (id: string) => visibleBlocks.has(id);
-  const isFocused = (id: string) => focusedBlocks.has(id);
+  const isFocused = (id: string) => {
+    // Only apply programmatic focus (auto-hover) on mobile devices
+    if (typeof window !== 'undefined' && window.innerWidth > 1024) {
+      return false;
+    }
+    return focusedBlocks.has(id);
+  };
 
   return (
     <section className={styles.teamSection} id="team" data-nav-section="team">

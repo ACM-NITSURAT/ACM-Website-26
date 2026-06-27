@@ -1662,7 +1662,7 @@
     justify-items: center;
     text-align: center;
     padding: 100px 32px 40px;
-    gap: 24px;
+    gap: 16px;
   }
 
   .heroContent {
@@ -1673,6 +1673,7 @@
 
   .sceneIndicator {
     justify-content: center;
+    margin-bottom: 12px;
   }
 
   .heroHeadline {
@@ -1680,11 +1681,12 @@
   }
 
   .heroDivider {
-    margin: 24px auto 20px;
+    margin: 16px auto 16px;
   }
 
   .heroSubtext {
     text-align: center;
+    margin-bottom: 24px;
   }
 
   .filmReelContainer {
@@ -1694,10 +1696,12 @@
 
   .heroReelSide {
     order: -1;
+    margin-bottom: -24px;
   }
 
-  /* Hide evidence markers on small screens — they clutter */
-  .acmEvidence {
+  /* Hide extra HUD and evidence markers on small screens — they clutter */
+  .acmEvidence,
+  .heroHud {
     display: none;
   }
 
@@ -1714,7 +1718,15 @@
 @media (max-width: 520px) {
   .heroInner {
     padding: 80px 20px 32px;
-    gap: 20px;
+    gap: 12px;
+  }
+
+  .heroReelSide {
+    margin-bottom: -32px;
+  }
+
+  .sceneIndicator {
+    margin-bottom: 8px;
   }
 
   .headlineLine {
@@ -1723,6 +1735,7 @@
 
   .heroSubtext {
     font-size: 15px;
+    margin-bottom: 20px;
   }
 
   .filmReelContainer {
