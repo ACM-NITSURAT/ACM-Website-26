@@ -758,7 +758,8 @@
     gap: 20px;
   }
 
-  .viewfinderGrid>* {
+  /* Reset the stagger effect completely for a flat 1-column list */
+  .viewfinderGrid > :nth-child(n) {
     margin-top: 0 !important;
   }
 
@@ -797,9 +798,13 @@
     align-items: center;
   }
 
-  /* Hide technical viewfinder marks on the split mobile layout as they clash */
-  .viewfinderMarkings, .cardHeader {
-    display: none;
+  /* Constrain the camera UI overlays to just the photo area (left 45%) on mobile */
+  .viewfinderMarkings {
+    right: 55%;
+  }
+
+  .cardHeader {
+    right: calc(55% + 16px);
   }
 
   /* Social shutter expands inline and is centered */
