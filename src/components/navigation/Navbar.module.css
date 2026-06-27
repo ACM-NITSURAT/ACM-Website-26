@@ -1320,7 +1320,7 @@
   --theme-glow: 220, 255, 240;
 }
 .themeTeam {
-  --theme-main: 255, 140, 80;
-  --theme-light: 255, 180, 130;
-  --theme-glow: 255, 230, 210;
+  --theme-main: 255, 255, 255;
+  --theme-light: 200, 200, 200;
+  --theme-glow: 255, 255, 255;
 }

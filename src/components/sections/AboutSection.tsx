@@ -44,7 +44,7 @@ const PILLARS_DATA = [
     title: 'COMPETE',
     desc: "ICPC, Codeforces, ranked battles. We don't just learn to code — we test ourselves against the best.",
     svg: (
-      <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="1">
+      <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="2">
         {/* Crosshair / Target */}
         <circle cx="50" cy="50" r="40" strokeDasharray="4 4" />
         <circle cx="50" cy="50" r="25" />
@@ -61,7 +61,7 @@ const PILLARS_DATA = [
     title: 'BUILD',
     desc: "Hackathons, real shipped products, open-source contributions. Ideas don't stay ideas here.",
     svg: (
-      <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="1">
+      <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="2">
         {/* Stacked Blocks / Construction */}
         <path d="M 50 15 L 85 30 L 50 45 L 15 30 Z" />
         <path d="M 15 30 L 15 50 L 50 65 L 50 45" />
@@ -78,7 +78,7 @@ const PILLARS_DATA = [
     title: 'CONNECT',
     desc: "A 500+ member network across companies, campuses, and careers. You're never building alone.",
     svg: (
-      <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="1">
+      <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="2">
         {/* Network Nodes */}
         <circle cx="50" cy="20" r="8" />
         <circle cx="20" cy="65" r="8" />

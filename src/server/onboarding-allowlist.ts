@@ -13,4 +13,5 @@
 export const ONBOARDING_ALLOWLIST: readonly string[] = [
   '/',
   '/onboarding',
+  '/team',
 ];

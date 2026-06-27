@@ -20,11 +20,11 @@ interface ClapperboardSVGProps {
   title?: string;
   scene?: string;
   take?: string;
-  colorTheme?: 'blue1' | 'blue2' | 'blue3';
+  colorTheme?: 'blue1' | 'blue2' | 'blue3' | 'bw';
 }
 
-export default function ClapperboardSVG({ 
-  revealed = false, 
+export default function ClapperboardSVG({
+  revealed = false,
   className = '',
   title = "ABOUT ACM",
   scene = "06",
@@ -55,9 +55,10 @@ export default function ClapperboardSVG({
 
   const getThemeRgb = () => {
     switch (colorTheme) {
+      case 'bw': return '255,255,255'; // Original Black and White
       case 'blue2': return '45,212,191'; // Neon Teal/Cyan (striking greenish-blue)
       case 'blue3': return '168,85,247'; // Electric Purple (striking purplish-blue)
-      case 'blue1': 
+      case 'blue1':
       default:
         return '37,99,235'; // Classic Royal Blue
     }
