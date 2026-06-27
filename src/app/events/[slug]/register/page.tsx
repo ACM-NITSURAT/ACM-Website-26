@@ -7,6 +7,7 @@ import type { Event } from '@/schema/event';
 import type { EventForm, FormField, DropdownField, CheckboxField, ParagraphField, AfterScreen } from '@/schema/form';
 import { useAuth } from '@/lib/firebase';
 import { EVENT_TYPES_WITHOUT_FORMS } from '@/config';
+import { isValidRollNumber, ROLL_NUMBER_ERROR } from '@/lib/validators/rollNumber';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -209,6 +210,8 @@ function RegistrationForm({ event, form }: { event: EventRow; form: EventForm | 
 
   // Team registration state
   const defaultMember = (): MemberEntry => ({ name: '', rollNumber: '', gender: '', userId: null });
+  // minTeamMembers / maxTeamMembers are TOTAL size including the leader.
+  // The `members` array holds additional members only (leader is separate).
   const minMembers = Math.max(0, event.minTeamMembers - 1);
   const maxMembers = event.maxTeamMembers - 1;
   const [team, setTeam] = useState({
@@ -219,6 +222,28 @@ function RegistrationForm({ event, form }: { event: EventRow; form: EventForm | 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSubmitError('');
+
+    // Client-side roll number format validation
+    if (showDefaults) {
+      if (!isTeam) {
+        if (!isValidRollNumber(individual.rollNumber)) {
+          setSubmitError(ROLL_NUMBER_ERROR);
+          return;
+        }
+      } else {
+        if (!isValidRollNumber(team.leaderRollNumber)) {
+          setSubmitError(`Leader: ${ROLL_NUMBER_ERROR}`);
+          return;
+        }
+        for (let i = 0; i < team.members.length; i++) {
+          if (!isValidRollNumber(team.members[i].rollNumber)) {
+            setSubmitError(`Member ${i + 1}: ${ROLL_NUMBER_ERROR}`);
+            return;
+          }
+        }
+      }
+    }
+
     setSubmitting(true);
 
     try {
@@ -256,11 +281,13 @@ function RegistrationForm({ event, form }: { event: EventRow; form: EventForm | 
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-      {/* Form title / description from form builder */}
+      {/* Form header: title → description (thumbnail is in the page banner above) */}
       {form && (
-        <div>
+        <div className="flex flex-col gap-3">
           {form.title && (
-            <h2 className="text-lg font-semibold text-white mb-2">{form.title}</h2>
+            <h2 className="text-xl font-bold text-white leading-snug" style={{ fontFamily: 'var(--font-display)' }}>
+              {form.title}
+            </h2>
           )}
           {form.description && (
             <div
@@ -292,7 +319,10 @@ function RegistrationForm({ event, form }: { event: EventRow; form: EventForm | 
             <label className={labelCls}>Roll number <span className="text-red-400">*</span></label>
             <input type="text" required value={individual.rollNumber}
               onChange={(e) => setIndividual((p) => ({ ...p, rollNumber: e.target.value }))}
-              placeholder="e.g. U24CS089" className={inputCls} />
+              placeholder="e.g. U24CS089"
+              pattern="[A-Za-z][0-9]{2}[A-Za-z]{2}[0-9]{3}"
+              title={ROLL_NUMBER_ERROR}
+              className={inputCls} />
           </div>
           <div>
             <label className={labelCls}>Gender <span className="text-red-400">*</span></label>
@@ -329,13 +359,16 @@ function RegistrationForm({ event, form }: { event: EventRow; form: EventForm | 
               <label className={labelCls}>Roll number <span className="text-red-400">*</span></label>
               <input type="text" required value={team.leaderRollNumber}
                 onChange={(e) => setTeam((p) => ({ ...p, leaderRollNumber: e.target.value }))}
-                placeholder="e.g. U24CS089" className={inputCls} />
+                placeholder="e.g. U24CS089"
+                pattern="[A-Za-z][0-9]{2}[A-Za-z]{2}[0-9]{3}"
+                title={ROLL_NUMBER_ERROR}
+                className={inputCls} />
             </div>
           </div>
           <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wide">
-                Team members ({team.members.length})
+                Team members ({team.members.length} additional · {team.members.length + 1} total incl. leader)
               </p>
               {team.members.length < maxMembers && (
                 <button type="button"
@@ -367,7 +400,10 @@ function RegistrationForm({ event, form }: { event: EventRow; form: EventForm | 
                   placeholder="Full name" className={inputCls} />
                 <input type="text" required value={m.rollNumber}
                   onChange={(e) => setTeam((p) => { const ms = [...p.members]; ms[i] = { ...ms[i], rollNumber: e.target.value }; return { ...p, members: ms }; })}
-                  placeholder="Roll number" className={inputCls} />
+                  placeholder="Roll number"
+                  pattern="[A-Za-z][0-9]{2}[A-Za-z]{2}[0-9]{3}"
+                  title={ROLL_NUMBER_ERROR}
+                  className={inputCls} />
                 <select required value={m.gender}
                   onChange={(e) => setTeam((p) => { const ms = [...p.members]; ms[i] = { ...ms[i], gender: e.target.value }; return { ...p, members: ms }; })}
                   className={selectCls}>
@@ -417,6 +453,33 @@ function RegistrationForm({ event, form }: { event: EventRow; form: EventForm | 
 }
 
 
+// ── Already registered screen ─────────────────────────────────────────────────
+
+function AlreadyRegistered({ event }: { event: EventRow }) {
+  return (
+    <div className="flex flex-col items-center text-center gap-5 py-8">
+      <div className="w-16 h-16 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-400">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+          <polyline points="22 4 12 14.01 9 11.01" />
+        </svg>
+      </div>
+      <div>
+        <h2 className="text-xl font-semibold text-white mb-2">You&apos;re already registered</h2>
+        <p className="text-sm text-zinc-400 max-w-xs">
+          You have already signed up for <span className="text-zinc-200">{event.eventName}</span>. No need to register again.
+        </p>
+      </div>
+      <Link
+        href={`/events/${event.slug}`}
+        className="mt-2 inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-zinc-800 border border-zinc-700 text-sm text-zinc-300 hover:bg-zinc-700 hover:text-white transition-colors"
+      >
+        ← Back to event
+      </Link>
+    </div>
+  );
+}
+
 // ── Loading skeleton ──────────────────────────────────────────────────────────
 
 function LoadingSkeleton() {
@@ -443,11 +506,16 @@ function LoadingSkeleton() {
 export default function RegisterPage() {
   const params = useParams();
   const slug = params?.slug as string;
+  const { user, loading: authLoading } = useAuth();
 
   const [data, setData] = useState<PageData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [alreadyRegistered, setAlreadyRegistered] = useState(false);
+  const [statusChecking, setStatusChecking] = useState(false);
+  const [thumbError, setThumbError] = useState(false);
 
+  // Load event + form
   useEffect(() => {
     if (!slug) return;
     fetch(`/api/events/${slug}`)
@@ -460,7 +528,28 @@ export default function RegisterPage() {
       .finally(() => setLoading(false));
   }, [slug]);
 
-  if (loading) return <LoadingSkeleton />;
+  // Check registration status once auth resolves and event is loaded
+  useEffect(() => {
+    if (authLoading || !data || !user) return;
+    // Only check for events that require auth (unregisteredForm=false)
+    if (data.event.unregisteredForm) return;
+
+    setStatusChecking(true);
+    user.getIdToken()
+      .then((token) =>
+        fetch(`/api/event/${slug}/registration-status`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+      )
+      .then((r) => r.json())
+      .then((d: { registered?: boolean }) => {
+        if (d.registered) setAlreadyRegistered(true);
+      })
+      .catch(() => { /* silently ignore — don't block the form */ })
+      .finally(() => setStatusChecking(false));
+  }, [authLoading, user, data, slug]);
+
+  if (loading || authLoading) return <LoadingSkeleton />;
 
   if (error || !data) {
     return (
@@ -479,6 +568,8 @@ export default function RegisterPage() {
   const isMeet = EVENT_TYPES_WITHOUT_FORMS.includes(event.type);
   const isFinished = event.status === 'finished';
   const formClosed = !event.isFormOpen;
+  const thumbSrc = !thumbError && event.eventThumbnail ? event.eventThumbnail : null;
+  const dateStr = tsToDate(event.startDate);
 
   // Gate: meets / no-form types have no registration
   if (isMeet) {
@@ -486,9 +577,7 @@ export default function RegisterPage() {
       <div className="min-h-screen bg-zinc-950 pt-[74px] flex items-center justify-center">
         <div className="text-center max-w-sm px-4">
           <p className="text-sm text-zinc-400 mb-4">This event does not have a registration form.</p>
-          <Link href={`/events/${slug}`} className="text-sm text-zinc-400 hover:text-zinc-200 transition-colors">
-            ← Back to event
-          </Link>
+          <Link href={`/events/${slug}`} className="text-sm text-zinc-400 hover:text-zinc-200 transition-colors">← Back to event</Link>
         </div>
       </div>
     );
@@ -503,9 +592,7 @@ export default function RegisterPage() {
             {isFinished ? 'This event has ended.' : 'Registration is not open yet.'}
           </p>
           <p className="text-xs text-zinc-600 mb-4">Check back later or follow us for updates.</p>
-          <Link href={`/events/${slug}`} className="text-sm text-zinc-400 hover:text-zinc-200 transition-colors">
-            ← Back to event
-          </Link>
+          <Link href={`/events/${slug}`} className="text-sm text-zinc-400 hover:text-zinc-200 transition-colors">← Back to event</Link>
         </div>
       </div>
     );
@@ -517,22 +604,18 @@ export default function RegisterPage() {
       <div className="min-h-screen bg-zinc-950 pt-[74px] flex items-center justify-center">
         <div className="text-center max-w-sm px-4">
           <p className="text-sm text-zinc-400 mb-4">The registration form isn&apos;t ready yet.</p>
-          <Link href={`/events/${slug}`} className="text-sm text-zinc-400 hover:text-zinc-200 transition-colors">
-            ← Back to event
-          </Link>
+          <Link href={`/events/${slug}`} className="text-sm text-zinc-400 hover:text-zinc-200 transition-colors">← Back to event</Link>
         </div>
       </div>
     );
   }
 
-  const dateStr = tsToDate(event.startDate);
-
   return (
     <div className="min-h-screen bg-zinc-950 pt-[74px] pb-16">
-      <div className="max-w-xl mx-auto px-4 sm:px-6 py-10">
+      <div className="max-w-xl mx-auto px-4 sm:px-6 py-8">
 
         {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-xs text-zinc-500 mb-8">
+        <div className="flex items-center gap-2 text-xs text-zinc-500 mb-6">
           <Link href="/events" className="hover:text-zinc-300 transition-colors">Events</Link>
           <span>/</span>
           <Link href={`/events/${slug}`} className="hover:text-zinc-300 transition-colors truncate max-w-[8rem]">
@@ -542,24 +625,42 @@ export default function RegisterPage() {
           <span className="text-zinc-400">Register</span>
         </div>
 
-        {/* Event mini header */}
-        <div className="flex items-center gap-3 mb-8 p-4 rounded-xl border border-zinc-800 bg-zinc-900/60">
-          {event.eventThumbnail && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={event.eventThumbnail}
-              alt={event.eventName}
-              className="w-14 h-9 rounded-lg object-cover flex-shrink-0 border border-zinc-700"
-            />
-          )}
-          <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold text-white truncate">{event.eventName}</p>
-            {dateStr && <p className="text-xs text-zinc-500 mt-0.5">{dateStr} · {event.location}</p>}
+        {/* Page header: title first, then full-width thumbnail below it */}
+        <div className="mb-8 flex flex-col gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-white leading-tight tracking-tight" style={{ fontFamily: 'var(--font-display)' }}>
+              {event.eventName}
+            </h1>
+            {dateStr && (
+              <p className="text-xs text-zinc-500 mt-1.5">{dateStr} · {event.location}</p>
+            )}
           </div>
+
+          {/* Full-width thumbnail — below title, inside the content column */}
+          {thumbSrc && (
+            <div className="relative w-full rounded-2xl overflow-hidden bg-zinc-800" style={{ aspectRatio: '16 / 9' }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={thumbSrc}
+                alt={event.eventName}
+                onError={() => setThumbError(true)}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none" />
+            </div>
+          )}
         </div>
 
-        {/* The actual form */}
-        <RegistrationForm event={event} form={form} />
+        {/* Status checking spinner */}
+        {statusChecking ? (
+          <div className="flex items-center justify-center py-16">
+            <div className="w-6 h-6 border-2 border-zinc-600 border-t-white rounded-full animate-spin" />
+          </div>
+        ) : alreadyRegistered ? (
+          <AlreadyRegistered event={event} />
+        ) : (
+          <RegistrationForm event={event} form={form} />
+        )}
 
       </div>
     </div>

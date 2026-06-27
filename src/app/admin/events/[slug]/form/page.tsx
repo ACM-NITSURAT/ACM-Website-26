@@ -777,7 +777,7 @@ export default function FormBuilderPage() {
                         </div>
                         <div>
                           <p className="text-xs font-semibold text-zinc-600 uppercase tracking-wider mb-1.5">
-                            Members ({event.minTeamMembers - 1}–{event.maxTeamMembers - 1} per team)
+                            Members ({event.minTeamMembers - 1}–{event.maxTeamMembers - 1} additional · {event.minTeamMembers}–{event.maxTeamMembers} total incl. leader)
                           </p>
                           <div className="flex flex-col gap-2 pl-2 border-l border-zinc-700">
                             <DefaultFieldRow label="Member name" required />

@@ -7,6 +7,7 @@ import type { Event } from '@/schema/event';
 import type { EventForm, FormResponse } from '@/schema/form';
 import { validateFormResponse } from '@/lib/form-builder/validate-response';
 import { EVENT_TYPES_WITHOUT_FORMS } from '@/config';
+import { isValidRollNumber } from '@/lib/validators/rollNumber';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -160,6 +161,12 @@ export async function POST(
         { status: 400 },
       );
     }
+    if (!isValidRollNumber(rollNumber)) {
+      return NextResponse.json(
+        { error: 'Invalid roll number format. Expected format: U24CS089 (1 letter, 2 digits, 2 letters, 3 digits).' },
+        { status: 400 },
+      );
+    }
     if (!VALID_GENDERS.includes(gender)) {
       return NextResponse.json({ error: 'Valid gender is required (male, female, other).' }, { status: 400 });
     }
@@ -255,6 +262,12 @@ export async function POST(
         { status: 400 },
       );
     }
+    if (!isValidRollNumber(leaderRollNumber)) {
+      return NextResponse.json(
+        { error: 'Invalid leader roll number format. Expected format: U24CS089.' },
+        { status: 400 },
+      );
+    }
     if (!Array.isArray(rawMembers)) {
       return NextResponse.json({ error: 'members must be an array.' }, { status: 400 });
     }
@@ -278,6 +291,9 @@ export async function POST(
         if (!name || !rollNumber) {
           throw Object.assign(new Error(`Member ${i + 1}: name and rollNumber are required.`), { status: 400 });
         }
+        if (!isValidRollNumber(rollNumber)) {
+          throw Object.assign(new Error(`Member ${i + 1}: invalid roll number format. Expected format: U24CS089.`), { status: 400 });
+        }
         if (!VALID_GENDERS.includes(gender)) {
           throw Object.assign(new Error(`Member ${i + 1}: valid gender is required.`), { status: 400 });
         }
@@ -288,14 +304,13 @@ export async function POST(
       return NextResponse.json({ error: err.message }, { status: err.status ?? 400 });
     }
 
-    // Build the full roster: leader + members
-    // Leader is always included in the members array for constraint checks
-    const teamSize = members.length;
+    // Total team size = leader + additional members
+    const teamSize = members.length + 1;
 
     if (teamSize < event.minTeamMembers || teamSize > event.maxTeamMembers) {
       return NextResponse.json(
         {
-          error: `Team size must be between ${event.minTeamMembers} and ${event.maxTeamMembers} members. Got ${teamSize}.`,
+          error: `Team size must be between ${event.minTeamMembers} and ${event.maxTeamMembers} (including leader). Got ${teamSize}.`,
         },
         { status: 422 },
       );
@@ -437,7 +452,7 @@ export async function POST(
         tx.set(docRef, participant);
         tx.update(eventRef, {
           totalTeams:        FieldValue.increment(1),
-          totalParticipants: FieldValue.increment(teamSize + 1), // members + leader
+          totalParticipants: FieldValue.increment(teamSize), // leader + members
         });
       });
     } catch (e) {

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import type { Event } from '@/schema/event';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -61,15 +62,16 @@ function FilterChip({
 // ── Event card ────────────────────────────────────────────────────────────────
 
 function EventCard({ event }: { event: EventRow }) {
+  const router = useRouter();
   const [thumbError, setThumbError] = useState(false);
   const thumbSrc = (!thumbError && event.eventThumbnail) ? event.eventThumbnail : '/event-placeholder.jpg';
   const isMeet = event.type === 'meet';
   const isFinished = event.status === 'finished';
 
   return (
-    <Link
-      href={`/events/${event.slug}`}
-      className="group flex flex-col rounded-xl border border-zinc-800 bg-zinc-900/50 hover:border-zinc-700 hover:bg-zinc-900 transition-all duration-200 overflow-hidden"
+    <div
+      onClick={() => router.push(`/events/${event.slug}`)}
+      className="group flex flex-col rounded-xl border border-zinc-800 bg-zinc-900/50 hover:border-zinc-700 hover:bg-zinc-900 transition-all duration-200 overflow-hidden cursor-pointer"
     >
       {/* Thumbnail */}
       <div className="relative w-full overflow-hidden bg-zinc-800" style={{ aspectRatio: '16 / 9' }}>
@@ -131,7 +133,11 @@ function EventCard({ event }: { event: EventRow }) {
         {/* CTA button */}
         <div className="mt-3">
           {isMeet ? (
-            <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-md bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-sm font-medium group-hover:bg-cyan-500/15 transition-colors">
+            <Link
+              href={`/events/${event.slug}/register`}
+              onClick={(e) => e.stopPropagation()}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-md bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-sm font-medium hover:bg-cyan-500/15 transition-colors"
+            >
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                 <polyline points="14 2 14 8 20 8" />
@@ -140,18 +146,22 @@ function EventCard({ event }: { event: EventRow }) {
                 <polyline points="10 9 9 9 8 9" />
               </svg>
               See Agenda
-            </span>
+            </Link>
           ) : isFinished ? (
             <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-md bg-zinc-800 border border-zinc-700 text-zinc-500 text-sm font-medium">
               Event Ended
             </span>
           ) : event.isFormOpen ? (
-            <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-md bg-white text-zinc-900 text-sm font-medium group-hover:bg-zinc-200 transition-colors">
+            <Link
+              href={`/events/${event.slug}/register`}
+              onClick={(e) => e.stopPropagation()}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-md bg-white text-zinc-900 text-sm font-medium hover:bg-zinc-200 transition-colors"
+            >
               Register Now
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M5 12h14M12 5l7 7-7 7" />
               </svg>
-            </span>
+            </Link>
           ) : (
             <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-md bg-zinc-800 border border-zinc-700 text-zinc-400 text-sm font-medium">
               View Details
@@ -159,7 +169,7 @@ function EventCard({ event }: { event: EventRow }) {
           )}
         </div>
       </div>
-    </Link>
+    </div>
   );
 }
 
