@@ -85,6 +85,8 @@ export function validateFormResponse(
   response: FormResponse,
 ): string | null {
   for (const field of form.fields) {
+    // Paragraph fields are display-only — never collected in extraFields
+    if (field.type === 'paragraph') continue;
     const value = response[field.id];
     const err = validateField(field, value);
     if (err) return err;

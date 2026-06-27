@@ -8,12 +8,15 @@
 import type { FormField } from '@/schema/form';
 import { FORM_MAX_FIELDS } from '@/config';
 
-const VALID_TYPES = ['text', 'email', 'mobile', 'rollNumber', 'dropdown', 'checkbox', 'url'];
+const VALID_TYPES = ['text', 'email', 'mobile', 'rollNumber', 'dropdown', 'checkbox', 'url', 'paragraph'];
+const INPUT_TYPES = ['text', 'email', 'mobile', 'rollNumber', 'dropdown', 'checkbox', 'url'];
 
 export function validateFormSchema(
   title: unknown,
   description: unknown,
   fields: unknown,
+  afterScreen?: unknown,
+  includeDefaultFields?: unknown,
 ): string | null {
   if (!title || typeof title !== 'string' || !title.trim())
     return 'Form title is required.';
@@ -30,7 +33,12 @@ export function validateFormSchema(
   if (fields.length > FORM_MAX_FIELDS)
     return `A form cannot have more than ${FORM_MAX_FIELDS} fields.`;
 
-  // Label uniqueness (case-insensitive)
+  // Must have at least one non-paragraph input field
+  const inputFields = (fields as Partial<FormField>[]).filter((f) => INPUT_TYPES.includes(f.type as string));
+  if (inputFields.length === 0)
+    return 'A form must have at least 1 input field (paragraph-only forms are not allowed).';
+
+  // Label uniqueness (case-insensitive) — only for input fields, not paragraphs
   const seenLabels = new Set<string>();
 
   for (let i = 0; i < fields.length; i++) {
@@ -39,6 +47,17 @@ export function validateFormSchema(
 
     if (!f.id || typeof f.id !== 'string')
       return `${pos}: missing or invalid id.`;
+
+    if (!VALID_TYPES.includes(f.type as string))
+      return `${pos}: invalid type "${f.type as string}".`;
+
+    // Paragraph fields: only require id and content, skip label/required checks
+    if (f.type === 'paragraph') {
+      const content = (f as { content?: unknown }).content;
+      if (typeof content !== 'string')
+        return `${pos} (paragraph): content must be a string.`;
+      continue;
+    }
 
     if (!f.label || typeof f.label !== 'string' || !f.label.trim())
       return `${pos}: label is required.`;
@@ -51,9 +70,6 @@ export function validateFormSchema(
     if (typeof f.required !== 'boolean')
       return `${pos} ("${f.label}"): required must be a boolean.`;
 
-    if (!VALID_TYPES.includes(f.type as string))
-      return `${pos} ("${f.label}"): invalid type "${f.type as string}".`;
-
     if (f.type === 'dropdown' || f.type === 'checkbox') {
       const options = (f as { options?: unknown }).options;
       if (!Array.isArray(options) || options.length === 0)
@@ -62,6 +78,19 @@ export function validateFormSchema(
         return `${pos} ("${f.label}"): all options must be non-empty strings.`;
     }
   }
+
+  // Validate afterScreen if provided
+  if (afterScreen !== undefined && afterScreen !== null) {
+    const as = afterScreen as Record<string, unknown>;
+    if (typeof as.heading !== 'string')
+      return 'afterScreen.heading must be a string.';
+    if (typeof as.body !== 'string')
+      return 'afterScreen.body must be a string.';
+  }
+
+  // includeDefaultFields must be boolean if provided
+  if (includeDefaultFields !== undefined && typeof includeDefaultFields !== 'boolean')
+    return 'includeDefaultFields must be a boolean.';
 
   return null;
 }

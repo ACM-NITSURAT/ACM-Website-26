@@ -76,7 +76,7 @@ export async function getForm(slug: string): Promise<EventForm> {
 
 export async function saveForm(
   slug: string,
-  data: Pick<EventForm, 'title' | 'description' | 'fields'>,
+  data: Pick<EventForm, 'title' | 'description' | 'fields' | 'afterScreen' | 'includeDefaultFields'>,
 ): Promise<void> {
   await apiFetch(`/api/admin/events/${slug}/form`, {
     method: 'PUT',

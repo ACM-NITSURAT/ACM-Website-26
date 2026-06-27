@@ -70,7 +70,7 @@ export async function PUT(
   }
 
   // Validate the form schema
-  const err = validateFormSchema(body.title, body.description, body.fields);
+  const err = validateFormSchema(body.title, body.description, body.fields, body.afterScreen, body.includeDefaultFields);
   if (err) return NextResponse.json({ error: err }, { status: 422 });
 
   const formRef = eventDoc.ref.collection('form').doc(FORM_DOC);
@@ -82,12 +82,14 @@ export async function PUT(
     createdAt: typeof now | EventForm['createdAt'];
     updatedAt: typeof now;
   } = {
-    eventId:     eventDoc.id,
-    title:       (body.title as string).trim(),
-    description: (body.description as string).trim(),
-    fields:      body.fields as EventForm['fields'],
-    createdAt:   existing.exists ? existing.data()!.createdAt : now,
-    updatedAt:   now,
+    eventId:              eventDoc.id,
+    title:                (body.title as string).trim(),
+    description:          (body.description as string).trim(),
+    fields:               body.fields as EventForm['fields'],
+    afterScreen:          (body.afterScreen as EventForm['afterScreen']) ?? null,
+    includeDefaultFields: (body.includeDefaultFields as boolean) ?? false,
+    createdAt:            existing.exists ? existing.data()!.createdAt : now,
+    updatedAt:            now,
   };
 
   await formRef.set(formData);
