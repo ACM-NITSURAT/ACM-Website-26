@@ -122,16 +122,15 @@ export interface EventForm {
   /**
    * When `true`, the registration page prepends the built-in identity
    * fields (name, roll number, gender for individuals; team name, leader
-   * info, members for teams) before the custom fields.
+   * info, members for teams) before the custom fields. The API validates
+   * and stores them inside `extraFields` using their form field UUIDs.
    *
    * When `false` (default), ONLY the custom `fields` array is shown to
-   * participants. The API still collects name/roll/gender from the body,
-   * but they must be collected via custom fields if the admin wants them
-   * visible in the form. This is the recommended setting when you want
-   * full control over field order and labels.
-   *
-   * The server always requires and validates firstName/lastName/rollNumber/
-   * gender regardless of this flag — this flag only controls UI rendering.
+   * participants. The API does not require or validate any default identity
+   * fields — it is purely a form collecting whatever the admin designed.
+   * The system still captures the submitter identity (userId + name + rollNumber)
+   * from the auth token when `unregisteredForm=false`, but does not require
+   * any identity fields in the form body.
    */
   includeDefaultFields: boolean;
 

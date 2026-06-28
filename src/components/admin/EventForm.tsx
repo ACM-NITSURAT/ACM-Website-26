@@ -355,8 +355,42 @@ export default function EventForm({ initial, submitLabel, onSubmit, cancelHref }
       </Field>
 
       <div className="flex flex-col gap-3">
-        <Toggle checked={form.isOpenToAll} onChange={(v) => set('isOpenToAll', v)} label="Open to all (non-ACM members can register)" />
-        <Toggle checked={form.unregisteredForm} onChange={(v) => set('unregisteredForm', v)} label="Allow unregistered participants (external form)" />
+        <Toggle
+          checked={form.isOpenToAll}
+          onChange={(v) => {
+            if (!v && form.unregisteredForm) {
+              // Turning OFF open-to-all while unregistered is ON → also turn off unregistered
+              set('isOpenToAll', false);
+              set('unregisteredForm', false);
+            } else {
+              set('isOpenToAll', v);
+            }
+          }}
+          label="Open to all (non-ACM members can register)"
+        />
+        <Toggle
+          checked={form.unregisteredForm}
+          onChange={(v) => {
+            if (v && !form.isOpenToAll) {
+              // Turning ON unregistered while open-to-all is OFF → also turn on open-to-all
+              set('isOpenToAll', true);
+              set('unregisteredForm', true);
+            } else {
+              set('unregisteredForm', v);
+            }
+          }}
+          label="Allow unregistered participants (external / anonymous form)"
+        />
+        {form.unregisteredForm && (
+          <p className="text-xs text-amber-400/80 bg-amber-500/10 border border-amber-500/20 rounded-lg px-3 py-2 leading-relaxed">
+            <strong>Auto-enabled:</strong> Unauthenticated forms don&apos;t verify who&apos;s submitting, so restricting to ACM executives would have no effect. <em>Open to all</em> is required alongside unauthenticated forms.
+          </p>
+        )}
+        {!form.isOpenToAll && form.unregisteredForm === false && (
+          <p className="text-xs text-zinc-500 leading-relaxed px-1">
+            When <em>Open to all</em> is off, only ACM executives and above can register (requires login).
+          </p>
+        )}
       </div>
 
       {/* ── Team settings ── */}

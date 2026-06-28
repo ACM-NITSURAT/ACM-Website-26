@@ -1,27 +1,42 @@
 import type { Timestamp } from './firestore';
 
-// ── Shared team-member shape ──────────────────────────────────────────────────
+// ── Submitter identity (always present when unregisteredForm=false) ───────────
 
 /**
- * Describes a single member within a team registration.
- * `userId` is `null` when the event allows anonymous (unregistered) participants.
+ * Denormalised identity of the person who submitted the form.
+ * Fetched from /users/{uid} at registration time and stored on the participant
+ * doc so the admin panel never needs a secondary lookup.
+ *
+ * Only present when `unregisteredForm=false`. When the event allows anonymous
+ * submissions (`unregisteredForm=true`), neither userId nor submitterInfo is
+ * stored — the submission is intentionally identity-free.
  */
-export interface TeamMember {
-  userId: string | null;
+export interface SubmitterInfo {
+  /** Firebase Auth UID of the submitter. */
+  userId: string;
+  /** Denormalised from /users/{uid}.firstName + lastName at registration time. */
   name: string;
+  /** Denormalised from /users/{uid}.rollNumber at registration time. */
   rollNumber: string;
-  gender: 'male' | 'female' | 'other';
 }
 
-// ── Common base fields ────────────────────────────────────────────────────────
+// ── Common base ───────────────────────────────────────────────────────────────
 
-/**
- * Fields shared by every document in the
- * `/events/{eventId}/participants/{participantId}` subcollection.
- */
 interface ParticipantBase {
   /** Firestore document ID. */
   id: string;
+
+  /**
+   * Discriminant: `false` for individual, `true` for team.
+   * Derived from event.isTeamEvent at write time — never changes.
+   */
+  isTeam: boolean;
+
+  /**
+   * Identity of the person who submitted the form.
+   * `null` when `event.unregisteredForm === true` (anonymous submission).
+   */
+  submitter: SubmitterInfo | null;
 
   /** Whether the participant physically attended / checked in. */
   attended: boolean;
@@ -30,70 +45,50 @@ interface ParticipantBase {
   registrationTimestamp: Timestamp;
 
   /**
-   * Catch-all map for dynamic fields collected via custom web forms.
-   * Keys are field names; values may be any serialisable type.
+   * All form responses, keyed by FormField.id (stable UUID).
+   * Also contains all default-field responses when includeDefaultFields=true
+   * (e.g. firstName, lastName, rollNumber, gender, teamName, members[]).
+   * The system does not interpret these keys — they are purely admin-defined.
+   * Paragraph field ids are never present here.
    */
   extraFields: Record<string, unknown>;
 }
 
-// ── Individual registration ───────────────────────────────────────────────────
+// ── Individual participant ────────────────────────────────────────────────────
 
 /**
  * A solo registration (`isTeam === false`).
  *
- * `userId` is `null` when the event's `unregisteredForm` flag is `true`
- * and the participant did not sign in with Firebase Auth.
+ * When `includeDefaultFields=true`, the body will contain firstName/lastName/
+ * rollNumber/gender but those are validated and stored inside `extraFields`
+ * using their form field UUIDs — not as top-level typed fields.
+ *
+ * The only system-level identity is `submitter` (from auth token).
  */
 export interface IndividualParticipant extends ParticipantBase {
   isTeam: false;
-
-  /** Firebase Auth UID, or `null` for anonymous submissions. */
-  userId: string | null;
-
-  firstName: string;
-  lastName: string;
-  rollNumber: string;
-
-  /** Gender of the individual participant. Used for diversity constraint checks. */
-  gender: 'male' | 'female' | 'other';
 }
 
-// ── Team registration ─────────────────────────────────────────────────────────
+// ── Team participant ──────────────────────────────────────────────────────────
 
 /**
  * A team registration (`isTeam === true`).
  *
- * `leaderId` is `null` for anonymous leaders (unregistered form).
+ * When `includeDefaultFields=true`, the body will contain teamName/leaderName/
+ * leaderRollNumber/members[] but those are validated and stored inside
+ * `extraFields` — not as top-level typed fields.
+ *
+ * The only system-level identity is `submitter` (from auth token), which
+ * always refers to the team leader.
  */
 export interface TeamParticipant extends ParticipantBase {
   isTeam: true;
-
-  teamName: string;
-
-  /** Actual number of members in this team at registration time. */
-  teamSize: number;
-
-  /** Firebase Auth UID of the team leader, or `null` for anonymous leaders. */
-  leaderId: string | null;
-
-  leaderName: string;
-  leaderRollNumber: string;
-
-  members: TeamMember[];
 }
 
 // ── Discriminated union ───────────────────────────────────────────────────────
 
 /**
- * Polymorphic type for any document in the participants subcollection.
- * Narrow using the `isTeam` discriminant:
- *
- * ```ts
- * if (participant.isTeam) {
- *   // participant is TeamParticipant
- * } else {
- *   // participant is IndividualParticipant
- * }
- * ```
+ * Any document in the /events/{eventId}/participants subcollection.
+ * Narrow on `isTeam` for display purposes only.
  */
 export type Participant = IndividualParticipant | TeamParticipant;

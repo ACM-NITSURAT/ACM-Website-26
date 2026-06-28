@@ -87,3 +87,42 @@ export async function saveForm(
 export async function deleteForm(slug: string): Promise<void> {
   await apiFetch(`/api/admin/events/${slug}/form`, { method: 'DELETE' });
 }
+
+// ── Participants ──────────────────────────────────────────────────────────────
+
+import type { Participant } from '@/schema/participant';
+
+export interface ParticipantsResult {
+  participants: (Participant & { id: string })[];
+  form: import('@/schema/form').EventForm | null;
+}
+
+export async function listParticipants(slug: string): Promise<ParticipantsResult> {
+  return apiFetch(`/api/admin/events/${slug}/participants`);
+}
+
+/**
+ * Triggers the CSV download in the browser.
+ * Uses a direct anchor-click approach so the browser handles the file save dialog.
+ */
+export async function downloadParticipantsCsv(slug: string): Promise<void> {
+  const token = await getBearer();
+  const res = await fetch(`/api/admin/events/${slug}/participants/csv`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body?.error ?? `HTTP ${res.status}`);
+  }
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  const disposition = res.headers.get('Content-Disposition') ?? '';
+  const match = disposition.match(/filename="([^"]+)"/);
+  a.download = match?.[1] ?? `${slug}-participants.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
