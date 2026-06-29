@@ -15,3 +15,28 @@
  * Only has any effect when DEV_MODE=false.
  */
 export const EARLY_REJECT = false;
+
+/**
+ * Fixed display dimensions for event thumbnail images.
+ * All thumbnails are rendered at exactly these dimensions with object-cover.
+ * Change here to update everywhere event thumbnails appear.
+ */
+export const EVENT_THUMBNAIL_WIDTH       = 1280;  // px
+export const EVENT_THUMBNAIL_HEIGHT      = 720;   // px — 16:9
+export const EVENT_THUMBNAIL_ASPECT_RATIO = `${EVENT_THUMBNAIL_WIDTH} / ${EVENT_THUMBNAIL_HEIGHT}`;
+
+/**
+ * Event types that do NOT support form creation or participant registration.
+ * Extend this array to block future types without touching API logic.
+ */
+export const EVENT_TYPES_WITHOUT_FORMS: string[] = ['meet'];
+
+/** Maximum number of custom fields allowed in a single event form. */
+export const FORM_MAX_FIELDS = 50;
+
+/**
+ * When true, the form builder infers the field type from the label text
+ * (e.g. "Email" → email type, "Roll number" → rollNumber type).
+ * Set to false to disable entirely.
+ */
+export const FORM_INTELLIGENT_MODE = true;

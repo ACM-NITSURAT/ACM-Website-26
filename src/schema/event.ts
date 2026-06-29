@@ -2,11 +2,23 @@ import type { Timestamp } from './firestore';
 
 /**
  * Represents a document in the `/events/{eventId}` collection.
- * The document ID is either a human-readable slug or an auto-generated Firestore ID.
+ *
+ * Firestore document ID is an auto-generated random hash — never changes.
+ * `slug` is the human-readable URL identifier used in event form links
+ * (e.g., /events/hackathon-2025). Admins can customise it; defaults to
+ * the auto-generated doc ID on creation.
  */
 export interface Event {
-  /** Firestore document ID — slug or auto-ID. */
+  /** Firestore document ID — auto-generated random hash. Never changes. */
   id: string;
+
+  /**
+   * URL-friendly slug used as the public identifier in event links.
+   * Defaults to the auto-generated doc ID. Admin can override it.
+   * Must be unique across all events.
+   * Example: "hackathon-2025", "webdev-workshop-jan"
+   */
+  slug: string;
 
   eventName: string;
   eventDescription: string;
@@ -86,12 +98,24 @@ export interface Event {
   /**
    * Breakdown of prize money across the top three positions (INR).
    * All three keys are always present; set a position to `0` if unused.
-   *
-   * Firestore key names use hyphens (`first-prize`, `second-prize`, `third-prize`).
-   * Access via bracket notation when reading raw Firestore data:
-   *   `data['first-prize']`
    */
   prizeMoneyDistribution: PrizeMoneyDistribution;
+
+  /**
+   * Controls whether the public registration form is currently accepting
+   * submissions. Admins toggle this from the event detail page.
+   * Defaults to `false` on event creation — must be explicitly opened.
+   * Cannot be set to `true` when `hasForm === false`.
+   */
+  isFormOpen: boolean;
+
+  /**
+   * Whether a custom form has been created for this event.
+   * Defaults to `false`. Set to `true` when the admin saves a form via the
+   * form builder. The `isFormOpen` toggle is hidden until this is `true`.
+   * Not applicable for event types listed in `EVENT_TYPES_WITHOUT_FORMS`.
+   */
+  hasForm: boolean;
 }
 
 /** Prize breakdown across the top three positions. Values are in INR (₹). */
