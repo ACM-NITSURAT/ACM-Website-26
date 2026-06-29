@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import CinemaLoader from "@/components/loading/CinemaLoader";
 import HeroSection from "@/components/sections/HeroSection";
 import AboutSection from "@/components/sections/AboutSection";
+import TeamSection from "@/components/sections/TeamSection";
 import ProjectorTransition from "@/components/transitions/ProjectorTransition";
 import dynamic from 'next/dynamic';
 
@@ -130,6 +131,7 @@ export default function Home() {
               transitionState={transitionState}
             />
             <AboutSection />
+            <TeamSection />
           </>
         )}
         <ProjectorTransition transitionState={transitionState} />

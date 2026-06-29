@@ -14,7 +14,7 @@ const NAV_SECTIONS = [
   { label: 'About',    scene: 'SC.02', section: 'about',    href: '/#about' },
   { label: 'Events',   scene: 'SC.03', section: 'events',   href: '/events' },
   { label: 'Projects', scene: 'SC.04', section: 'projects', href: '/projects' },
-  { label: 'Team',     scene: 'SC.05', section: 'team',     href: '/team' },
+  { label: 'Team',     scene: 'SC.05', section: 'team',     href: '/#team' },
 ];
 
 /* ============================================================

@@ -39,10 +39,10 @@
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(37, 99, 235, 0.08) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(37, 99, 235, 0.08) 1px, transparent 1px);
+    linear-gradient(rgba(37, 99, 235, 0.15) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(37, 99, 235, 0.15) 1px, transparent 1px);
   background-size: 60px 60px;
-  mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black 20%, transparent 80%);
+  mask-image: radial-gradient(ellipse 90% 80% at 50% 50%, black 40%, transparent 90%);
 }
 
 /* 2. Living Wireframe Scene (Replaces ambient SVGs) */
@@ -141,6 +141,7 @@
   margin-left: auto;
   text-align: right;
 }
+
 .block1Reverse .titleRule {
   margin-left: auto;
   margin-right: 0;
@@ -562,12 +563,12 @@
 /* Pillar Card Background SVGs */
 .pillarBgIcon {
   position: absolute;
-  top: 15%;
+  top: 10%;
   left: 50%;
   transform: translateX(-50%);
-  width: 140px;
-  height: 140px;
-  opacity: 0.12;
+  width: 240px;
+  height: 240px;
+  opacity: 0.2;
   pointer-events: none;
   z-index: 1;
 }
@@ -648,6 +649,53 @@
   z-index: 2;
 }
 
+/* ============================================================
+   PILLAR SVG ANIMATIONS
+   ============================================================ */
+.animRotateSlow {
+  transform-origin: 50px 50px;
+  animation: svgRotate 20s linear infinite;
+}
+
+.animPulseSlow {
+  transform-origin: 50px 50px;
+  animation: svgPulse 4s ease-in-out infinite alternate;
+}
+
+.animFloatTop {
+  transform-origin: 50px 50px;
+  animation: svgFloat 6s ease-in-out infinite alternate;
+}
+
+.animFloatBottom {
+  transform-origin: 50px 50px;
+  animation: svgFloat 6s ease-in-out infinite alternate-reverse;
+}
+
+.animDashFlow {
+  animation: svgDashFlow 20s linear infinite;
+}
+
+@keyframes svgRotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes svgPulse {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  100% { transform: scale(1.05); opacity: 1; }
+}
+
+@keyframes svgFloat {
+  0% { transform: translateY(-5px); }
+  100% { transform: translateY(5px); }
+}
+
+@keyframes svgDashFlow {
+  0% { stroke-dashoffset: 100; }
+  100% { stroke-dashoffset: 0; }
+}
+
 .pillarContent {
   position: relative;
   z-index: 2;
@@ -725,28 +773,58 @@
   max-width: 1200px;
   border-radius: 8px;
   /* Fades the edges of the image to transparent to hide the background */
-  mask-image: radial-gradient(ellipse at center, rgba(0,0,0,1) 30%, rgba(0,0,0,0) 70%);
-  -webkit-mask-image: radial-gradient(ellipse at center, rgba(0,0,0,1) 30%, rgba(0,0,0,0) 70%);
+  mask-image: radial-gradient(ellipse at center, rgba(0, 0, 0, 1) 30%, rgba(0, 0, 0, 0) 70%);
+  -webkit-mask-image: radial-gradient(ellipse at center, rgba(0, 0, 0, 1) 30%, rgba(0, 0, 0, 0) 70%);
   z-index: 0;
-  pointer-events: none;
-  opacity: 0.3; /* Makes it subtle behind the quote */
+  pointer-events: auto;
+  /* Allow hover */
+  opacity: 1;
+  /* Made solid so the background grid doesn't bleed through */
+  background-color: #07060a;
+  /* Ensure the grid is fully blocked */
 }
 
 .groupPhotoOverlay {
   position: absolute;
   inset: 0;
-  background: rgba(37, 99, 235, 0.8);
-  mix-blend-mode: color;
-  /* Or overlay */
+  background: rgba(37, 99, 235, 0.15);
+  /* Significantly reduced blue tint */
+  mix-blend-mode: overlay;
+  /* Soft overlay instead of aggressive color override */
   z-index: 1;
+  transition: opacity 600ms ease;
 }
 
 .groupPhoto {
   display: block;
   width: 100%;
   height: auto;
-  /* Grayscale and contrast for that cinematic sci-fi feel */
-  filter: grayscale(1) contrast(1.4) brightness(0.7);
+  /* Pure black and white, dark but visible */
+  filter: grayscale(1) contrast(1.4) brightness(0.55);
+  transition: filter 600ms ease, transform 6s ease-out;
+}
+
+/* HOVER STATE: Restore to original color and brightness */
+.groupPhotoWrapper:hover .groupPhotoOverlay {
+  opacity: 0;
+}
+
+.groupPhotoWrapper:hover .groupPhoto {
+  filter: grayscale(0) contrast(1.1) brightness(0.8);
+  transform: scale(1.02);
+  /* Slight cinematic zoom on hover */
+}
+
+/* TOUCH DEVICES: Automatically colorize when visible since there's no hover */
+@media (hover: none) and (pointer: coarse) {
+  .block4Visible .groupPhotoOverlay {
+    opacity: 0;
+  }
+
+  .block4Visible .groupPhoto {
+    filter: grayscale(0) contrast(1.1) brightness(0.8);
+    transform: scale(1.02);
+  }
 }
 
 .quoteRule {
@@ -803,10 +881,12 @@
     right: 20px;
     transform: translateY(-50%) rotate(4deg) scale(0.8);
   }
+
   .clapperboardWrapLeft {
     left: 20px;
     transform: translateY(-50%) rotate(-4deg) scale(0.8);
   }
+
   .clapperboardWrapAltRight {
     right: 20px;
     top: 65%;
@@ -856,10 +936,11 @@
   .clapperboardWrapAltRight {
     display: none;
   }
-  
+
   .block1Reverse .block1Text {
     text-align: left;
   }
+
   .block1Reverse .titleRule {
     margin-left: 0;
   }

@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import styles from './WalkThroughReel.module.css';
 import AcmLogoSvg from '../loading/AcmLogoSvg';
-import CinematicDust from './CinematicDust';
 import WireframeArtifacts from './WireframeArtifacts';
 
 interface WalkThroughReelProps {
@@ -1823,7 +1822,7 @@ export default function WalkThroughReel({ isVisible, onBack }: WalkThroughReelPr
             <div className={styles.scene4LightRay1} />
             <div className={styles.scene4LightRay2} />
             <div className={styles.scene4DustContainer}>
-              <CinematicDust />
+              {/* CinematicDust removed for performance */}
             </div>
           </div>
 
