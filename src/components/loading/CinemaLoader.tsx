@@ -77,7 +77,7 @@ export default function CinemaLoader({ children }: CinemaLoaderProps) {
     const shouldSkip = sessionStorage.getItem('cinema-loaded') === '1';
     if (shouldSkip) {
       setLoaderState('hidden');
-      
+
       // Restore audio preference
       const isMuted = sessionStorage.getItem('cinema-audio-muted') === 'true';
       if (isMuted) {
@@ -85,7 +85,7 @@ export default function CinemaLoader({ children }: CinemaLoaderProps) {
       } else {
         setMasterVolume(1);
       }
-      
+
       window.dispatchEvent(new CustomEvent('cinema-loader-complete'));
     }
   }, []);
@@ -276,7 +276,7 @@ export default function CinemaLoader({ children }: CinemaLoaderProps) {
       }
 
       // Pre-set the hero section to be pushed back and blurred
-      gsap.set(contentWrapper, { scale: 0.9, filter: 'blur(15px)' });
+      gsap.set(contentWrapper, { scale: 0.95, opacity: 0 });
 
       // ==========================================
       // SCENE 1 — Darkness (0.00 - 0.30s)
@@ -636,13 +636,13 @@ export default function CinemaLoader({ children }: CinemaLoaderProps) {
       // Projector body fades
       tl.to(body, { opacity: 0, duration: 0.25, ease: 'power1.out' }, 4.10);
 
-      // Hero Section Zoom-In / Parallax Push Forward
+      // Hero Section Zoom-In — opacity + scale only (no blur, GPU-friendly)
       tl.to(contentWrapper, {
         scale: 1,
-        filter: 'blur(0px)',
-        duration: 1.5,
-        ease: 'power3.out',
-      }, 4.00);
+        opacity: 1,
+        duration: 0.8,
+        ease: 'power2.out',
+      }, 4.10);
 
       // Fade out projector elements right before the curtain splits
       tl.to([ambient, projection, hotspot, vignette, filmGrain], {

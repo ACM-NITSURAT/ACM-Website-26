@@ -351,17 +351,17 @@
 }
 
 /* --- Focus Pull Entrance Animation --- */
+/* Replaced filter: blur(20px→0) with opacity + scale — same fix as loader transition.
+   Animating filter: blur() forces GPU re-rasterization of the photo every frame. */
 .cardHidden .cardPhotoWrap {
   opacity: 0;
-  filter: blur(20px);
-  transform: scale(1.2);
+  transform: scale(1.08) translateY(20px);
 }
 
 .cardVisible .cardPhotoWrap {
   opacity: 1;
-  filter: blur(0);
-  transform: scale(1);
-  transition: opacity 800ms ease-out, filter 1.2s cubic-bezier(0.16, 1, 0.3, 1), transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: scale(1) translateY(0);
+  transition: opacity 800ms ease-out, transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* --- Viewfinder Markings --- */

@@ -449,6 +449,7 @@
 .contentWrapper {
   position: relative;
   z-index: 1;
+  will-change: transform, opacity;
 }
 
 /* --- Skip Button --- */

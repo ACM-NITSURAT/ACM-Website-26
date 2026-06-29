@@ -84,14 +84,20 @@
 
 /* --- Explore transition: blue energy shift --- */
 .heroBgBlue {
-  filter: brightness(1.5) saturate(1.5) contrast(1.1);
+  /* Removed filter: brightness/saturate/contrast on the entire background layer —
+     it forced re-rasterization of the video, grain, and vignette every frame.
+     The blue energy effect is now achieved via the ::after pseudo-element overlay. */
 }
 
 .heroBgBlue::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse 100% 100% at 50% 50%, rgba(75, 165, 228, 0.25) 0%, rgba(75, 165, 228, 0.05) 45%, transparent 80%);
+  background: radial-gradient(ellipse 100% 100% at 50% 50%,
+    rgba(75, 165, 228, 0.35) 0%,
+    rgba(75, 165, 228, 0.15) 35%,
+    rgba(75, 165, 228, 0.05) 55%,
+    transparent 80%);
   mix-blend-mode: screen;
   pointer-events: none;
   animation: centerFlare 2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
@@ -115,8 +121,11 @@
 }
 
 .blueLightTransition {
-  transition: filter 2s cubic-bezier(0.16, 1, 0.3, 1);
-  filter: brightness(1.5) saturate(1.5) contrast(1.1);
+  /* Removed filter: brightness/saturate/contrast — it forced re-rasterization
+     of the reel lighting layers (with mix-blend-mode) every frame during
+     the 2s transition. The visual effect is handled by the heroBgBlue overlay. */
+  transition: opacity 2s cubic-bezier(0.16, 1, 0.3, 1);
+  opacity: 0.7;
 }
 
 /* Film Grain — Barely visible cinematic texture */
@@ -269,19 +278,16 @@
   0% {
     opacity: 1;
     transform: scale(1);
-    filter: brightness(1);
   }
 
   50% {
     opacity: 1;
     transform: scale(1.1);
-    filter: brightness(1.5);
   }
 
   100% {
-    opacity: 1;
+    opacity: 0;
     transform: scale(1.5);
-    filter: brightness(4);
   }
 }
 

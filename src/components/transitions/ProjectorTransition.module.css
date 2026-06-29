@@ -64,9 +64,15 @@
 .flashWhiteout {
   position: fixed;
   inset: 0;
-  background: rgba(201, 168, 76, 0.15); /* Soft gold tint */
-  backdrop-filter: blur(40px) brightness(1.5);
-  -webkit-backdrop-filter: blur(40px) brightness(1.5);
+  /* Solid radial flash — replaces backdrop-filter: blur(40px) which was
+     forcing full-viewport GPU re-rasterization every frame */
+  background: radial-gradient(
+    circle at var(--ox, 50vw) var(--oy, 50vh),
+    rgba(255, 248, 230, 0.95) 0%,
+    rgba(245, 235, 210, 0.85) 25%,
+    rgba(201, 168, 76, 0.4) 60%,
+    rgba(201, 168, 76, 0.15) 100%
+  );
   z-index: 9998;
   pointer-events: none;
 }

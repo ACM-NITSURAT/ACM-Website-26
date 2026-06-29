@@ -3,14 +3,21 @@
 import { useState, useRef, useEffect } from "react";
 import CinemaLoader from "@/components/loading/CinemaLoader";
 import HeroSection from "@/components/sections/HeroSection";
-import AboutSection from "@/components/sections/AboutSection";
-import TeamSection from "@/components/sections/TeamSection";
 import ProjectorTransition from "@/components/transitions/ProjectorTransition";
 import dynamic from 'next/dynamic';
 
 const WalkThroughReel = dynamic(() => import('@/components/sections/WalkThroughReel'), {
-  ssr: false, // Ensures it only loads on the client when needed
+  ssr: false,
 });
+
+const AboutSection = dynamic(() => import('@/components/sections/AboutSection'), {
+  ssr: false, 
+});
+
+const TeamSection = dynamic(() => import('@/components/sections/TeamSection'), {
+  ssr: false, 
+});
+
 import { playAccelerationWhir, playLightFlash } from "@/components/loading/ProjectorAudio";
 
 export type TransitionState = 'idle' | 'accel1' | 'accel2' | 'accel3' | 'flash' | 'intro' | 'reverseFlash' | 'reverseFlashHero';
@@ -18,6 +25,7 @@ export type TransitionState = 'idle' | 'accel1' | 'accel2' | 'accel3' | 'flash' 
 export default function Home() {
   const [transitionState, setTransitionState] = useState<TransitionState>('idle');
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [isLoaderComplete, setIsLoaderComplete] = useState(false);
   const timersRef = useRef<NodeJS.Timeout[]>([]);
 
   // Keep track of latest state for the event listener without causing re-renders
@@ -31,6 +39,18 @@ export default function Home() {
     return () => {
       timersRef.current.forEach(clearTimeout);
     };
+  }, []);
+
+  // Listen for loader completion
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if (sessionStorage.getItem('cinema-loaded') === '1') {
+        setIsLoaderComplete(true);
+      }
+      const handleComplete = () => setIsLoaderComplete(true);
+      window.addEventListener('cinema-loader-complete', handleComplete);
+      return () => window.removeEventListener('cinema-loader-complete', handleComplete);
+    }
   }, []);
 
   const handleExploreClick = () => {
@@ -130,8 +150,12 @@ export default function Home() {
               isTransitioning={isTransitioning}
               transitionState={transitionState}
             />
-            <AboutSection />
-            <TeamSection />
+            {isLoaderComplete && (
+              <>
+                <AboutSection />
+                <TeamSection />
+              </>
+            )}
           </>
         )}
         <ProjectorTransition transitionState={transitionState} />
