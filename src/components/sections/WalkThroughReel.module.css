@@ -134,7 +134,15 @@
 }
 
 /* --- Ceiling --- */
-.hallCeiling {
+@font-face {
+  font-family: 'Detunized';
+  src: url('/DetunizedPersonalUseRegular-2Oqzw.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+.timelineLine {
   position: absolute;
   top: 0;
   left: -8%;
@@ -313,7 +321,9 @@
     width: 160%;
     height: 40%;
   }
-  .seatBankLeft, .seatBankRight {
+
+  .seatBankLeft,
+  .seatBankRight {
     width: 25%;
   }
 }
@@ -323,23 +333,33 @@
     width: 220%;
     height: 35%;
   }
-  .seatBankLeft, .seatBankRight {
+
+  .seatBankLeft,
+  .seatBankRight {
     width: 28%;
   }
-  .hallWallLeft, .hallWallRight {
+
+  .hallWallLeft,
+  .hallWallRight {
     width: 35%;
   }
+
   .hallBackWall {
     width: 100%;
     left: 0%;
   }
-  .exitSignLeft, .exitSignRight {
-    display: none; /* Too cluttered on mobile */
+
+  .exitSignLeft,
+  .exitSignRight {
+    display: none;
+    /* Too cluttered on mobile */
   }
+
   .wallSconce {
     width: 8px;
     height: 20px;
   }
+
   .projectorHousing {
     width: 90px;
     height: 45px;
@@ -1328,9 +1348,9 @@
   bottom: calc(50% + 11.4vw + 40px);
   left: 50%;
   transform: translate(-50%, 0);
-  font-family: var(--font-display), 'Space Grotesk', sans-serif;
+  font-family: var(--font-progress), 'Monument Extended', var(--font-display), 'Space Grotesk', sans-serif;
   font-size: clamp(32px, 5vw, 72px);
-  font-weight: 700;
+  font-weight: 400;
   text-align: center;
   color: rgba(255, 255, 255, 0.95);
   letter-spacing: 0.1em;
@@ -1516,6 +1536,292 @@
   user-select: none;
 }
 
+/* ============================================================
+   SCENE 2 — ARCHIVAL MONTAGE
+   ============================================================ */
+.archivalText {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 90vw;
+  text-align: center;
+  font-family: var(--font-display), 'Space Grotesk', sans-serif;
+  font-size: clamp(32px, 6vw, 84px);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: #fff;
+  line-height: 1.1;
+  text-transform: uppercase;
+  will-change: transform, opacity;
+  pointer-events: none;
+  z-index: 10;
+  text-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+}
+
+.archivalSceneCut {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  max-width: 90vw;
+  max-height: 80vh;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 50px 100px rgba(0, 0, 0, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  will-change: transform, opacity;
+  pointer-events: none;
+  z-index: 5;
+  background: #111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.archivalImageIntrinsic {
+  max-width: 90vw;
+  max-height: 80vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.archivalSceneOverlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: clamp(20px, 4vw, 40px);
+  padding-top: 80px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, transparent 100%);
+  font-family: var(--font-display), 'Space Grotesk', sans-serif;
+  font-size: clamp(14px, 2vw, 24px);
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 1);
+  line-height: 1.4;
+  box-sizing: border-box;
+  z-index: 2;
+}
+
+.archivalSceneOverlay p {
+  margin: 0;
+  max-width: 95%;
+}
+
+.archivalFinal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 90vw;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: 'Detunized', var(--font-display), 'Space Grotesk', sans-serif;
+  color: #ffffff;
+  will-change: transform, opacity, filter;
+  pointer-events: none;
+  z-index: 10;
+  text-shadow: none;
+}
+
+.archivalFinalTop {
+  font-size: clamp(32px, 6vw, 64px);
+  margin: 0;
+  margin-bottom: -0.2em;
+  /* pull big text closer */
+  letter-spacing: 0.1em;
+}
+
+.archivalFinalMain {
+  font-size: clamp(64px, 14vw, 200px);
+  margin: 0;
+  line-height: 1;
+}
+
+.archivalFinalSub {
+  font-family: var(--font-sans), 'Space Grotesk', sans-serif;
+  font-size: clamp(12px, 2vw, 24px);
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  margin: 0;
+  margin-top: 2rem;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+}
+
+/* --- Continuous Blue & White Glitch Effect --- */
+.archivalGlitchText {
+  position: relative;
+  display: inline-block;
+  color: transparent !important;
+  /* Fix bounding box for Detunized font which overflows downwards */
+  padding-bottom: 0.4em;
+  margin-bottom: -0.4em;
+  line-height: 1;
+}
+
+.archivalGlitchText::before,
+.archivalGlitchText::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 1;
+  pointer-events: none;
+  color: #ffffff;
+}
+
+.archivalGlitchText::before {
+  -webkit-mask-image: linear-gradient(to bottom,
+      black 0%, black 25%, transparent 25%, transparent 40%,
+      black 40%, black 65%, transparent 65%, transparent 80%,
+      black 80%, black 100%);
+  mask-image: linear-gradient(to bottom,
+      black 0%, black 25%, transparent 25%, transparent 40%,
+      black 40%, black 65%, transparent 65%, transparent 80%,
+      black 80%, black 100%);
+  animation: glitch-anim-before-blue 0.3s infinite linear alternate-reverse;
+}
+
+.archivalGlitchText::after {
+  -webkit-mask-image: linear-gradient(to bottom,
+      transparent 0%, transparent 25%, black 25%, black 40%,
+      transparent 40%, transparent 65%, black 65%, black 80%,
+      transparent 80%, transparent 100%);
+  mask-image: linear-gradient(to bottom,
+      transparent 0%, transparent 25%, black 25%, black 40%,
+      transparent 40%, transparent 65%, black 65%, black 80%,
+      transparent 80%, transparent 100%);
+  animation: glitch-anim-after-blue 0.3s infinite linear alternate-reverse;
+}
+
+@keyframes glitch-anim-before-blue {
+  0% {
+    transform: translate(-4px, 0);
+    text-shadow: -3px -3px 0 #ffffff, 3px 3px 0 #0066ff;
+  }
+
+  10% {
+    transform: translate(5px, 0);
+    text-shadow: -2px -2px 0 #ffffff, 4px 2px 0 #0066ff;
+  }
+
+  20% {
+    transform: translate(-3px, 0);
+    text-shadow: -4px -3px 0 #ffffff, 2px 4px 0 #0066ff;
+  }
+
+  30% {
+    transform: translate(6px, 0);
+    text-shadow: -2px -4px 0 #ffffff, 3px 2px 0 #0066ff;
+  }
+
+  40% {
+    transform: translate(-5px, 0);
+    text-shadow: -3px -2px 0 #ffffff, 4px 3px 0 #0066ff;
+  }
+
+  50% {
+    transform: translate(4px, 0);
+    text-shadow: -4px -4px 0 #ffffff, 2px 2px 0 #0066ff;
+  }
+
+  60% {
+    transform: translate(-6px, 0);
+    text-shadow: -2px -3px 0 #ffffff, 3px 4px 0 #0066ff;
+  }
+
+  70% {
+    transform: translate(3px, 0);
+    text-shadow: -4px -2px 0 #ffffff, 4px 2px 0 #0066ff;
+  }
+
+  80% {
+    transform: translate(-5px, 0);
+    text-shadow: -3px -4px 0 #ffffff, 2px 3px 0 #0066ff;
+  }
+
+  90% {
+    transform: translate(6px, 0);
+    text-shadow: -2px -3px 0 #ffffff, 4px 4px 0 #0066ff;
+  }
+
+  100% {
+    transform: translate(-4px, 0);
+    text-shadow: -4px -4px 0 #ffffff, 3px 3px 0 #0066ff;
+  }
+}
+
+@keyframes glitch-anim-after-blue {
+  0% {
+    transform: translate(4px, 0);
+    text-shadow: -3px -3px 0 #ffffff, 3px 3px 0 #0066ff;
+  }
+
+  10% {
+    transform: translate(-5px, 0);
+    text-shadow: -4px -2px 0 #ffffff, 2px 4px 0 #0066ff;
+  }
+
+  20% {
+    transform: translate(6px, 0);
+    text-shadow: -2px -4px 0 #ffffff, 4px 2px 0 #0066ff;
+  }
+
+  30% {
+    transform: translate(-3px, 0);
+    text-shadow: -4px -3px 0 #ffffff, 3px 3px 0 #0066ff;
+  }
+
+  40% {
+    transform: translate(5px, 0);
+    text-shadow: -2px -2px 0 #ffffff, 4px 4px 0 #0066ff;
+  }
+
+  50% {
+    transform: translate(-6px, 0);
+    text-shadow: -4px -4px 0 #ffffff, 2px 2px 0 #0066ff;
+  }
+
+  60% {
+    transform: translate(4px, 0);
+    text-shadow: -3px -2px 0 #ffffff, 4px 3px 0 #0066ff;
+  }
+
+  70% {
+    transform: translate(-4px, 0);
+    text-shadow: -2px -4px 0 #ffffff, 3px 2px 0 #0066ff;
+  }
+
+  80% {
+    transform: translate(5px, 0);
+    text-shadow: -4px -3px 0 #ffffff, 2px 4px 0 #0066ff;
+  }
+
+  90% {
+    transform: translate(-3px, 0);
+    text-shadow: -3px -2px 0 #ffffff, 4px 3px 0 #0066ff;
+  }
+
+  100% {
+    transform: translate(4px, 0);
+    text-shadow: -4px -4px 0 #ffffff, 3px 3px 0 #0066ff;
+  }
+}
+
+.archivalLogoWrapper {
+  width: 80px;
+  height: 80px;
+  opacity: 0.9;
+  filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.2));
+}
+
 /* --- Beat items — all centered, RAF drives transform --- */
 
 .beatItem {
@@ -1549,6 +1855,7 @@
    RESPONSIVE — Scene 2
    ============================================================ */
 @media (max-width: 860px) {
+
   .beatMemory1 .filmFrame,
   .beatMemory2 .filmFrame,
   .beatMemory3 .filmFrame {
@@ -1559,6 +1866,7 @@
 }
 
 @media (max-width: 520px) {
+
   .beatMemory1 .filmFrame,
   .beatMemory2 .filmFrame,
   .beatMemory3 .filmFrame {
@@ -1566,6 +1874,7 @@
     height: auto;
     aspect-ratio: 4 / 3;
   }
+
   .frameCaptionBar {
     padding: 12px 14px 14px;
   }
@@ -2084,7 +2393,7 @@
   overflow: visible;
   /* Central radial glow */
   background: radial-gradient(circle at 50% 50%, rgba(37, 99, 235, 0.08) 0%, transparent 60%);
-  
+
   /* Responsive grid variables */
   --s3-gap: 38vw;
   --s3-row0-y: 8vh;
@@ -2834,37 +3143,37 @@
     white-space: normal;
     width: 90vw;
   }
-  
+
   .memoryStripContainer {
     --s3-gap: 48vw;
   }
-  
+
   .memoryFrame {
     width: min(35vw, 320px);
   }
-  
+
   .dotslashVideoContainer {
     width: 90vw;
   }
-  
+
   .dotslashGallery {
     padding: 5vh 2vw;
   }
-  
+
   .dotslashGalleryImgWrapper {
     width: 42vw;
     height: 30vw;
   }
-  
+
   .mosaicLogoSvg {
     width: 41vw;
     height: 41vw;
   }
-  
+
   .mosaicHeader {
     bottom: calc(50% + 20.5vw + 30px);
   }
-  
+
   .mosaicFooter {
     top: calc(50% + 20.5vw + 20px);
   }
@@ -2874,50 +3183,50 @@
   .scene3MidText {
     font-size: clamp(28px, 8vw, 42px);
   }
-  
+
   .scene3Punchline {
     font-size: clamp(28px, 8vw, 42px);
   }
-  
+
   .memoryStripContainer {
     --s3-gap: 55vw;
     --s3-row0-y: 12vh;
     --s3-row1-y: 40vh;
     --s3-row2-y: 68vh;
   }
-  
+
   .memoryFrame {
     width: min(42vw, 320px);
   }
-  
+
   .dotslashVideoContainer {
     width: 95vw;
     aspect-ratio: 16 / 9;
   }
-  
+
   .dotslashGalleryImgWrapper {
     width: 90vw;
     height: 60vw;
   }
-  
+
   .mosaicLogoSvg {
     width: 64vw;
     height: 64vw;
   }
-  
+
   .mosaicHeader {
     bottom: calc(50% + 32vw + 30px);
     font-size: clamp(24px, 6vw, 42px);
   }
-  
+
   .mosaicFooter {
     top: calc(50% + 32vw + 20px);
   }
-  
+
   .imageOverlayContent {
     max-height: 70vh;
   }
-  
+
   .imageOverlayClose {
     top: -60px;
     right: 0;
@@ -2930,6 +3239,7 @@
    desktop. Disable the heaviest operations to maintain 60fps.
    ============================================================ */
 @media (hover: none) and (pointer: coarse) {
+
   /* Disable the spinning conic gradient — very heavy on mobile GPUs */
   .mosaicAura::after {
     animation: none;

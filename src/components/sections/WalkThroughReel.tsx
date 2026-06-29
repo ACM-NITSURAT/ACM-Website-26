@@ -28,8 +28,7 @@ const TRAILER_END = 0.28;
 /** Scene 2 enters as teaser 2 exits */
 const SCENE2_START = 0.236;
 const SCENE2_SETTLE = 0.286;
-/** Scene 2 beat band ends; Scene 3 overlaps the fade-out */
-const SCENE2_END = 0.48;
+const SCENE2_END = 0.43; // Ends before Scene 3 starts to give logo hold time
 const SCENE3_START = 0.455;
 const SCENE3_END = 0.66;
 const DOTSLASH_START = 0.66;
@@ -56,7 +55,7 @@ const S3_MEMORY_FRAMES = Array.from({ length: 24 }).map((_, i) => {
 
   // Add organic vertical variation
   const yOffset = (Math.cos(i * 3.7) * 3); // in vh
-  
+
   // Slight rotation
   const rot = Math.sin(i * 2.1) * 8; // -8 to 8 deg
 
@@ -399,27 +398,15 @@ export default function WalkThroughReel({ isVisible, onBack }: WalkThroughReelPr
   const trailerGrainRef = useRef<HTMLDivElement>(null);
   const trailerSpeedRef = useRef<HTMLDivElement>(null);
   const scene2Ref = useRef<HTMLDivElement>(null);
-  const bgParallaxRef = useRef<HTMLDivElement>(null);
-  const bgImage1Ref = useRef<HTMLDivElement>(null);
-  const bgImage2Ref = useRef<HTMLDivElement>(null);
-  const bgImage3Ref = useRef<HTMLDivElement>(null);
-  const ghost72Ref = useRef<HTMLDivElement>(null);
-  const memory1Ref = useRef<HTMLDivElement>(null);
-  const memory2Ref = useRef<HTMLDivElement>(null);
-  const memory3Ref = useRef<HTMLDivElement>(null);
-  const memory3EchoRef = useRef<HTMLDivElement>(null);
-  const text1Ref = useRef<HTMLDivElement>(null);
-  const text2Ref = useRef<HTMLDivElement>(null);
-  const finaleRef = useRef<HTMLDivElement>(null);
-  const finaleRuleRef = useRef<HTMLDivElement>(null);
-  const finaleCapturedRef = useRef<HTMLDivElement>(null);
-  const finaleHintRef = useRef<HTMLDivElement>(null);
-  const mem1CaptionBarRef = useRef<HTMLDivElement>(null);
-  const mem2CaptionBarRef = useRef<HTMLDivElement>(null);
-  const mem3CaptionBarRef = useRef<HTMLDivElement>(null);
-  const text1LineRef = useRef<HTMLParagraphElement>(null);
-  const text2LineRef = useRef<HTMLParagraphElement>(null);
-  const rippleRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const archivalText1Ref = useRef<HTMLDivElement>(null);
+  const archivalShot1Ref = useRef<HTMLDivElement>(null);
+  const archivalShot2Ref = useRef<HTMLDivElement>(null);
+  const archivalShot3Ref = useRef<HTMLDivElement>(null);
+  const archivalShot4Ref = useRef<HTMLDivElement>(null);
+  const archivalShot5Ref = useRef<HTMLDivElement>(null);
+  const archivalShot6Ref = useRef<HTMLDivElement>(null);
+  const archivalShot7Ref = useRef<HTMLDivElement>(null);
+  const archivalLogoRef = useRef<HTMLDivElement>(null);
 
   const scene3Ref = useRef<HTMLDivElement>(null);
   const scene3DarkRef = useRef<HTMLDivElement>(null);
@@ -500,8 +487,7 @@ export default function WalkThroughReel({ isVisible, onBack }: WalkThroughReelPr
   /* P8: Ref for full-bg wireframe engineering artifacts in Scene 3 */
   const wireframeBgRef = useRef<HTMLDivElement>(null);
 
-  const rippled = useRef<Set<string>>(new Set());
-
+  // Cinematic progression tracking
   const scrollAccumulator = useRef(0);
   const displayProgress = useRef(0);
   const sceneRef = useRef(0);
@@ -563,7 +549,6 @@ export default function WalkThroughReel({ isVisible, onBack }: WalkThroughReelPr
     mem3CaptionActiveRef.current = false;
     text1ActiveRef.current = false;
     text2ActiveRef.current = false;
-    rippled.current = new Set();
     teaserFlashedRef.current = false; /* P2: reset flash flag */
     arrowAnimatedRef.current = false; /* P2: reset arrow flag */
     spliceFiredRef.current = false; /* P2: reset splice flag */
@@ -606,12 +591,6 @@ export default function WalkThroughReel({ isVisible, onBack }: WalkThroughReelPr
       touchStartY = currentY;
       if (scrollAccumulator.current > prev) directionRef.current = 'down';
       else if (scrollAccumulator.current < prev) directionRef.current = 'up';
-    };
-
-    const fireRipple = (key: string, index: number) => {
-      if (rippled.current.has(key)) return;
-      rippled.current.add(key);
-      rippleRefs.current[index]?.classList.add(styles.rippleActive);
     };
 
     const tick = () => {
@@ -892,7 +871,7 @@ export default function WalkThroughReel({ isVisible, onBack }: WalkThroughReelPr
           // Staggered convergence
           const staggeredT = clamp01((convergeT - tile.delay * 0.2) / (1 - tile.delay * 0.2));
           const ease = 1 - Math.pow(1 - staggeredT, 3); // easeOutCubic
-          
+
           const mScale = window.innerWidth < 520 ? 2.8 : window.innerWidth < 860 ? 1.8 : 1;
 
           // Interpolate scatter → grid
@@ -1032,7 +1011,7 @@ export default function WalkThroughReel({ isVisible, onBack }: WalkThroughReelPr
         }
       }
 
-      /* --- Scene 2: crossfades with scene 1, no pop-in --- */
+      /* --- Scene 2: The Deep Space Monoliths --- */
       if (scene2Ref.current) {
         const enterE = scene2Blend;
         const scale = 1.18 - enterE * 0.18;
@@ -1053,133 +1032,100 @@ export default function WalkThroughReel({ isVisible, onBack }: WalkThroughReelPr
         const scene2Progress = clamp01(
           (progress - SCENE2_SETTLE) / (SCENE2_END - SCENE2_SETTLE)
         );
-        const exitFade = clamp01((scene2Progress - 0.94) / 0.06);
-        const drift = scene2Progress;
-        const scene2Alpha = scene2Blend * (1 - exitFade);
+        // Let scene2Blend handle the crossfade into Scene 3, don't force an early exit fade.
+        const scene2Alpha = scene2Blend;
 
-        if (bgParallaxRef.current) {
-          const enterParallax = (1 - scene2Blend) * 4;
-          const parallaxX = drift * 14 + enterParallax;
-          bgParallaxRef.current.style.transform = `translate3d(${parallaxX}vw, ${drift * 2}vh, 0)`;
-          bgParallaxRef.current.style.opacity = String(scene2Alpha);
-        }
+        // Archival Montage Helper
+        const applyArchivalCut = (ref: React.RefObject<HTMLElement | null>, start: number, end: number, isText: boolean) => {
+          if (!ref.current) return;
+          const t = clamp01((scene2Progress - start) / (end - start));
+          if (t === 0) {
+             ref.current.style.opacity = '0';
+             ref.current.style.visibility = 'hidden';
+             return;
+          }
+          if (t === 1) {
+             ref.current.style.opacity = '0';
+             ref.current.style.visibility = 'hidden';
+             return;
+          }
+          ref.current.style.visibility = 'visible';
+          
+          // Fast fade in, fast fade out
+          const fadeT = 0.15; // 15% of the clip duration is fading
+          let op = 1;
+          if (t < fadeT) op = easeOutCubic(t / fadeT);
+          else if (t > 1 - fadeT) op = 1 - easeInCubic((t - (1 - fadeT)) / fadeT);
+          
+          // Very subtle slow zoom for images (dolly push), text stays static
+          const scale = isText ? 1.0 : (1.0 + (t * 0.04));
+          
+          ref.current.style.transform = `translate(-50%, -50%) scale(${scale})`;
+          ref.current.style.opacity = String(op * scene2Alpha);
+          ref.current.style.filter = 'none'; // reset filter
+        };
 
-        if (ghost72Ref.current) {
-          const ghostT = clamp01((scene2Progress - 0.02) / 0.5);
-          const ghostOp =
-            ghostT > 0 && ghostT < 1 ? 0.025 + Math.sin(ghostT * Math.PI) * 0.07 : 0;
-          ghost72Ref.current.style.opacity = String(ghostOp);
-          ghost72Ref.current.style.transform = `translate(-50%, -50%) translateX(${-drift * 6}vw)`;
-        }
+        // Cinematic Title Reveal (Heavy Impact)
+        const applyImpactTitleCut = (ref: React.RefObject<HTMLElement | null>, start: number) => {
+          if (!ref.current) return;
+          
+          // Dead zone check (Anticipation silence)
+          if (scene2Progress < start) {
+             ref.current.style.opacity = '0';
+             ref.current.style.visibility = 'hidden';
+             return;
+          }
+          
+          ref.current.style.visibility = 'visible';
+          
+          // Impact happens very fast over a short scroll distance
+          const impactDuration = 0.08; 
+          const t = clamp01((scene2Progress - start) / impactDuration);
+          const easeImpact = easeOutCubic(t);
+          
+          // Opacity snaps in quickly
+          const op = clamp01(t / 0.2); 
+          
+          // 1. Overshoot scale (1.06 -> 1.00)
+          const scale = 1.06 - (0.06 * easeImpact);
+          
+          // 2. Vertical Settle (starts slightly high, drops into place)
+          const translateY = -15 * (1 - easeImpact); 
+          
+          // 3. Motion blur (intense on arrival, snaps crisp)
+          const blur = 12 * (1 - easeImpact);
+          
+          // 4. Projector Glow / Bloom (intense flash on impact)
+          const bloomStrength = 1 - easeImpact;
+          const shadowColor = `rgba(255, 255, 255, ${bloomStrength * 0.8})`;
+          const dropShadow = `drop-shadow(0px 0px ${bloomStrength * 60}px ${shadowColor})`;
+          
+          // 5. Subconscious camera shake (deterministic high-frequency sine waves)
+          let shakeX = 0;
+          let shakeY = 0;
+          if (t > 0 && t < 1) {
+            shakeX = Math.sin(t * 60) * 3 * (1 - t);
+            shakeY = Math.cos(t * 70) * 3 * (1 - t);
+          }
+          
+          ref.current.style.opacity = String(op * scene2Alpha);
+          ref.current.style.transform = `translate(calc(-50% + ${shakeX}px), calc(-50% + ${shakeY}px + ${translateY}px)) scale(${scale})`;
+          ref.current.style.filter = `blur(${blur}px) ${dropShadow}`;
+        };
 
-        const m1 = applyBeat(memory1Ref.current, scene2Progress, BEATS.memory1.start, BEATS.memory1.dur, -1.5);
-        if (m1.inDwell && m1.t > 0.14) fireRipple('m1', 0);
-        toggleDwellClass(mem1CaptionBarRef.current, mem1CaptionActiveRef, m1.inDwell, styles.frameCaptionBarActive);
-
-        if (bgImage1Ref.current) {
-          const op = m1.t > 0 && m1.t < 1 ? Math.sin(m1.t * Math.PI) * 0.6 : 0;
-          bgImage1Ref.current.style.opacity = String(op);
-          bgImage1Ref.current.style.transform = `scale(${1.05 + m1.t * 0.1})`;
-        }
-
-        if (playIcon1Ref.current && m1.inDwell !== playPulse1Ref.current) {
-          playPulse1Ref.current = m1.inDwell;
-          playIcon1Ref.current.classList.toggle(styles.playIconPulse, m1.inDwell);
-        }
-
-        const m2 = applyBeat(memory2Ref.current, scene2Progress, BEATS.memory2.start, BEATS.memory2.dur, 2);
-        if (m2.inDwell && m2.t > 0.14) fireRipple('m2', 1);
-        toggleDwellClass(mem2CaptionBarRef.current, mem2CaptionActiveRef, m2.inDwell, styles.frameCaptionBarActive);
-
-        if (bgImage2Ref.current) {
-          const op = m2.t > 0 && m2.t < 1 ? Math.sin(m2.t * Math.PI) * 0.6 : 0;
-          bgImage2Ref.current.style.opacity = String(op);
-          bgImage2Ref.current.style.transform = `scale(${1.05 + m2.t * 0.1})`;
-        }
-
-        if (playIcon2Ref.current && m2.inDwell !== playPulse2Ref.current) {
-          playPulse2Ref.current = m2.inDwell;
-          playIcon2Ref.current.classList.toggle(styles.playIconPulse, m2.inDwell);
-        }
-
-        const t1 = applyBeat(text1Ref.current, scene2Progress, BEATS.text1.start, BEATS.text1.dur, 0, -50);
-        toggleDwellClass(text1LineRef.current, text1ActiveRef, t1.inDwell, styles.beatTextActive);
-        if (text1LineRef.current) {
-          const tracking = 0.15 - t1.enterT * 0.18;
-          text1LineRef.current.style.letterSpacing = `${tracking}em`;
-        }
-
-        const m3 = applyBeat(memory3Ref.current, scene2Progress, BEATS.memory3.start, BEATS.memory3.dur, -1);
-        if (m3.inDwell && m3.t > 0.14) fireRipple('m3', 2);
-        toggleDwellClass(mem3CaptionBarRef.current, mem3CaptionActiveRef, m3.inDwell, styles.frameCaptionBarActive);
-
-        if (bgImage3Ref.current) {
-          const op = m3.t > 0 && m3.t < 1 ? Math.sin(m3.t * Math.PI) * 0.6 : 0;
-          bgImage3Ref.current.style.opacity = String(op);
-          bgImage3Ref.current.style.transform = `scale(${1.05 + m3.t * 0.1})`;
-        }
-
-        if (playIcon3Ref.current && m3.inDwell !== playPulse3Ref.current) {
-          playPulse3Ref.current = m3.inDwell;
-          playIcon3Ref.current.classList.toggle(styles.playIconPulse, m3.inDwell);
-        }
-
-        if (memory3EchoRef.current) {
-          const echoState = getBeatState(beatT(scene2Progress, BEATS.memory3.start, BEATS.memory3.dur));
-          const echoX = echoState.xVw + 3;
-          memory3EchoRef.current.style.opacity = String(echoState.opacity * 0.25);
-          memory3EchoRef.current.style.transform = `translate(-50%, -46%) translateX(${echoX}vw) rotate(2deg) scale(0.9)`;
-          memory3EchoRef.current.style.visibility = echoState.opacity > 0.02 ? 'visible' : 'hidden';
-        }
-
-        const t2 = applyBeat(text2Ref.current, scene2Progress, BEATS.text2.start, BEATS.text2.dur, 0, -50);
-        toggleDwellClass(text2LineRef.current, text2ActiveRef, t2.inDwell, styles.beatTextActive);
-        if (text2LineRef.current) {
-          const tracking = 0.15 - t2.enterT * 0.18;
-          text2LineRef.current.style.letterSpacing = `${tracking}em`;
-        }
-
-        const finaleState = applyBeat(
-          finaleRef.current,
-          scene2Progress,
-          BEATS.finale.start,
-          BEATS.finale.dur,
-          0,
-          -50
-        );
-
-        if (finaleRuleRef.current) {
-          const ruleT = finaleState.inDwell ? clamp01((finaleState.t - 0.15) / 0.3) : 0;
-          finaleRuleRef.current.style.width = `${ruleT * 42}vw`;
-          finaleRuleRef.current.style.opacity = String(ruleT);
-        }
-        if (finaleCapturedRef.current) {
-          const capT = finaleState.inDwell ? clamp01((finaleState.t - 0.38) / 0.28) : 0;
-
-          // Cinematic, heavy drop-in: easeOutQuart gives a snappy but settled arrival
-          const easeOutQuart = 1 - Math.pow(1 - capT, 4);
-
-          // Opacity fades in slightly faster than the movement settles
-          const opacity = clamp01(capT * 1.5);
-
-          // Scale down from 1.15 to 1.0 (feels like a heavy stamp/impact)
-          const scale = 1.15 - (easeOutQuart * 0.15);
-
-          // Letter spacing tightens from wide to solid
-          const tracking = 0.15 - (easeOutQuart * 0.1); // ends at 0.05em
-
-          finaleCapturedRef.current.style.opacity = String(opacity);
-          finaleCapturedRef.current.style.transform = `scale(${scale})`;
-          finaleCapturedRef.current.style.letterSpacing = `${tracking}em`;
-
-          // Optional: Add a slight vertical drop for extra weight
-          const translateY = 10 * (1 - easeOutQuart);
-          finaleCapturedRef.current.style.transform = `translateY(${translateY}px) scale(${scale})`;
-        }
-        if (finaleHintRef.current) {
-          const hintT = finaleState.inDwell ? clamp01((finaleState.t - 0.62) / 0.3) : 0;
-          finaleHintRef.current.style.opacity = String(hintT * (1 - scene3Blend));
-        }
+        // The Archival Rhythm (1 text + 7 photo frames)
+        applyArchivalCut(archivalText1Ref, 0.00, 0.09, true);
+        applyArchivalCut(archivalShot1Ref, 0.10, 0.19, false);
+        applyArchivalCut(archivalShot2Ref, 0.20, 0.29, false);
+        applyArchivalCut(archivalShot3Ref, 0.30, 0.39, false);
+        applyArchivalCut(archivalShot4Ref, 0.40, 0.49, false);
+        applyArchivalCut(archivalShot5Ref, 0.50, 0.59, false);
+        applyArchivalCut(archivalShot6Ref, 0.60, 0.69, false);
+        applyArchivalCut(archivalShot7Ref, 0.70, 0.81, false);
+        
+        // 0.81 to 0.88 is complete blackness (The anticipation/silence)
+        // 0.88 onwards is the heavy impact and hold
+        applyImpactTitleCut(archivalLogoRef, 0.88);
       }
 
       /* --- Scene 3: the world opens --- */
@@ -1451,7 +1397,7 @@ export default function WalkThroughReel({ isVisible, onBack }: WalkThroughReelPr
                 <div className={styles.projectedText}>
                   <p className={styles.openingLine}>
                     <span className={styles.wordLight}>Since </span>
-                    <span className={styles.year}>2008</span>
+                    <span className={styles.year}>2005</span>
                     <span className={styles.wordLight}>, we&apos;ve been </span>
                     <span className={styles.wordItalic}>building</span>
                   </p>
@@ -1487,15 +1433,15 @@ export default function WalkThroughReel({ isVisible, onBack }: WalkThroughReelPr
         </div>
 
         <div ref={scene2Ref} className={styles.scene2}>
-          <div ref={bgParallaxRef} className={styles.bgParallax} aria-hidden="true">
+          <div className={styles.bgParallax} aria-hidden="true">
             <div className={styles.scene2BgImages}>
-              <div ref={bgImage1Ref} className={styles.bgImageWrapper}>
+              <div className={styles.bgImageWrapper}>
                 <Image src="/dotslash/Dotslash9-winners.webp" alt="bg1" fill style={{ objectFit: 'cover' }} />
               </div>
-              <div ref={bgImage2Ref} className={styles.bgImageWrapper}>
+              <div className={styles.bgImageWrapper}>
                 <Image src="/dotslash/Dotslash9-team.webp" alt="bg2" fill style={{ objectFit: 'cover' }} />
               </div>
-              <div ref={bgImage3Ref} className={styles.bgImageWrapper}>
+              <div className={styles.bgImageWrapper}>
                 <Image src="/dotslash/DSC_2163 (1).webp" alt="bg3" fill style={{ objectFit: 'cover' }} />
               </div>
             </div>
@@ -1508,126 +1454,76 @@ export default function WalkThroughReel({ isVisible, onBack }: WalkThroughReelPr
             <div className={styles.bgStreaks} />
           </div>
 
-          <div ref={ghost72Ref} className={styles.ghost72} aria-hidden="true">
-            72
-          </div>
-
           {/* Cinematic Light Leak Overlay */}
           <div className={styles.scene2LightLeak} aria-hidden="true" />
 
-          <div ref={memory1Ref} className={`${styles.beatItem} ${styles.beatMemory1}`}>
-            <div className={styles.filmFrame}>
-              <div className={styles.filmFrameBody}>
-                <div className={styles.frameImage}>
-                  <Image
-                    src="/dotslash/Dotslash9-winners.webp"
-                    alt="Dotslash 9 Winners"
-                    fill
-                    style={{ objectFit: 'cover' }}
-                    sizes="(max-width: 768px) 80vw, 400px"
-                  />
-                </div>
-                <div ref={mem1CaptionBarRef} className={styles.frameCaptionBar}>
-                  <p className={styles.captionLine}>
-                    <span className={`${styles.captionReveal} ${styles.captionWordBold}`}>HACKATHON</span>
-                    <span className={`${styles.captionReveal} ${styles.captionWordAccent}`}>&apos;24</span>
-                    <span className={`${styles.captionReveal} ${styles.captionWordDim}`}> · </span>
-                    <span className={`${styles.captionReveal} ${styles.captionWordBold}`}>02:47</span>
-                    <span className={`${styles.captionReveal} ${styles.captionWordItalic}`}> AM</span>
-                  </p>
-                  <p className={`${styles.captionSubLine} ${styles.captionReveal}`}>
-                    RECORDING // RAW
-                  </p>
-                </div>
-              </div>
-              <div ref={(el) => { rippleRefs.current[0] = el; }} className={styles.ripple} />
+          {/* Text 1 */}
+          <div ref={archivalText1Ref} className={styles.archivalText} aria-hidden="true">
+            <p>EVERY COMMUNITY<br/>STARTS SMALL.</p>
+          </div>
+          
+          {/* Frame 1: CP */}
+          <div ref={archivalShot1Ref} className={styles.archivalSceneCut} aria-hidden="true">
+            <img src="/webp/scene2/compprogramming.webp" alt="Competitive Programming" className={styles.archivalImageIntrinsic} />
+            <div className={styles.archivalSceneOverlay}>
+              <p>A QUIET ROOM. A FOCUSED MIND.</p>
             </div>
           </div>
 
-          <div ref={memory2Ref} className={`${styles.beatItem} ${styles.beatMemory2}`}>
-            <div className={styles.filmFrame}>
-              <div className={styles.filmFrameBody}>
-                <div className={styles.frameImage}>
-                  <Image
-                    src="/dotslash/Dotslash9-team.webp"
-                    alt="Prototype Iteration 14"
-                    fill
-                    style={{ objectFit: 'cover' }}
-                    sizes="(max-width: 768px) 80vw, 400px"
-                  />
-                </div>
-                <div ref={mem2CaptionBarRef} className={styles.frameCaptionBar}>
-                  <p className={styles.captionLine}>
-                    <span className={`${styles.captionReveal} ${styles.captionWordBoldItalic}`}>PROTOTYPE</span>
-                    <span className={`${styles.captionReveal} ${styles.captionWordDim}`}> — </span>
-                    <span className={`${styles.captionReveal} ${styles.captionWordLight}`}>ITERATION </span>
-                    <span className={`${styles.captionReveal} ${styles.captionWordBold}`}>14</span>
-                  </p>
-                  <p className={`${styles.captionSubLine} ${styles.captionReveal}`}>
-                    FILE // NOT_FOUND
-                  </p>
-                </div>
-              </div>
-              <div ref={(el) => { rippleRefs.current[1] = el; }} className={styles.ripple} />
+          {/* Frame 2: Hour of AI */}
+          <div ref={archivalShot2Ref} className={styles.archivalSceneCut} aria-hidden="true">
+            <img src="/webp/scene2/hourofai.webp" alt="Hour of AI" className={styles.archivalImageIntrinsic} />
+            <div className={styles.archivalSceneOverlay}>
+              <p>WE SHARED THE KNOWLEDGE WE COULD FIND.</p>
             </div>
           </div>
 
-          <div ref={text1Ref} className={`${styles.beatItem} ${styles.beatText}`}>
-            <p ref={text1LineRef} className={styles.beatTextLine}>
-              <span className={styles.beatWordLight}>WE DON&apos;T JUST </span>
-              <span className={styles.beatWordBoldItalic}>CODE.</span>
+          {/* Frame 3: SIH */}
+          <div ref={archivalShot3Ref} className={styles.archivalSceneCut} aria-hidden="true">
+            <img src="/webp/scene2/sih.webp" alt="SIH" className={styles.archivalImageIntrinsic} />
+            <div className={styles.archivalSceneOverlay}>
+              <p>WE HUDDLED CLOSE TO BUILD THE BASE,</p>
+            </div>
+          </div>
+
+          {/* Frame 4: DotSlash */}
+          <div ref={archivalShot4Ref} className={styles.archivalSceneCut} aria-hidden="true">
+            <img src="/webp/scene2/dotslash.webp" alt="DotSlash" className={styles.archivalImageIntrinsic} />
+            <div className={styles.archivalSceneOverlay}>
+              <p>THEN SCALED IT TO A MASSIVE SPACE.</p>
+            </div>
+          </div>
+
+          {/* Frame 5: Executive Meet */}
+          <div ref={archivalShot5Ref} className={styles.archivalSceneCut} aria-hidden="true">
+            <img src="/webp/scene2/executivemeet.webp" alt="Executive Meet" className={styles.archivalImageIntrinsic} />
+            <div className={styles.archivalSceneOverlay}>
+              <p>AROUND THE TABLE, LEADERS MET,</p>
+            </div>
+          </div>
+
+          {/* Frame 6: ACM Peeps */}
+          <div ref={archivalShot6Ref} className={styles.archivalSceneCut} aria-hidden="true">
+            <img src="/webp/scene2/acmpeeps.webp" alt="ACM Community" className={styles.archivalImageIntrinsic} />
+            <div className={styles.archivalSceneOverlay}>
+              <p>AND BUILT A TEAM WE WON'T FORGET.</p>
+            </div>
+          </div>
+
+          {/* Frame 7: Echelon */}
+          <div ref={archivalShot7Ref} className={styles.archivalSceneCut} aria-hidden="true">
+            <img src="/webp/scene2/echelon.webp" alt="Echelon" className={styles.archivalImageIntrinsic} />
+            <div className={styles.archivalSceneOverlay}>
+              <p>THE TROPHIES RUST. THE CODE MOVES ON.<br /><br />BUT WHAT WE BUILT WILL NOT BE GONE.</p>
+            </div>
+          </div>
+
+          <div ref={archivalLogoRef} className={styles.archivalFinal} aria-hidden="true">
+            <p className={styles.archivalFinalTop}>THIS IS</p>
+            <p className={styles.archivalFinalMain}>
+              <span className={styles.archivalGlitchText} data-text="ACM">ACM</span> NIT SURAT
             </p>
-          </div>
-
-          <div ref={memory3EchoRef} className={`${styles.beatItem} ${styles.beatMemory3} ${styles.beatEcho}`}>
-            <div className={styles.filmFrame}>
-              <div className={styles.filmFrameBody}>
-                <div className={styles.frameImage} />
-              </div>
-            </div>
-          </div>
-          <div ref={memory3Ref} className={`${styles.beatItem} ${styles.beatMemory3}`}>
-            <div className={styles.filmFrame}>
-              <div className={styles.filmFrameBody}>
-                <div className={styles.frameImage}>
-                  <Image
-                    src="/webp/icpc.webp"
-                    alt="ICPC Regionals"
-                    fill
-                    style={{ objectFit: 'cover' }}
-                    sizes="(max-width: 768px) 80vw, 400px"
-                  />
-                </div>
-                <div ref={mem3CaptionBarRef} className={styles.frameCaptionBar}>
-                  <p className={styles.captionLine}>
-                    <span className={`${styles.captionReveal} ${styles.captionWordBold}`}>ICPC</span>
-                    <span className={`${styles.captionReveal} ${styles.captionWordDim}`}> / </span>
-                    <span className={`${styles.captionReveal} ${styles.captionWordLight}`}>REGIONALS</span>
-                  </p>
-                  <p className={`${styles.captionSubLine} ${styles.captionReveal}`}>
-                    STATUS // QUALIFIED
-                  </p>
-                </div>
-              </div>
-              <div ref={(el) => { rippleRefs.current[2] = el; }} className={styles.ripple} />
-            </div>
-          </div>
-
-          <div ref={text2Ref} className={`${styles.beatItem} ${styles.beatText}`}>
-            <p ref={text2LineRef} className={styles.beatTextLine}>
-              <span className={styles.beatWordLight}>WE ENGINEER THE </span>
-              <span className={styles.beatWordAccent}>FUTURE.</span>
-            </p>
-          </div>
-
-          <div ref={finaleRef} className={`${styles.beatItem} ${styles.beatFinale}`}>
-            <div ref={finaleRuleRef} className={styles.finaleRule} />
-            <div ref={finaleCapturedRef} className={styles.finaleCaptured}>
-              WE ARE <span className={styles.acmBlueText}>ACM.</span>
-            </div>
-            <div ref={finaleHintRef} className={styles.finaleHint}>
-              SCROLL TO CONTINUE →
-            </div>
+            <p className={styles.archivalFinalSub}>BUILT BY STUDENTS. FOR STUDENTS. SINCE 2005.</p>
           </div>
         </div>
 
@@ -1637,18 +1533,18 @@ export default function WalkThroughReel({ isVisible, onBack }: WalkThroughReelPr
           <WireframeArtifacts bgRef={wireframeBgRef} />
 
           <p ref={scene3OpenRef} className={styles.scene3OpenLine}>
-            <span ref={scene3NumInlineRef} className={styles.scene3NumInline}>500+</span>
-            <span ref={scene3OpenRestRef} className={styles.scene3OpenRest}> ELITE BUILDERS.</span>
+            <span ref={scene3NumInlineRef} className={styles.scene3NumInline}>20+</span>
+            <span ref={scene3OpenRestRef} className={styles.scene3OpenRest}> YEARS OF CURIOSITY.</span>
           </p>
 
-          <div ref={scene3GiantNumRef} className={styles.scene3GiantNum}>500</div>
+          <div ref={scene3GiantNumRef} className={styles.scene3GiantNum}>20</div>
 
           <div ref={scene3Mid1Ref} className={styles.scene3MidText}>
-            NO SHORTCUTS.
+            NOTHING WAS PERFECT.
           </div>
 
           <div ref={scene3Mid2Ref} className={styles.scene3MidText}>
-            ONLY BREAKTHROUGHS.
+            EVERYTHING WAS EARNED.
           </div>
 
           <div ref={memoryStripRef} className={styles.memoryStripContainer} aria-hidden="true">
