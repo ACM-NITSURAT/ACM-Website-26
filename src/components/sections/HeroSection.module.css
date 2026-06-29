@@ -1766,3 +1766,26 @@
     font-size: 8px;
   }
 }
+
+/* ============================================================
+   TOUCH DEVICES — GPU PERFORMANCE REDUCTION
+   Disable the heaviest animated effects on mobile GPUs.
+   ============================================================ */
+@media (hover: none) and (pointer: coarse) {
+  /* Disable CSS dust mote animations — 14 concurrent infinite keyframes */
+  .dustMote {
+    animation: none !important;
+    opacity: 0 !important;
+  }
+
+  /* Reduce CTA button backdrop-filter */
+  .exploreBtn {
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+
+  /* Simplify lightning arc filters */
+  .lightningArc {
+    filter: none;
+  }
+}

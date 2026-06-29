@@ -307,10 +307,16 @@ function applyBeat(
 }
 
 function lockBody() {
+  // Cross-platform scroll lock: works on both iOS Safari and Android Chrome.
+  // Avoids position:fixed which breaks iOS Safari momentum scrolling.
+  const scrollY = window.scrollY;
+  document.documentElement.style.overflow = 'hidden';
   document.body.style.overflow = 'hidden';
-  document.body.style.position = 'fixed';
-  document.body.style.width = '100%';
-  document.body.style.top = '0';
+  document.body.style.touchAction = 'none';
+  // Android Chrome: prevent pull-to-refresh during custom scroll handling
+  document.body.style.overscrollBehavior = 'none';
+  // Store scroll position so we can restore it on unlock
+  document.body.dataset.scrollLockY = String(scrollY);
 }
 
 function toggleDwellClass(
@@ -325,10 +331,13 @@ function toggleDwellClass(
 }
 
 function unlockBody() {
+  const scrollY = Number(document.body.dataset.scrollLockY || '0');
+  document.documentElement.style.overflow = '';
   document.body.style.overflow = '';
-  document.body.style.position = '';
-  document.body.style.width = '';
-  document.body.style.top = '';
+  document.body.style.touchAction = '';
+  document.body.style.overscrollBehavior = '';
+  delete document.body.dataset.scrollLockY;
+  window.scrollTo(0, scrollY);
 }
 
 /* P6: Color temperature stops — each is [r, g, b] keyed to progress ranges.
@@ -581,15 +590,20 @@ export default function WalkThroughReel({ isVisible, onBack }: WalkThroughReelPr
 
     const handleTouchMove = (e: TouchEvent) => {
       e.preventDefault();
+      const currentY = e.touches[0].clientY;
+      const delta = touchStartY - currentY;
+
+      // Dead-zone: ignore sub-pixel jitter from touch sensors
+      if (Math.abs(delta) < 2) return;
+
       const prev = scrollAccumulator.current;
-      const delta = touchStartY - e.touches[0].clientY;
       /* P5: Same reverse resistance for touch */
       const resistance = directionRef.current === 'up' ? 0.85 : 1.0;
       scrollAccumulator.current = Math.max(
         0,
         Math.min(SCROLL_RANGE, scrollAccumulator.current + delta * TOUCH_SCALE * resistance)
       );
-      touchStartY = e.touches[0].clientY;
+      touchStartY = currentY;
       if (scrollAccumulator.current > prev) directionRef.current = 'down';
       else if (scrollAccumulator.current < prev) directionRef.current = 'up';
     };
@@ -1298,7 +1312,7 @@ export default function WalkThroughReel({ isVisible, onBack }: WalkThroughReelPr
     rafIdRef.current = requestAnimationFrame(tick);
 
     window.addEventListener('wheel', handleWheel, { passive: false });
-    window.addEventListener('touchstart', handleTouchStart, { passive: false });
+    window.addEventListener('touchstart', handleTouchStart, { passive: true });
     window.addEventListener('touchmove', handleTouchMove, { passive: false });
 
     return () => {

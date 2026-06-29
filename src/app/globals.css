@@ -68,6 +68,14 @@ body.is-loading {
   /* On top of everything */
 }
 
+/* Touch devices: disable film grain — the fixed position + mix-blend-mode: overlay
+   forces the mobile GPU to re-composite every pixel on every scroll frame */
+@media (hover: none) and (pointer: coarse) {
+  .cinemaGrainOverlay {
+    display: none;
+  }
+}
+
 /* Animated checkmark — stroke draws in from 0 to full length */
 @keyframes stroke-draw {
   from { stroke-dashoffset: 24; }
