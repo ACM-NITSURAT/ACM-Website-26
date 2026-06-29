@@ -4,10 +4,9 @@
   left: 0;
   width: 100%;
   height: 100vh;
-  /* Android Chrome: 100vh includes the address bar area. 100dvh accounts
-     for the dynamic address bar height, preventing content from being
-     hidden behind it. Browsers that don't support dvh ignore this line. */
-  height: 100dvh;
+  /* Android Chrome/iOS Safari: 100dvh causes layout jumps on scroll as the URL bar hides.
+     100svh ensures a stable fixed height based on the smallest viewport. */
+  height: 100svh;
   z-index: 50;
   opacity: 0;
   pointer-events: none;
@@ -2407,7 +2406,7 @@
   top: 0;
   left: 0;
   width: 100vw;
-  height: 100vh;
+  height: 100svh;
   will-change: transform;
 }
 
