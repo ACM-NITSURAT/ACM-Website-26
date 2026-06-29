@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
-import { verifyIdToken } from '@/lib/firebase-admin/auth';
+import { verifyIdToken, syncUser } from '@/lib/firebase-admin/auth';
 import adminDb from '@/lib/firebase-admin/firestore';
+import { isValidSvnitEmail, SVNIT_EMAIL_ERROR } from '@/lib/validators/email';
 import type { User } from '@/schema/user';
 
 const COOKIE = 'onboarding_complete';
@@ -29,12 +30,20 @@ export async function POST(request: Request) {
     }
 
     const token = await verifyIdToken(idToken);
-    const { uid } = token;
+    const { uid, email } = token;
+
+    const devMode = process.env.DEV_MODE === 'true';
+    if (!isValidSvnitEmail(email ?? '', devMode)) {
+      return NextResponse.json({ error: SVNIT_EMAIL_ERROR }, { status: 403 });
+    }
 
     const validGenders: User['gender'][] = ['male', 'female', 'other'];
     if (!validGenders.includes(gender)) {
       return NextResponse.json({ error: 'Invalid gender value' }, { status: 400 });
     }
+
+    // Ensure the user doc exists in Firestore before updating it
+    await syncUser(token);
 
     await adminDb.doc(`users/${uid}`).update({
       firstName:             firstName.trim(),
@@ -51,3 +60,4 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 }
+

@@ -35,7 +35,15 @@ export default function OnboardingPage() {
         if (data?.isOnboardingCompleted) {
           // Firestore says done — heal the cookie and redirect
           setAlreadyComplete(true);
-          fetch('/api/onboarding/heal', { method: 'POST' })
+          auth.currentUser?.getIdToken()
+            .then((idToken) => {
+              if (!idToken) return;
+              return fetch('/api/onboarding/heal', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ idToken }),
+              });
+            })
             .catch(() => {/* non-critical */})
             .finally(() => router.replace('/'));
         } else {
