@@ -14,7 +14,8 @@ ACM SVNIT — `acm-nit-surat` project.
 ```
 /users/{userId}
 /events/{eventId}
-    └── /participants/{participantId}
+    ├── /participants/{participantId}
+    └── /form/config
 /dict/executives
 ```
 
@@ -24,7 +25,7 @@ ACM SVNIT — `acm-nit-surat` project.
 
 **File:** `src/schema/user.ts`
 
-The document ID is the Firebase Auth UID of the account owner.
+Document ID = Firebase Auth UID.
 
 | Field | Type | Notes |
 |---|---|---|
@@ -32,23 +33,16 @@ The document ID is the Firebase Auth UID of the account owner.
 | `firstName` | `string` | |
 | `lastName` | `string` | |
 | `email` | `string` | |
-| `rollNumber` | `string` | Institutional roll number, e.g. `"22CE001"` |
+| `rollNumber` | `string` | Everything before `@` in the email |
 | `gender` | `'male' \| 'female' \| 'other'` | |
 | `profileImageUrl` | `string` | Public download URL |
-| `role` | `'member' \| 'executive' \| 'core' \| 'adviser'` | ACM SVNIT organisational role |
-| `isSuperAdmin` | `boolean` | Unrestricted platform access. Defaults to `false` |
-| `registrationTimestamp` | `Timestamp` | UTC time of account creation |
+| `role` | `'member' \| 'executive' \| 'core' \| 'adviser'` | |
+| `position` | `CorePosition \| null` | Non-null only when `role === 'core'` |
+| `isOnboardingCompleted` | `boolean` | Defaults `false`; set `true` after onboarding form |
+| `isSuperAdmin` | `boolean` | Defaults `false` |
+| `registrationTimestamp` | `Timestamp` | |
 
-### Role hierarchy
-
-```
-adviser  ──┐
-core     ──┤  (privileged — set manually in Firestore only)
-executive ─┤  (set automatically via /dict/executives)
-member   ──┘  (default for all new accounts)
-```
-
-`isSuperAdmin` is orthogonal to `role` — a member could technically be a super-admin, though in practice it is only set on core/adviser accounts.
+`CorePosition` values: `Chairperson`, `Vice Chairperson`, `Secretary`, `Developer`, `Community Head`, `Designer`, `Treasurer`, `Social Media Manager`, `Core Member`.
 
 ---
 
@@ -56,66 +50,64 @@ member   ──┘  (default for all new accounts)
 
 **File:** `src/schema/event.ts`
 
-The document ID is either a human-readable slug (e.g. `"hackathon-2025"`) or a Firestore auto-ID.
+Document ID = Firestore auto-generated hash (never changes). `slug` is the human-readable public identifier.
 
 ### Core fields
 
 | Field | Type | Notes |
 |---|---|---|
-| `id` | `string` | Document ID |
-| `eventName` | `string` | Display name |
-| `eventDescription` | `string` | Full description / body copy |
-| `status` | `'upcoming' \| 'ongoing' \| 'finished'` | Lifecycle state |
-| `eventThumbnail` | `string` | Public URL for cover image |
-| `type` | `'event' \| 'workshop' \| 'meet'` | Format classification |
-| `location` | `string` | e.g. `"Online"`, `"Computer Dept. Seminar Hall"` |
-| `tags` | `string[]` | Topic tags, e.g. `["AI", "Web3", "CP"]` |
+| `id` | `string` | Firestore doc ID |
+| `slug` | `string` | URL identifier used in event links. Unique, admin-editable |
+| `eventName` | `string` | |
+| `eventDescription` | `string` | |
+| `status` | `'upcoming' \| 'ongoing' \| 'finished'` | |
+| `eventThumbnail` | `string` | Public URL. Falls back to `/event-placeholder.jpg` |
+| `type` | `'event' \| 'workshop' \| 'meet'` | |
+| `location` | `string` | |
+| `tags` | `string[]` | |
 | `isOpenToAll` | `boolean` | `true` → non-ACM members may register |
-| `unregisteredForm` | `boolean` | `true` → anonymous participation via external form |
-| `maxParticipants` | `number` | Hard registration cap |
-| `startDate` | `Timestamp` | UTC event start |
-| `endDate` | `Timestamp` | UTC event end |
-| `creationDate` | `Timestamp` | UTC document creation time |
-| `totalParticipants` | `number` | Denormalised running count (increment on each registration) |
+| `unregisteredForm` | `boolean` | `true` → anonymous participation, no Firebase auth needed |
+| `isFormOpen` | `boolean` | Registration form gate. Defaults `false`; admin must open explicitly |
+| `hasForm` | `boolean` | `true` once a form is saved via the form builder. `isFormOpen` toggle hidden until `true` |
+| `maxParticipants` | `number` | `0` = unlimited |
+| `startDate` | `Timestamp` | |
+| `endDate` | `Timestamp` | |
+| `creationDate` | `Timestamp` | Server-set on creation |
+| `totalParticipants` | `number` | Denormalised counter, incremented via transaction |
 
 ### Team configuration
 
-These fields are only meaningful when `isTeamEvent === true`. When `false`, set `totalTeams`, `minTeamMembers`, `maxTeamMembers` to `0`.
-
 | Field | Type | Notes |
 |---|---|---|
-| `isTeamEvent` | `boolean` | `true` → participants register as teams |
-| `totalTeams` | `number` | Denormalised running count of registered teams |
-| `minTeamMembers` | `number` | Minimum members to form a valid team |
-| `maxTeamMembers` | `number` | Maximum members allowed per team |
+| `isTeamEvent` | `boolean` | `true` → team-based registration |
+| `totalTeams` | `number` | Denormalised team count |
+| `minTeamMembers` | `number` | |
+| `maxTeamMembers` | `number` | |
 
 ### Diversity constraints
 
 | Field | Type | Notes |
 |---|---|---|
-| `isFemaleMandatory` | `boolean` | `true` → at least one female member required |
-| `minFemaleRequired` | `number` | Minimum female participants per team/registration |
-
-> When `isFemaleMandatory === false`, `minFemaleRequired` should be `0` but is not enforced at the schema level — enforce in application logic or Security Rules.
+| `isFemaleMandatory` | `boolean` | At least `minFemaleRequired` female members required |
+| `minFemaleRequired` | `number` | |
 
 ### Prize configuration
 
 | Field | Type | Notes |
 |---|---|---|
-| `prizeMoney` | `number` | Total prize pool in INR (₹). Set to `0` if no prize money |
-| `prizeMoneyDistribution` | `PrizeMoneyDistribution` | Breakdown across top three positions |
+| `prizeMoney` | `number` | Total pool in INR. `0` = no prize |
+| `prizeMoneyDistribution` | `PrizeMoneyDistribution` | `{ firstPrize, secondPrize, thirdPrize }` in INR |
 
-#### `PrizeMoneyDistribution` shape
+### `isFormOpen` behaviour
 
-| TS key | Firestore key | Type | Notes |
-|---|---|---|---|
-| `firstPrize` | `first-prize` | `number` | INR value for 1st place. `0` if unused |
-| `secondPrize` | `second-prize` | `number` | INR value for 2nd place. `0` if unused |
-| `thirdPrize` | `third-prize` | `number` | INR value for 3rd place. `0` if unused |
+- Defaults `false` on event creation.
+- Admin toggles it from the event detail page.
+- The registration API (`POST /api/event/[slug]/form`) returns 403 when `false`.
+- Orthogonal to `status` — an `upcoming` event can have the form open, a `finished` event cannot accept registrations regardless.
 
-> **Key naming:** Firestore stores these with hyphens (`first-prize`). The TypeScript interface uses camelCase because hyphens are not valid in identifier names. When writing raw Firestore data use the hyphenated keys; the typed SDK handles this transparently via the field mapping.
+### Inconsistent state warning
 
-All three keys are always present in the document. For events with no prize money, set `prizeMoney: 0` and all three distribution values to `0`.
+`isOpenToAll=false` + `unregisteredForm=true` is a logically invalid combination (role cannot be verified without auth). The registration API rejects submissions for this combination with 409.
 
 ---
 
@@ -123,136 +115,101 @@ All three keys are always present in the document. For events with no prize mone
 
 **File:** `src/schema/participant.ts`
 
-This subcollection is **polymorphic** — a single document can represent either an individual registration or a full team. The `isTeam` boolean is the discriminant used to narrow the TypeScript type.
+All registrations share a single flat shape. `isTeam` indicates team vs individual (for display), but no typed identity fields exist at the top level — everything beyond submitter identity goes into `extraFields`.
 
-```
-Participant  (union type)
-  ├── IndividualParticipant  (isTeam: false)
-  └── TeamParticipant        (isTeam: true)
-```
-
-### Common base fields (both variants)
+### Fields
 
 | Field | Type | Notes |
 |---|---|---|
-| `id` | `string` | Document ID |
-| `attended` | `boolean` | Physical check-in / attendance status |
-| `registrationTimestamp` | `Timestamp` | UTC time of registration |
-| `isTeam` | `boolean` | Discriminant — determines the document shape |
-| `extraFields` | `Record<string, unknown>` | Catch-all for dynamic fields from custom web forms |
+| `id` | `string` | Firestore doc ID |
+| `isTeam` | `boolean` | `true` for team events |
+| `submitter` | `SubmitterInfo \| null` | `null` when `unregisteredForm=true` |
+| `attended` | `boolean` | Physical check-in |
+| `registrationTimestamp` | `Timestamp` | |
+| `extraFields` | `Record<string, unknown>` | All form responses, keyed by `FormField.id` |
 
-### `IndividualParticipant` — when `isTeam === false`
+### `SubmitterInfo`
+
+Denormalised from `/users/{uid}` at registration time. Present only when `unregisteredForm=false`.
+
+| Field | Type |
+|---|---|
+| `userId` | `string` |
+| `name` | `string` |
+| `rollNumber` | `string` |
+
+### `extraFields`
+
+Contains every response the user submitted — both custom form fields (keyed by UUID) and default identity fields when `includeDefaultFields=true` on the form config (e.g. firstName, rollNumber, teamName, members array).
+
+---
+
+## 4. `/events/{eventId}/form/config`
+
+**File:** `src/schema/form.ts`
+
+Single document per event. Doc ID always `"config"`.
 
 | Field | Type | Notes |
 |---|---|---|
-| `userId` | `string \| null` | Firebase Auth UID, or `null` for anonymous submissions |
-| `firstName` | `string` | |
-| `lastName` | `string` | |
-| `rollNumber` | `string` | |
+| `eventId` | `string` | Parent event's Firestore doc ID |
+| `title` | `string` | Form heading (TipTap HTML) |
+| `description` | `string` | Subtitle (TipTap HTML) |
+| `includeDefaultFields` | `boolean` | When `true`, default identity fields (name, roll, gender / team info) are shown on the registration page and included in submissions. Defaults `false`. |
+| `fields` | `FormField[]` | Ordered list. Min 1 non-paragraph field, max `FORM_MAX_FIELDS` (50) |
+| `afterScreen` | `AfterScreen \| null` | Confirmation screen after submission |
+| `createdAt` | `Timestamp` | Set on first save |
+| `updatedAt` | `Timestamp` | Updated on every save |
 
-`userId` is `null` when the parent event has `unregisteredForm: true` and the person did not sign in.
+### `FormField` union (discriminated on `type`)
 
-### `TeamParticipant` — when `isTeam === true`
+| `type` | Extra fields | Notes |
+|---|---|---|
+| `text` | — | Short text |
+| `email` | — | Email format validated |
+| `mobile` | — | 10-digit Indian number |
+| `rollNumber` | — | `U24CS089` format |
+| `url` | — | `http(s)://` required |
+| `dropdown` | `options: string[]` | Single select |
+| `checkbox` | `options: string[]` | Multi-select |
+| `paragraph` | `content: string` | Display-only rich text (TipTap HTML). Not collected in `extraFields`. |
+
+All input fields share: `id` (stable UUID), `label`, `required: boolean`, `order: number`.
+
+### `AfterScreen`
+
+| Field | Type |
+|---|---|
+| `heading` | `string` |
+| `body` | `string` (TipTap HTML) |
+
+### `includeDefaultFields` behaviour
+
+- `false` (default) — form shows only admin-defined fields. The system only stores `submitter` identity (from auth token) plus `extraFields`. No identity fields are required or validated in the request body.
+- `true` — the registration page prepends built-in fields (individual: first name, last name, roll number, gender; team: team name, leader info, members). These are validated and stored inside `extraFields` using their form field UUIDs.
+
+---
+
+## 5. `/dict/executives`
+
+**File:** `src/schema/dict.ts`
 
 | Field | Type | Notes |
 |---|---|---|
-| `teamName` | `string` | |
-| `teamSize` | `number` | Actual member count at registration time |
-| `leaderId` | `string \| null` | Auth UID of the leader, or `null` for anonymous |
-| `leaderName` | `string` | |
-| `leaderRollNumber` | `string` | |
-| `members` | `TeamMember[]` | All team members including the leader |
+| `emails` | `string[]` | Lowercase emails that receive `role: 'executive'` on sign-in |
 
-#### `TeamMember` shape
+Role is re-evaluated on every sign-in. See `docs/authorization.md`.
 
-| Field | Type | Notes |
-|---|---|---|
-| `userId` | `string \| null` | Auth UID or `null` for anonymous |
-| `name` | `string` | Full display name |
-| `rollNumber` | `string` | |
-| `gender` | `'male' \| 'female' \| 'other'` | Used for diversity constraint validation |
+- **Anonymous submissions** — `submitter` is `null` only when `unregisteredForm=true`. No identity is stored or required.
+- **`extraFields`** — keyed by `FormField.id` (UUID). Contains all form responses plus any default-field data when `includeDefaultFields=true`. Orphaned keys from deleted fields are ignored.
 
-### Narrowing the union in code
-
-```ts
-import type { Participant } from '@/schema';
-
-function handle(p: Participant) {
-  if (p.isTeam) {
-    // p is TeamParticipant — p.members, p.teamName, etc. are available
-    console.log(p.teamName, p.members.length);
-  } else {
-    // p is IndividualParticipant — p.firstName, p.userId, etc. are available
-    console.log(p.firstName, p.userId);
-  }
-}
-```
 
 ---
 
 ## Design notes
 
-### Denormalised counters
-`totalParticipants` and `totalTeams` on the `Event` document are written at registration time to avoid expensive `COUNT` queries on the subcollection. Use a Firestore `increment()` transaction when writing a new participant document.
-
-```ts
-import { increment, runTransaction, doc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-
-await runTransaction(db, async (tx) => {
-  const eventRef = doc(db, 'events', eventId);
-  tx.set(participantRef, participantData);
-  tx.update(eventRef, { totalParticipants: increment(1) });
-});
-```
-
-### Anonymous participants
-Both `IndividualParticipant.userId` and `TeamParticipant.leaderId` / `TeamMember.userId` are typed as `string | null`. `null` is only valid when the parent event has `unregisteredForm: true`. Enforce this constraint in your registration logic, not the schema.
-
-### `extraFields`
-Typed as `Record<string, unknown>` (not `any`). Always narrow before use:
-
-```ts
-const value = participant.extraFields['tShirtSize'];
-if (typeof value === 'string') {
-  // safe to use value as string
-}
-```
-
-### Timestamp import
-All schema files import `Timestamp` from `src/schema/firestore.ts`, which re-exports it from `firebase/firestore`. This keeps the import path stable across the codebase.
-
-```ts
-import { Timestamp } from 'firebase/firestore';
-
-// Creating a timestamp
-const now = Timestamp.now();
-const fromDate = Timestamp.fromDate(new Date('2025-09-01'));
-```
-
----
-
-## 4. `/dict/executives`
-
-**File:** `src/schema/dict.ts`
-
-A single-document collection used as a server-side email allowlist for automatic role assignment.
-
-Path: `/dict/executives` (document ID is always `"executives"`)
-
-| Field | Type | Notes |
-|---|---|---|
-| `emails` | `string[]` | Lowercase email addresses that receive `role: 'executive'` on sign-in |
-
-### How role assignment works
-
-| Condition | Assigned role |
-|---|---|
-| Existing role is `'core'` or `'adviser'` | Kept as-is — never overwritten automatically |
-| Email is in `/dict/executives` | `'executive'` |
-| Neither of the above | `'member'` (default for all new accounts) |
-
-- `'core'` and `'adviser'` must be set **manually** in Firestore. There is no interface or automated path for these roles.
-- Role is re-evaluated on **every sign-in**, so adding or removing an email from the dict takes effect on the user's next login.
-- See `docs/auth.md` for the server-side implementation (`syncUser`, `verifyIdToken`).
-
+- **Denormalised counters** — `totalParticipants` and `totalTeams` are incremented inside a Firestore transaction to prevent race conditions.
+- **Thumbnail** — `1280×720` (16:9). Defined in `src/config/index.ts`.
+- **Roll number format** — `[A-Za-z]\d{2}[A-Za-z]{2}\d{3}` (e.g. `U24CS089`). Validator: `src/lib/validators/rollNumber.ts`. Shared isomorphic validation: `src/lib/validators/form-fields.ts`.
+- **Public routes** — `/events` and `/events/*` are publicly accessible without auth. See `src/config/routes.ts`.
+- **Toggle constraint** — `isOpenToAll=false` + `unregisteredForm=true` is invalid. The event form builder enforces this automatically (turning on `unregisteredForm` also forces `isOpenToAll=true`).
