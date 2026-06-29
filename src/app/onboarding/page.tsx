@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth, logout, auth } from '@/lib/firebase';
+import { doc, getDoc } from 'firebase/firestore';
+import { useAuth, logout, auth, db } from '@/lib/firebase';
 import type { User } from '@/schema/user';
 
 type Gender = User['gender'];
@@ -16,11 +17,36 @@ export default function OnboardingPage() {
   const [gender, setGender] = useState<Gender | ''>('');
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  // null = still checking, false = show form, true = already done (healing)
+  const [alreadyComplete, setAlreadyComplete] = useState<boolean | null>(null);
 
   // Redirect unauthenticated users to login
   useEffect(() => {
     if (!loading && !user) router.replace('/login');
   }, [user, loading, router]);
+
+  // Secondary check: cookie was missing/false but Firestore may say otherwise
+  useEffect(() => {
+    if (!user) return;
+
+    getDoc(doc(db, 'users', user.uid))
+      .then((snap) => {
+        const data = snap.data() as Partial<User> | undefined;
+        if (data?.isOnboardingCompleted) {
+          // Firestore says done — heal the cookie and redirect
+          setAlreadyComplete(true);
+          fetch('/api/onboarding/heal', { method: 'POST' })
+            .catch(() => {/* non-critical */})
+            .finally(() => router.replace('/'));
+        } else {
+          setAlreadyComplete(false);
+        }
+      })
+      .catch(() => {
+        // Firestore unreachable — fall back to showing the form
+        setAlreadyComplete(false);
+      });
+  }, [user, router]);
 
   // Pre-fill from OAuth display name if available
   useEffect(() => {
@@ -30,7 +56,7 @@ export default function OnboardingPage() {
     if (parts.slice(1).join(' ')) setLastName(parts.slice(1).join(' '));
   }, [user]);
 
-  if (loading || !user) {
+  if (loading || !user || alreadyComplete === null) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-zinc-950">
         <span className="text-zinc-500 text-sm">Loading…</span>
