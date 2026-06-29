@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Space_Grotesk, Inter, Caveat } from "next/font/google";
+import localFont from "next/font/local";
 import Navbar from "@/components/navigation/Navbar";
 import "./globals.css";
 
@@ -24,6 +25,16 @@ const inter = Inter({
   subsets: ["latin"],
 });
 
+const crampsFont = localFont({
+  src: "../../public/CrampsRegular-OV7od.ttf",
+  variable: "--font-cramps",
+});
+
+const progressFont = localFont({
+  src: "../../public/ProgressPersonalUse-EaJdz.ttf",
+  variable: "--font-progress",
+});
+
 const caveat = Caveat({
   variable: "--font-handwritten",
   subsets: ["latin"],
@@ -43,7 +54,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${spaceGrotesk.variable} ${inter.variable} ${caveat.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${spaceGrotesk.variable} ${inter.variable} ${caveat.variable} ${crampsFont.variable} ${progressFont.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col relative">
         <div className="cinemaGrainOverlay" aria-hidden="true" />

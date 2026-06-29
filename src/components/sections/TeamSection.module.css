@@ -1,0 +1,816 @@
+/* ============================================================
+   TEAM SECTION — "The Light Table & Viewfinder"
+   
+   Zero-CPU animated background representing a photographer's 
+   illuminated light table. Cards act as cinematic viewfinders
+   with a focus-pull reveal effect on scroll.
+   ============================================================ */
+
+/* ============================================================
+   SECTION ROOT
+   ============================================================ */
+.teamSection {
+  position: relative;
+  width: 100%;
+  background-color: #07060a;
+  padding: 120px 80px 80px;
+  overflow: hidden;
+}
+
+.contentWrap {
+  max-width: 1400px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+
+/* ============================================================
+   BACKGROUND ATMOSPHERE: EXTENDED FROM ABOUT SECTION
+   ============================================================ */
+.bgAtmosphere {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Faint technical blueprint grid */
+.bgGrid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(37, 99, 235, 0.15) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(37, 99, 235, 0.15) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse 90% 80% at 50% 50%, black 40%, transparent 90%);
+}
+
+/* Drifting glow blobs */
+.bgGlow1,
+.bgGlow2 {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.bgGlow1 {
+  width: 600px;
+  height: 600px;
+  top: 8%;
+  left: -5%;
+  animation: driftSlow1 25s ease-in-out infinite alternate;
+}
+
+.bgGlow2 {
+  width: 500px;
+  height: 500px;
+  bottom: 12%;
+  right: -6%;
+  animation: driftSlow2 35s ease-in-out infinite alternate;
+}
+
+@keyframes driftSlow1 {
+  0% {
+    transform: translate(0, 0);
+  }
+
+  100% {
+    transform: translate(60px, 40px);
+  }
+}
+
+@keyframes driftSlow2 {
+  0% {
+    transform: translate(0, 0);
+  }
+
+  100% {
+    transform: translate(-40px, -60px);
+  }
+}
+
+/* ============================================================
+   TITLE BLOCK
+   ============================================================ */
+.titleBlock {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  padding-bottom: 80px;
+  position: relative;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.titleText {
+  text-align: left;
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  /* Forces children like eyebrow to left-align */
+}
+
+.eyebrow {
+  font-family: var(--font-geist-mono), 'Courier New', monospace;
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: rgba(37, 99, 235, 0.7);
+  margin: 0 0 20px;
+  text-align: left;
+}
+
+.heading {
+  font-family: var(--font-cramps), 'Monument Extended', var(--font-display), 'Space Grotesk', sans-serif;
+  font-size: clamp(50px, 11vw, 200px);
+  font-weight: 400;
+  /* Cramps Regular */
+  letter-spacing: 0.02em;
+  /* Added slight tracking for custom fonts */
+  text-transform: uppercase;
+  margin: 0 0 20px;
+  line-height: 0.9;
+  text-align: left;
+
+  color: #f8fafc;
+  /* Clean, light slate-white */
+}
+
+
+
+/* Entrance animation */
+.titleBlockHidden .eyebrow,
+.titleBlockHidden .heading {
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+.titleBlockVisible .eyebrow {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 600ms ease-out, transform 600ms ease-out;
+}
+
+.titleBlockVisible .heading {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 600ms ease-out 150ms, transform 600ms ease-out 150ms;
+}
+
+/* --- Title Clapperboard --- */
+.clapperboardWrap {
+  position: relative;
+  flex: 0 0 auto;
+  opacity: 0;
+  margin-top: 30px;
+  /* Visually lowers the clapperboard to balance with the text */
+  transform: translateY(20px) rotate(8deg) scale(0.95);
+  transition: opacity 800ms ease-out 300ms, transform 1s cubic-bezier(0.16, 1, 0.3, 1) 300ms;
+  pointer-events: auto;
+  /* Required for hover clapping interaction */
+  z-index: 10;
+}
+
+.clapperboardVisible {
+  opacity: 1;
+  transform: translateY(0) rotate(12deg) scale(1);
+}
+
+/* ============================================================
+   STAGGERED GRID LAYOUT
+   ============================================================ */
+.viewfinderGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+  /* Tighter layout for cohesive roster */
+  padding-bottom: 80px;
+  /* Extra padding for staggered child */
+  max-width: 1000px;
+  margin: 0 auto;
+  align-items: start;
+  /* Prevents stretching and aspect-ratio squishing */
+}
+
+/* Stagger the middle column for an organic cinematic feel without shrinking it */
+.viewfinderGrid> :nth-child(3n+2) {
+  margin-top: 80px;
+}
+
+/* ============================================================
+   PREMIUM GLASS ENCLOSURE
+   ============================================================ */
+.viewfinderCard {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  cursor: default;
+  isolation: isolate;
+  transform: translateZ(0);
+  transition: transform 600ms cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 4px;
+}
+
+.viewfinderCard:hover, .viewfinderCard.cardFocused {
+  transform: translateY(-8px) scale(1.02);
+  z-index: 10;
+}
+
+.glassContainer {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(20, 25, 45, 0.6) 0%, rgba(5, 10, 20, 0.8) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-top: 1px solid rgba(255, 255, 255, 0.25);
+  border-left: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  overflow: hidden;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: all 500ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.viewfinderCard:hover .glassContainer, .viewfinderCard.cardFocused .glassContainer {
+  border-color: rgba(56, 189, 248, 0.8);
+  border-top-color: rgba(56, 189, 248, 1);
+  box-shadow:
+    0 30px 60px rgba(0, 0, 0, 0.9),
+    0 0 40px rgba(56, 189, 248, 0.4),
+    inset 0 0 30px rgba(56, 189, 248, 0.2);
+}
+
+/* --- Scanning Laser Animation --- */
+.scanline {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(56, 189, 248, 0.6) 50%,
+      transparent 100%);
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+  z-index: 20;
+  opacity: 0.6;
+  animation: scan 6s linear infinite;
+}
+
+@keyframes scan {
+  0% {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+
+  10% {
+    opacity: 0.8;
+  }
+
+  90% {
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: translateY(110%);
+    opacity: 0;
+  }
+}
+
+/* --- Photo & Ken Burns Pan --- */
+.cardPhotoWrap {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  /* Thick bezel inside the glass */
+  margin: 6px;
+  border-radius: 4px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5);
+  /* Inner lip */
+}
+
+.cardPhoto {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  transform: scale(1.05);
+  transition: filter 600ms ease, transform 600ms cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: filter, transform;
+}
+
+@keyframes hoverPan {
+  0% {
+    transform: scale(1.05) translate(0, 0);
+  }
+
+  100% {
+    transform: scale(1.2) translate(-2%, 2%);
+  }
+}
+
+/* Cinematic Duotone for Resting State */
+.photoOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(0deg, rgba(8, 12, 30, 0.8) 0%, rgba(14, 25, 60, 0.4) 100%);
+  mix-blend-mode: multiply;
+  transition: opacity 600ms ease;
+  z-index: 2;
+}
+
+.cardPhotoWrap::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  /* Deep cyan/blue tint */
+  background: rgba(37, 99, 235, 0.15);
+  mix-blend-mode: color;
+  transition: opacity 600ms ease;
+  z-index: 3;
+}
+
+/* Hover: Resolve to full color */
+.viewfinderCard:hover .cardPhotoWrap::after, .viewfinderCard.cardFocused .cardPhotoWrap::after,
+.viewfinderCard:hover .photoOverlay, .viewfinderCard.cardFocused .photoOverlay {
+  opacity: 0;
+}
+
+.viewfinderCard:hover .cardPhoto, .viewfinderCard.cardFocused .cardPhoto {
+  /* Keep original brightness */
+  filter: none;
+  /* Triggers a continuous, ultra-slow zoom and pan only while hovered */
+  animation: hoverPan 15s linear forwards;
+}
+
+/* --- Focus Pull Entrance Animation --- */
+/* Replaced filter: blur(20px→0) with opacity + scale — same fix as loader transition.
+   Animating filter: blur() forces GPU re-rasterization of the photo every frame. */
+.cardHidden .cardPhotoWrap {
+  opacity: 0;
+  transform: scale(1.08) translateY(20px);
+}
+
+.cardVisible .cardPhotoWrap {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  transition: opacity 800ms ease-out, transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* --- Viewfinder Markings --- */
+.viewfinderMarkings {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 400ms ease;
+}
+
+.viewfinderCard:hover .viewfinderMarkings, .viewfinderCard.cardFocused .viewfinderMarkings {
+  opacity: 1;
+}
+
+/* Rule of Thirds Lines */
+.viewfinderMarkings::before,
+.viewfinderMarkings::after {
+  content: '';
+  position: absolute;
+  background: rgba(37, 99, 235, 0.8);
+}
+
+/* Horizontal thirds */
+.viewfinderMarkings::before {
+  top: 33.33%;
+  bottom: 33.33%;
+  left: 0;
+  right: 0;
+  background: transparent;
+  border-top: 1px dashed rgba(37, 99, 235, 0.4);
+  border-bottom: 1px dashed rgba(37, 99, 235, 0.4);
+}
+
+/* Vertical thirds */
+.viewfinderMarkings::after {
+  left: 33.33%;
+  right: 33.33%;
+  top: 0;
+  bottom: 0;
+  background: transparent;
+  border-left: 1px dashed rgba(37, 99, 235, 0.4);
+  border-right: 1px dashed rgba(37, 99, 235, 0.4);
+}
+
+/* Corner Crop Marks */
+.cropMark {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(56, 189, 248, 0.8);
+  transition: transform 500ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cropMark.tl {
+  top: 16px;
+  left: 16px;
+  border-right: none;
+  border-bottom: none;
+  transform: translate(-10px, -10px);
+}
+
+.cropMark.tr {
+  top: 16px;
+  right: 16px;
+  border-left: none;
+  border-bottom: none;
+  transform: translate(10px, -10px);
+}
+
+.cropMark.bl {
+  bottom: 16px;
+  left: 16px;
+  border-right: none;
+  border-top: none;
+  transform: translate(-10px, 10px);
+}
+
+.cropMark.br {
+  bottom: 16px;
+  right: 16px;
+  border-left: none;
+  border-top: none;
+  transform: translate(10px, 10px);
+}
+
+/* Snap inward on hover */
+.viewfinderCard:hover .cropMark.tl, .viewfinderCard.cardFocused .cropMark.tl,
+.viewfinderCard:hover .cropMark.tr, .viewfinderCard.cardFocused .cropMark.tr,
+.viewfinderCard:hover .cropMark.bl, .viewfinderCard.cardFocused .cropMark.bl,
+.viewfinderCard:hover .cropMark.br, .viewfinderCard.cardFocused .cropMark.br {
+  transform: translate(0, 0);
+}
+
+/* ============================================================
+   INTEGRATED METADATA UI
+   ============================================================ */
+.cardHeader {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  right: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 15;
+  opacity: 0;
+  transition: opacity 400ms ease;
+}
+
+.viewfinderCard:hover .cardHeader, .viewfinderCard.cardFocused .cardHeader {
+  opacity: 1;
+}
+
+.metaBadge {
+  font-family: var(--font-geist-mono), 'Courier New', monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 4px 8px;
+  border-radius: 2px;
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* REC dot */
+.recStatus {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-geist-mono), 'Courier New', monospace;
+  font-size: 10px;
+  font-weight: bold;
+  color: #ff3b30;
+  opacity: 0;
+  transition: opacity 300ms ease;
+}
+
+.recDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #ff3b30;
+  box-shadow: 0 0 8px rgba(255, 59, 48, 0.8);
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0;
+  }
+}
+
+.viewfinderCard:hover .recStatus, .viewfinderCard.cardFocused .recStatus {
+  opacity: 1;
+}
+
+/* --- Subject Info Panel --- */
+.subjectInfo {
+  position: absolute;
+  bottom: 6px;
+  left: 16px;
+  right: 16px;
+  z-index: 15;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  background: rgba(10, 15, 30, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  opacity: 0.8;
+  transition: opacity 500ms ease, background 500ms ease, border-color 500ms ease;
+}
+
+.viewfinderCard:hover .subjectInfo, .viewfinderCard.cardFocused .subjectInfo {
+  opacity: 1;
+  background: rgba(10, 15, 30, 0.85);
+  border-color: rgba(56, 189, 248, 0.4);
+}
+
+.subjectText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.subjectName {
+  font-family: var(--font-display), 'Space Grotesk', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #fff;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.subjectRole {
+  font-family: var(--font-geist-mono), 'Courier New', monospace;
+  font-size: 11px;
+  color: #38bdf8;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin: 0;
+}
+
+/* --- Social Shutter Reveal --- */
+.socialShutter {
+  display: flex;
+  gap: 12px;
+  pointer-events: auto;
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: opacity 400ms ease, max-height 400ms ease, margin-top 400ms ease;
+  z-index: 15;
+}
+
+.viewfinderCard:hover .socialShutter, .viewfinderCard.cardFocused .socialShutter {
+  opacity: 1;
+  max-height: 40px;
+  margin-top: 4px;
+}
+
+.socialIcon {
+  width: 16px;
+  height: 16px;
+  color: rgba(255, 255, 255, 0.6);
+  transition: all 300ms ease;
+  display: block;
+}
+
+.socialIcon:hover {
+  color: #3b82f6;
+  transform: scale(1.1);
+}
+
+/* ============================================================
+   CLOSING CTA
+   ============================================================ */
+.closingBlock {
+  padding: 60px 0 20px;
+  text-align: center;
+  position: relative;
+  z-index: 2;
+}
+
+.closingHeading {
+  font-family: var(--font-display), 'Space Grotesk', sans-serif;
+  font-style: italic;
+  font-size: clamp(32px, 5vw, 56px);
+  font-weight: 500;
+  color: #ffffff;
+  margin: 0 0 16px;
+}
+
+.closingSubline {
+  font-family: var(--font-body), 'Inter', sans-serif;
+  font-size: 16px;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0 auto 40px;
+  max-width: 480px;
+}
+
+.ctaButton {
+  display: inline-block;
+  padding: 16px 36px;
+  background: #2563eb;
+  color: #ffffff;
+  font-family: var(--font-display), 'Space Grotesk', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border-radius: 4px;
+  transition: all 300ms ease;
+}
+
+.ctaButton:hover {
+  background: #3b82f6;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(37, 99, 235, 0.3);
+}
+
+/* Entrance animation */
+.closingBlockHidden {
+  opacity: 0;
+  transform: scale(0.96);
+}
+
+.closingBlockVisible {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 700ms ease-out, transform 700ms ease-out;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 1024px) {
+  .viewfinderGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 40px;
+  }
+
+  /* Reset and apply new stagger */
+  .viewfinderGrid>* {
+    margin-top: 0 !important;
+  }
+
+  .viewfinderGrid> :nth-child(2n) {
+    margin-top: 80px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .teamSection {
+    padding: 80px 24px 60px;
+  }
+
+  .viewfinderGrid {
+    gap: 20px;
+  }
+
+  .viewfinderGrid> :nth-child(2n) {
+    margin-top: 40px !important;
+  }
+
+  .subjectName {
+    font-size: 16px;
+  }
+
+  .subjectRole {
+    font-size: 9px;
+  }
+
+  .metaText {
+    display: none;
+    /* Hide metadata on small screens to reduce clutter */
+  }
+}
+
+@media (max-width: 1024px) {
+  .clapperboardWrap {
+    transform: translateY(10px) rotate(4deg) scale(0.7);
+  }
+
+  .clapperboardVisible {
+    transform: translateY(0) rotate(8deg) scale(0.75);
+  }
+}
+
+@media (max-width: 768px) {
+  .titleBlock {
+    flex-direction: column-reverse;
+    gap: 20px;
+  }
+
+  .titleText {
+    text-align: center;
+  }
+
+  .clapperboardWrap {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .teamSection {
+    padding: 64px 16px 48px;
+  }
+
+  .clapperboardWrap {
+    transform: translateY(10px) rotate(4deg) scale(0.5);
+  }
+
+  .clapperboardVisible {
+    transform: translateY(0) rotate(8deg) scale(0.55);
+  }
+
+  .viewfinderGrid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  /* Reset the stagger effect completely for a flat 1-column list */
+  .viewfinderGrid > :nth-child(n) {
+    margin-top: 0 !important;
+  }
+
+  /* Split layout: Photo on left, Text on right */
+  .viewfinderCard {
+    aspect-ratio: 16 / 10;
+    height: auto;
+  }
+
+  .cardPhotoWrap {
+    left: 0;
+    right: 55%;
+    margin: 0;
+    border-radius: 0;
+    -webkit-mask-image: none;
+    mask-image: none;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .subjectInfo {
+    top: 0;
+    bottom: 0;
+    left: 45%;
+    right: 0;
+    padding: 16px;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background: transparent !important;
+    border: none !important;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .subjectText {
+    align-items: center;
+  }
+
+  /* Constrain the camera UI overlays to just the photo area (left 45%) on mobile */
+  .viewfinderMarkings {
+    right: 55%;
+  }
+
+  .cardHeader {
+    right: calc(55% + 16px);
+  }
+
+  /* Social shutter expands inline and is centered */
+  .socialShutter {
+    gap: 16px;
+    justify-content: center;
+  }
+}
+

@@ -4,6 +4,10 @@
   left: 0;
   width: 100%;
   height: 100vh;
+  /* Android Chrome: 100vh includes the address bar area. 100dvh accounts
+     for the dynamic address bar height, preventing content from being
+     hidden behind it. Browsers that don't support dvh ignore this line. */
+  height: 100dvh;
   z-index: 50;
   opacity: 0;
   pointer-events: none;
@@ -12,6 +16,12 @@
 .wrapper.visible {
   opacity: 1;
   pointer-events: auto;
+  /* Prevent browser compositor from handling touch gestures (pan/pinch)
+     simultaneously with our JS touchmove handler — eliminates stutter */
+  touch-action: none;
+  /* Android Chrome: prevent pull-to-refresh and edge overscroll bounce
+     from fighting with the custom touch scroll handler */
+  overscroll-behavior: none;
 }
 
 .sticky {
@@ -21,6 +31,8 @@
   overflow: hidden;
   background: #020104;
   will-change: background-color;
+  /* Prevent overscroll bounce on Android during custom scroll handling */
+  overscroll-behavior: contain;
 }
 
 /* ============================================================
@@ -598,11 +610,11 @@
 
   0%,
   100% {
-    filter: brightness(1);
+    opacity: 0.95;
   }
 
   50% {
-    filter: brightness(1.03);
+    opacity: 1;
   }
 }
 
@@ -2593,7 +2605,6 @@
   100% {
     transform: translate(-50%, -50%) scale(1.2);
     opacity: 0.9;
-    filter: blur(40px) brightness(1.0);
   }
 }
 
@@ -2910,5 +2921,45 @@
   .imageOverlayClose {
     top: -60px;
     right: 0;
+  }
+}
+
+/* ============================================================
+   TOUCH DEVICES — GPU PERFORMANCE REDUCTION
+   Both iOS and Android touch devices have weaker GPUs than
+   desktop. Disable the heaviest operations to maintain 60fps.
+   ============================================================ */
+@media (hover: none) and (pointer: coarse) {
+  /* Disable the spinning conic gradient — very heavy on mobile GPUs */
+  .mosaicAura::after {
+    animation: none;
+    opacity: 0.3;
+  }
+
+  /* Reduce the pulsating blur aura — already breathing via opacity only */
+  .mosaicAura::before {
+    animation-duration: 6s;
+  }
+
+  /* Simplify backdrop-filter on scene elements */
+  .imageOverlayContent {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  /* Reduce nebula blur from 60px to 30px */
+  .scene4Nebula {
+    filter: blur(30px);
+    animation-duration: 30s;
+  }
+
+  /* Reduce ambient beam blur */
+  .beamAmbient {
+    filter: blur(16px);
+  }
+
+  /* Reduce beam blur wrapper */
+  .beamBlurWrapper {
+    filter: blur(12px);
   }
 }

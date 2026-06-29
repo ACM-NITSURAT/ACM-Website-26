@@ -13,7 +13,5 @@
 export const ONBOARDING_ALLOWLIST: readonly string[] = [
   '/',
   '/onboarding',
-  '/admin',
-  '/admin/events',
-  '/admin/create/event',
+  '/team',
 ];

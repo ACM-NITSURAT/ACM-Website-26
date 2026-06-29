@@ -28,6 +28,47 @@ export default function AboutWireframeScene() {
   const text2Ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    // Detect touch device — matches the CSS media query (hover: none) and (pointer: coarse)
+    const isTouchDevice = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+
+    const allRefs = [s1Ref, s2Ref, s3Ref, s4Ref, s5Ref, s6Ref, s7Ref, s8Ref, text1Ref, text2Ref];
+
+    if (isTouchDevice) {
+      // ── TOUCH DEVICE PATH ──
+      // Use IntersectionObserver to fade in structures when the container
+      // enters the viewport. iOS Safari fires IO reliably during momentum
+      // scroll, unlike scroll events which pause during inertial scrolling.
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              // Fade in all structures with staggered delays via CSS
+              allRefs.forEach((ref, i) => {
+                if (ref.current) {
+                  ref.current.style.transition = `opacity 800ms ease-out ${i * 100}ms, transform 1.2s ease-out ${i * 100}ms`;
+                  ref.current.style.opacity = '0.6';
+                  ref.current.style.transform = 'scale(1) rotate(0deg)';
+                }
+              });
+              // One-shot: unobserve after triggering
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.05, rootMargin: '100px 0px' }
+      );
+
+      observer.observe(container);
+
+      return () => {
+        observer.disconnect();
+      };
+    }
+
+    // ── DESKTOP PATH ── (original scroll-driven parallax)
     let animationFrameId: number;
 
     const updateScene = () => {

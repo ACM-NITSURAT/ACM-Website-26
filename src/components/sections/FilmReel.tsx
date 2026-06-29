@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useMemo } from 'react';
-import { motion, useMotionValue, useTransform, useAnimationFrame } from 'framer-motion';
+import { motion, useMotionValue, useTransform, useAnimationFrame, useInView } from 'framer-motion';
 import styles from './HeroSection.module.css';
 
 /* ============================================================
@@ -27,8 +27,8 @@ interface FilmReelProps {
   transitionState?: 'idle' | 'accel1' | 'accel2' | 'accel3' | 'flash' | 'intro' | 'reverseFlash' | 'reverseFlashHero';
 }
 
-function FilmReel({ 
-  className, 
+function FilmReel({
+  className,
   transitionState = 'idle',
   size,
   speedMultiplier = 1,
@@ -36,21 +36,34 @@ function FilmReel({
 }: FilmReelProps) {
   const CX = 250;
   const CY = 250;
-  
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const isInView = useInView(containerRef);
+
   // Memoize cutout geometry — only recomputed if component remounts
   const cutouts = useMemo(() => {
     const cutoutCount = 6;
-    return Array.from({ length: cutoutCount }, (_, i) => {
+    const images = [
+      '/dotslash/Dotslash9-team.webp',
+      '/webp/DSC_2075.webp',
+      '/dotslash/DSC_2163 (1).webp',
+      '/webp/DSC_6725.webp',
+      '/dotslash/Dotslash9-winners.webp',
+      '/webp/IMG_7643.webp',
+    ];
+
+    return Array.from({ length: cutoutCount }).map((_, i) => {
       const angle = i * 60;
       const rad = angle * Math.PI / 180;
-      const R = 135; 
-      const r = 58;  
-      
+      const R = 135;
+      const r = 58;
+
       return {
         angle,
         cx: Number((CX + R * Math.cos(rad)).toFixed(4)),
         cy: Number((CY + R * Math.sin(rad)).toFixed(4)),
-        r
+        r,
+        image: images[i]
       };
     });
   }, []);
@@ -82,6 +95,8 @@ function FilmReel({
      ========================================== */
 
   useAnimationFrame((t, delta) => {
+    if (!isInView) return; // Pause physics when scrolled off-screen
+
     // Prevent huge delta spikes on tab switch
     const safeDelta = Math.min(delta, 100);
 
@@ -101,7 +116,7 @@ function FilmReel({
       const progress = Math.min(elapsed / 1800, 1);
       // Smooth quartic easing for a deeply physical, heavy spin-up
       const easeInQuart = progress * progress * progress * progress;
-      
+
       const targetSpeed = (8 * speedMultiplier) + (maxSpeed * easeInQuart);
       // Directly track the mathematical curve for zero-lag smooth acceleration
       currentBaseSpeed.current = targetSpeed;
@@ -118,13 +133,17 @@ function FilmReel({
 
 
   return (
-    <div 
-      className={`${styles.filmReelContainer} ${className || ''}`} 
+    <div
+      ref={containerRef}
+      className={`${styles.filmReelContainer} ${className || ''}`}
       style={size ? { width: size, height: size } : undefined}
       aria-hidden="true"
       onMouseEnter={() => (isHovered.current = true)}
       onMouseLeave={() => (isHovered.current = false)}
     >
+      {/* Invisible circular hitbox so the rectangular corners don't trigger hover */}
+      <div className={styles.filmReelHitbox} />
+
       {/* PHYSICAL PROJECTED SHADOW SYSTEM
           Matches the upper-left projection light source */}
       <div className={styles.reelProjectedShadow}>
@@ -141,7 +160,7 @@ function FilmReel({
       <div className={styles.reelCoreShadow} />
 
       {/* The rotating reel — ONLY this spins */}
-      <motion.div 
+      <motion.div
         className={styles.filmReelRotator}
         style={{ rotate: rotateTransform }}
       >
@@ -194,17 +213,24 @@ function FilmReel({
             <mask id="cutout-mask">
               <circle cx={CX} cy={CY} r="250" fill="white" />
               {cutouts.map((hole, i) => (
-                <circle 
-                  key={`mask-hole-${i}`} 
-                  cx={hole.cx} 
-                  cy={hole.cy} 
-                  r={hole.r} 
-                  fill="black" 
+                <circle
+                  key={`mask-hole-${i}`}
+                  cx={hole.cx}
+                  cy={hole.cy}
+                  r={hole.r}
+                  fill="black"
                 />
               ))}
-              {/* Central Axle Cutout */}
+              {/* Central Axle Cutout / Arc Reactor Base */}
               <circle cx={CX} cy={CY} r="18" fill="black" />
             </mask>
+
+            {/* Clip path to ensure images stay perfectly inside the holes */}
+            <clipPath id="image-clips">
+              {cutouts.map((hole, i) => (
+                <circle key={`clip-hole-${i}`} cx={hole.cx} cy={hole.cy} r={hole.r} />
+              ))}
+            </clipPath>
           </defs>
 
           {/* ========================================
@@ -215,7 +241,7 @@ function FilmReel({
           <circle cx={CX} cy={CY} r="236" fill="url(#metal-chrome)" opacity="0.3" />
 
           {/* ========================================
-              LAYER 2: SPOOLED FILM
+              LAYER 2: SPOOLED FILM & VIEW-MASTER IMAGES
               Tightly wound strips visible between flanges
               ======================================== */}
           <circle cx={CX} cy={CY} r="215" fill="url(#film-spool)" />
@@ -224,6 +250,23 @@ function FilmReel({
             <circle key={`film-groove-${r}`} cx={CX} cy={CY} r={r} fill="none" stroke="rgba(255,255,255,0.025)" strokeWidth="1.5" />
           ))}
 
+          {/* View-Master Event Highlight Photos */}
+          <g clipPath="url(#image-clips)">
+            {cutouts.map((hole, i) => (
+              <image
+                key={`img-${i}`}
+                href={hole.image}
+                x={hole.cx - hole.r}
+                y={hole.cy - hole.r}
+                width={hole.r * 2}
+                height={hole.r * 2}
+                preserveAspectRatio="xMidYMid slice"
+                opacity="0.85"
+                filter="grayscale(100%) contrast(130%) brightness(0.8)"
+              />
+            ))}
+          </g>
+
           {/* ========================================
               LAYER 3: FRONT FLANGE (Solid Plate with Holes)
               ======================================== */}
@@ -231,8 +274,9 @@ function FilmReel({
             <g mask="url(#cutout-mask)">
               {/* Main Plate Body */}
               <circle cx={CX} cy={CY} r="236" fill="url(#metal-brushed)" />
-              <circle cx={CX} cy={CY} r="236" fill="url(#metal-chrome)" opacity="0.75" style={{ mixBlendMode: 'overlay' }} />
-              
+              {/* Removed mix-blend-mode: overlay for massive GPU performance gains */}
+              <circle cx={CX} cy={CY} r="236" fill="url(#metal-chrome)" opacity="0.4" />
+
               {/* Outer Rim Thickness & Ridges */}
               <circle cx={CX} cy={CY} r="234" fill="none" stroke="rgba(0,0,0,0.8)" strokeWidth="4" />
               <circle cx={CX} cy={CY} r="226" fill="none" stroke="url(#metal-chrome)" strokeWidth="14" />
@@ -262,48 +306,84 @@ function FilmReel({
           </g>
 
           {/* ========================================
-              LAYER 5: THE CLASSIC 6-HOLE HUB
+              LAYER 5: ARC REACTOR CORE (ACM Edition)
               ======================================== */}
-          <circle cx={CX} cy={CY} r="48" fill="url(#metal-chrome)" stroke="rgba(0,0,0,0.7)" strokeWidth="3" />
-          {/* Film Slot Circles (grouped to apply blur selectively) */}
-          <g className={`${styles.reelSlots} ${isBlurActive ? styles.reelSlotsBlur : ''}`}>
-            {cutouts.map((hole, i) => {
-               const px = Number((CX + 28 * Math.cos(hole.angle * Math.PI / 180)).toFixed(4));
-               const py = Number((CY + 28 * Math.sin(hole.angle * Math.PI / 180)).toFixed(4));
-               return (
-                 <g key={`hub-hole-${i}`}>
-                   <circle cx={px} cy={py} r="5" fill="#060708" />
-                   <circle cx={px} cy={py} r="5" fill="none" stroke="rgba(0,0,0,0.8)" strokeWidth="2" />
-                   <circle cx={px} cy={py} r="5" fill="none" stroke="url(#edge-highlight)" strokeWidth="0.8" />
-                 </g>
-               );
-            })}
+          {/* Outer Housing Ring (Matches original reel color) */}
+          <circle cx={CX} cy={CY} r="50" fill="#060709" stroke="rgba(0,0,0,0.9)" strokeWidth="5" />
+          <circle cx={CX} cy={CY} r="48" fill="none" stroke="url(#metal-chrome)" strokeWidth="2" />
+
+          {/* Glowing Inner Reactor Chamber */}
+          <circle cx={CX} cy={CY} r="40" fill="#020304" />
+
+          {/* Pure White / Silver Energy Rings */}
+          <g style={{ filter: 'drop-shadow(0 0 8px rgba(255, 255, 255, 0.6)) drop-shadow(0 0 16px rgba(220, 230, 240, 0.3))' }}>
+            {/* Outer Energy Ring */}
+            <circle cx={CX} cy={CY} r="35" fill="none" stroke="rgba(240, 245, 255, 0.8)" strokeWidth="3" />
+            <circle cx={CX} cy={CY} r="35" fill="none" stroke="rgba(255, 255, 255, 0.5)" strokeWidth="1" />
+
+            {/* Middle Grid Ring */}
+            <circle cx={CX} cy={CY} r="26" fill="none" stroke="rgba(255, 255, 255, 0.9)" strokeWidth="8" strokeDasharray="4 4" />
+
+            {/* Core Lens (Blinding White) */}
+            <circle cx={CX} cy={CY} r="16" fill="rgba(255, 255, 255, 1)" />
+            <circle cx={CX} cy={CY} r="16" fill="none" stroke="rgba(200, 210, 220, 1)" strokeWidth="2" />
+            <circle cx={CX} cy={CY} r="10" fill="#ffffff" style={{ filter: 'drop-shadow(0 0 6px #ffffff)' }} />
           </g>
-          <circle cx="250" cy="250" r="45" fill="url(#metalGradient)" filter="url(#dropShadow)" />
-          
+
+          {/* Gunmetal Coils and Cage */}
+          {cutouts.map((hole, i) => {
+            const angle = hole.angle * Math.PI / 180;
+            const px = Number((CX + 45 * Math.cos(angle)).toFixed(4));
+            const py = Number((CY + 45 * Math.sin(angle)).toFixed(4));
+
+            return (
+              <g key={`reactor-coil-${i}`} transform={`rotate(${hole.angle} ${CX} ${CY})`}>
+                {/* Titanium Coil Wrap */}
+                <rect x={CX + 38} y={CY - 8} width="12" height="16" fill="#4a555e" stroke="#2a3238" strokeWidth="1" />
+                {/* Coil wiring lines */}
+                {[-6, -3, 0, 3, 6].map((yOffset) => (
+                  <line key={`wire-${yOffset}`} x1={CX + 38} y1={CY + yOffset} x2={CX + 50} y2={CY + yOffset} stroke="#687682" strokeWidth="1" />
+                ))}
+                {/* Metal Cage Bracket */}
+                <rect x={CX + 36} y={CY - 2} width="16" height="4" fill="url(#metal-chrome)" stroke="#000" strokeWidth="1" />
+                <circle cx={CX + 44} cy={CY} r="1.5" fill="#000" />
+              </g>
+            );
+          })}
+
+          {/* Inner Cage Spokes */}
+          {cutouts.map((hole, i) => {
+            return (
+              <g key={`reactor-spoke-${i}`} transform={`rotate(${hole.angle + 30} ${CX} ${CY})`}>
+                {/* Metal spokes reaching into the center */}
+                <line x1={CX + 16} y1={CY} x2={CX + 35} y2={CY} stroke="url(#metal-chrome)" strokeWidth="4" />
+                <line x1={CX + 16} y1={CY} x2={CX + 35} y2={CY} stroke="#000" strokeWidth="1" strokeDasharray="2 6" />
+              </g>
+            );
+          })}
           {/* Pre-flash cinematic expanding ring (Stage 3) */}
-          <circle 
-            cx="250" 
-            cy="250" 
-            r="45" 
-            fill="none" 
-            stroke="url(#accentGradient)" 
-            strokeWidth="2" 
-            className={`${styles.preFlashRing} ${transitionState === 'accel3' ? styles.preFlashRingActive : ''} ${transitionState !== 'idle' ? styles.blueLightTransition : ''}`} 
+          <circle
+            cx="250"
+            cy="250"
+            r="45"
+            fill="none"
+            stroke="url(#accentGradient)"
+            strokeWidth="2"
+            className={`${styles.preFlashRing} ${transitionState === 'accel3' ? styles.preFlashRingActive : ''} ${transitionState !== 'idle' ? styles.blueLightTransition : ''}`}
           />
-          
+
           {/* Pulsing Gold Glow (Stage 2 and 3) */}
-          <circle 
-            cx="250" 
-            cy="250" 
-            r="80" 
-            fill="url(#accentGradient)" 
-            className={`${styles.centralGlow} ${transitionState === 'accel2' ? styles.glowStage2 : ''} ${transitionState === 'accel3' ? styles.glowStage3 : ''} ${transitionState !== 'idle' ? styles.blueLightTransition : ''}`} 
+          <circle
+            cx="250"
+            cy="250"
+            r="80"
+            fill="url(#accentGradient)"
+            className={`${styles.centralGlow} ${transitionState === 'accel2' ? styles.glowStage2 : ''} ${transitionState === 'accel3' ? styles.glowStage3 : ''} ${transitionState !== 'idle' ? styles.blueLightTransition : ''}`}
           />
-          
-          <circle data-reel-hub="true" cx="250" cy="250" r="20" fill="#0A0908" stroke="url(#edge-highlight)" strokeWidth="1.5" />
-          <circle cx={CX} cy={CY} r="13" fill="#0a0a0c" />
-          
+
+          {/* Invisible target for the Lightning Strike transition effect */}
+          <circle data-reel-hub="true" cx={CX} cy={CY} r="20" fill="transparent" />
+
         </svg>
       </motion.div>
     </div>

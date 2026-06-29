@@ -1,0 +1,553 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="400" viewBox="0 0 800 400">
+  <rect width="100%" height="100%" fill="transparent" />
+  <path d="M 300 0 H 340 V -20 H 300 V -60 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 120 80 H 180 V 40 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 400 220 V 180 V 240 L 340 300 H 300 H 320 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 480 320 L 500 300 H 460 L 380 220 V 200 V 220 V 280 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 740 260 V 220 V 280 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 200 360 L 240 400 V 360 H 200 H 120 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 780 20 H 760 L 800 60 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 500 20 H 440 H 460 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 440 140 V 220 L 420 240 V 160 L 380 200 V 280 L 440 340 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 60 340 L 0 280 H -40 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 760 280 V 200 L 700 260 H 780 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 800 60 L 860 120 H 780 H 760 H 840 V 100 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 100 340 L 40 280 H -20 H 40 L -40 200 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 660 240 V 180 V 120 V 160 V 80 L 680 60 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 40 400 L 120 480 V 440 H 200 V 520 H 140 L 80 460 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 60 320 V 240 L 140 320 V 340 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 260 300 L 280 280 H 220 L 200 300 H 120 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 20 40 H 0 V 100 L -20 80 H -60 H 0 H 80 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 300 240 L 260 200 V 160 H 300 H 360 H 300 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 460 360 V 300 V 360 L 420 320 V 340 L 400 320 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 800 40 L 720 -40 H 680 L 740 20 H 660 L 600 -40 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 360 340 V 280 V 200 V 240 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 440 400 L 400 440 L 380 420 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 160 160 V 220 V 180 H 240 H 160 L 80 100 H 120 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 160 320 V 260 V 280 L 120 320 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 140 20 V 0 V 40 L 160 60 H 100 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 340 20 H 260 V -20 L 220 20 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 660 180 H 740 H 760 L 800 220 L 780 200 H 800 L 880 280 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 260 380 V 400 L 340 320 H 360 L 420 260 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 420 40 V 120 L 340 40 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 260 300 H 280 L 200 220 H 120 L 100 200 H 60 V 260 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 420 260 L 360 200 H 380 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 680 280 V 240 L 720 280 H 800 V 340 V 420 L 860 480 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 540 20 H 600 L 580 0 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 720 300 V 220 L 660 280 L 600 220 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 280 360 V 380 H 360 L 300 320 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 700 240 V 320 L 680 340 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 600 340 H 660 H 580 L 640 280 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 700 20 L 660 60 V 140 V 200 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 280 260 L 220 320 H 300 H 260 H 200 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 160 300 V 280 H 100 V 300 H 60 H 0 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 460 80 L 440 60 H 500 L 440 0 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 120 240 V 300 L 60 240 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 300 360 H 360 H 420 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 720 80 H 700 H 640 V 160 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 700 360 H 640 H 580 H 500 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 480 360 V 440 V 380 H 440 V 420 L 360 340 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 660 120 V 60 H 680 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 780 320 H 860 L 840 300 V 260 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 540 160 L 580 200 H 600 L 620 180 H 560 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 420 340 V 360 H 360 V 300 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 520 380 V 300 L 460 240 V 220 V 280 L 380 200 V 240 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 540 160 L 580 120 L 600 140 V 60 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 160 280 L 240 200 L 180 140 H 240 V 220 L 220 200 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 580 300 H 600 L 620 320 V 340 V 300 H 560 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 560 100 V 140 L 640 220 H 620 L 660 260 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 60 80 L 80 100 L 140 40 H 220 H 240 L 280 80 L 320 120 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 340 260 V 340 H 400 H 480 H 420 L 400 320 L 420 300 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 40 280 L 100 220 V 240 L 120 260 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 20 60 H -20 V 100 V 120 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 640 360 L 600 320 V 280 L 540 220 H 480 H 400 V 200 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 660 380 H 620 V 420 L 580 380 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 580 340 H 660 V 360 V 380 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 800 120 L 780 100 V 120 H 820 L 760 60 V 40 V 80 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 20 260 V 280 L -60 360 V 440 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 200 80 L 180 60 V 0 H 140 L 220 80 L 240 100 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 640 320 H 700 L 660 360 V 280 H 580 H 620 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 800 0 H 860 H 900 H 860 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 680 80 L 660 100 H 600 H 560 H 500 V 60 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 720 80 H 800 V 0 V 80 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 320 320 V 280 H 300 L 240 340 L 280 380 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 500 100 H 440 V 40 L 520 120 L 480 80 L 540 20 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 720 40 H 700 H 740 L 720 20 H 800 L 880 100 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 200 360 V 340 H 140 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 300 80 H 380 H 400 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 360 180 V 220 H 320 H 340 V 200 L 300 160 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 0 380 V 300 V 360 H -60 L -120 300 V 340 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 220 280 V 340 H 280 L 240 300 H 320 H 340 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 220 300 H 200 V 320 H 180 V 240 H 200 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 180 120 V 60 L 260 140 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 200 60 V -20 L 180 -40 L 200 -20 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 160 200 L 180 180 V 260 H 100 H 140 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 120 160 L 160 120 L 80 40 H 40 H 80 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 380 20 V 40 L 340 80 H 280 V 160 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 720 260 H 680 V 240 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 220 0 L 160 -60 L 240 20 V 60 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 740 100 H 700 L 660 60 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 140 140 H 100 L 120 160 V 200 V 220 H 160 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 40 120 L -40 200 V 220 L -120 140 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 760 240 V 220 V 260 H 740 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 200 140 V 180 V 120 V 60 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 0 160 L 40 200 V 140 L 60 160 V 180 L 100 140 L 40 200 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 340 340 V 300 H 300 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 380 140 V 160 H 360 V 120 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 620 280 L 580 240 L 640 300 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 560 120 H 580 L 600 140 V 180 H 660 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 500 180 L 520 200 L 540 180 V 100 H 560 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 180 280 L 160 260 L 140 280 L 100 320 L 180 400 H 100 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 660 0 H 680 H 700 H 640 V 20 L 620 40 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 100 380 L 120 400 H 140 H 100 V 380 H 20 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 120 340 L 140 320 V 240 H 100 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 380 180 L 360 200 L 400 160 H 440 L 360 80 L 340 100 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 540 300 V 240 H 500 L 460 280 H 440 H 500 L 440 340 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 420 260 L 440 240 V 320 L 360 240 H 300 V 300 H 380 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 700 160 L 680 180 V 160 H 620 V 240 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 580 120 L 520 60 H 460 V 140 V 180 H 400 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 80 400 H 40 H 20 H -20 V 460 V 400 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 480 120 V 160 H 440 H 380 V 180 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 320 380 L 380 440 H 320 V 520 L 360 480 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 720 140 H 800 H 860 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 180 280 L 100 200 V 140 V 160 V 140 L 120 160 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 760 0 V -60 L 820 0 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 20 400 L 40 380 H 0 V 460 H 80 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 660 60 V 140 V 60 H 580 V 0 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 780 380 L 720 440 L 680 400 V 360 L 660 340 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 100 140 H 40 L 0 100 L 80 180 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 620 360 H 580 V 400 H 560 H 480 H 420 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 800 200 L 880 280 H 940 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 260 20 H 240 H 320 H 360 H 400 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 620 220 H 660 L 600 280 H 680 H 600 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 740 100 L 760 120 V 200 L 740 180 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 260 240 H 320 V 160 H 260 V 180 L 340 100 V 120 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 160 60 L 180 40 H 200 V -20 V -40 L 260 20 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 640 0 L 680 40 L 600 120 L 540 60 V -20 H 600 V 0 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 520 280 V 200 H 440 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 20 260 V 220 H -20 H -60 H -80 L -60 200 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 580 120 H 520 V 200 V 260 L 600 180 L 620 200 H 560 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 60 320 V 360 H 40 L -40 280 V 340 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 60 380 V 400 V 360 L 0 420 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 320 360 L 300 380 V 340 V 260 L 220 180 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 560 120 L 500 60 V 120 V 200 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 740 200 L 820 120 V 180 L 860 220 H 780 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 720 140 H 700 H 780 V 120 L 740 80 L 780 40 L 760 20 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 400 40 L 460 -20 L 440 -40 V 40 H 380 V 0 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 460 80 H 420 V 100 L 380 140 L 360 160 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 260 260 V 200 H 340 H 300 V 220 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 500 340 V 420 H 480 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 560 240 H 500 L 520 220 V 300 V 340 L 440 420 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 400 100 H 440 L 420 120 V 100 L 380 140 L 460 220 L 440 240 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 40 160 H 100 V 180 H 80 L 60 160 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 780 340 L 700 260 H 660 L 700 300 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 620 280 L 560 220 H 500 V 180 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 360 240 L 280 320 V 400 L 200 320 L 140 260 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 20 160 L -60 240 V 280 V 200 L 0 260 H -60 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 600 200 H 620 V 240 V 300 V 280 H 560 L 520 320 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 160 160 H 140 H 180 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 300 140 V 120 L 240 60 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 760 360 H 800 H 840 H 860 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 640 220 L 620 240 H 680 L 600 160 H 640 H 660 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 540 320 V 280 H 560 V 220 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 580 380 V 400 V 440 V 380 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 620 120 V 80 V 60 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 540 260 V 300 V 240 V 320 L 620 240 H 680 H 640 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 640 320 V 380 V 440 H 620 H 580 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 260 340 H 300 L 380 260 V 220 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 140 20 V 60 H 200 H 220 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 500 0 H 520 L 560 -40 V -80 H 480 H 400 V -60 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 40 180 H 60 V 120 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 160 80 L 80 0 H 20 H -20 V -40 H -100 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 640 380 H 700 L 740 340 L 700 300 V 280 H 780 V 340 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 160 120 H 80 V 40 V 120 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 60 180 H 140 V 160 L 220 240 V 160 V 120 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 320 200 H 300 H 240 V 120 H 320 H 380 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 720 300 V 360 L 800 280 H 840 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 220 380 H 180 L 200 400 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 20 0 L 80 60 H 140 H 160 L 200 20 L 120 -60 L 160 -20 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 720 360 V 320 H 760 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 440 140 V 160 V 200 V 180 V 100 L 420 120 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 680 100 V 80 H 620 L 580 40 V 0 H 620 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 180 220 H 100 H 60 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 300 40 H 380 V 60 L 420 20 L 480 80 H 500 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 120 380 L 60 440 V 500 H 20 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 440 40 L 420 60 H 440 V 40 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 620 0 V -40 L 700 -120 V -60 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 580 400 V 320 V 340 L 540 300 H 560 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 740 240 V 200 L 700 160 V 180 V 140 H 660 L 600 80 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 780 340 L 700 260 V 180 H 740 L 720 160 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 180 260 V 280 V 320 H 160 L 80 240 H 160 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 480 200 V 160 V 100 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 540 80 L 620 0 H 680 L 760 -80 V -120 L 820 -180 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 380 240 V 220 H 360 H 300 L 320 240 V 280 V 240 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 40 180 V 100 L 120 20 L 160 -20 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 560 120 L 620 180 L 600 160 L 540 220 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 580 220 V 200 V 120 L 520 60 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 320 40 L 260 100 H 220 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 520 20 L 540 0 H 480 H 440 V 60 H 360 H 280 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 20 360 H 100 L 20 440 H -40 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 380 320 V 300 L 300 380 H 340 V 360 L 380 320 V 300 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 360 220 H 420 L 500 140 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 180 280 V 220 L 160 240 L 180 220 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 580 220 V 140 H 600 L 580 120 V 140 L 500 220 L 560 160 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 500 40 H 560 H 580 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 460 120 H 420 H 360 L 440 200 H 500 L 560 140 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 200 140 V 120 V 160 L 280 240 H 340 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 180 80 L 200 100 L 220 80 H 300 H 380 H 360 V 120 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 440 180 V 260 V 340 V 280 H 500 H 560 L 500 340 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 260 300 V 220 H 240 L 320 140 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 0 120 H 80 H 140 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 360 260 V 240 V 200 H 380 H 440 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 620 260 V 200 V 240 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 280 60 L 220 120 H 200 H 160 V 180 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 580 400 L 560 420 H 540 L 460 500 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 240 20 H 300 V 80 H 380 L 300 0 V 60 L 260 20 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 560 280 V 260 V 300 H 580 V 380 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 300 200 L 220 120 V 60 V 80 L 260 40 L 300 80 V 100 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 420 220 V 140 L 480 200 V 280 V 220 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 700 0 H 640 H 600 L 580 -20 L 660 -100 L 600 -40 H 620 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 480 160 H 500 L 580 80 V 40 L 600 20 V 80 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 560 40 H 520 H 440 L 520 -40 L 440 40 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 300 120 L 240 60 H 320 L 400 -20 H 380 V 0 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 500 220 H 540 H 500 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 40 240 H 20 L -40 180 H 0 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 760 180 L 840 260 V 320 H 820 V 340 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 620 260 H 580 V 320 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 780 200 V 260 H 760 H 840 H 880 L 820 200 L 800 180 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 780 80 H 820 L 860 40 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 100 140 L 140 100 H 180 L 260 20 L 240 40 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 0 300 V 360 H -80 H 0 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 580 20 H 620 H 680 L 740 -40 V 40 V 100 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 180 220 L 120 160 L 160 120 V 200 V 180 V 200 H 240 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 180 220 L 100 300 L 120 280 H 80 H 140 H 160 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 360 220 H 280 V 300 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 200 0 H 180 V 80 H 240 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 800 380 L 880 300 L 900 280 V 260 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 440 380 H 420 V 420 V 360 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 740 180 V 140 V 60 V 80 V 120 L 820 200 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 320 200 V 120 V 60 H 240 H 280 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 800 320 H 760 V 400 H 700 L 780 320 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 800 60 H 880 H 860 V 100 V 120 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 300 160 V 180 V 260 H 220 H 260 L 220 220 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 680 400 L 720 440 V 500 V 580 H 660 L 700 540 L 620 460 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 540 320 L 500 360 H 540 L 460 280 H 380 H 320 H 260 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 320 300 V 260 L 260 200 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 380 100 H 300 H 320 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 580 220 L 600 200 H 540 L 460 280 V 320 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 320 160 V 140 H 400 V 80 L 380 60 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 500 280 V 320 H 420 L 500 400 H 580 H 500 V 480 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 40 80 H 100 V 100 H 140 V 80 L 180 40 L 160 60 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 740 140 H 680 V 220 H 660 L 580 300 L 600 280 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 680 140 L 660 120 L 680 100 V 140 H 600 L 520 220 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 180 280 L 140 320 H 60 H 100 V 280 H 20 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 580 300 V 280 H 540 L 480 220 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 140 220 H 180 V 260 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 160 100 V 60 H 80 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 580 220 H 520 H 500 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 500 260 L 560 320 L 580 340 V 280 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 720 100 V 180 L 760 140 V 200 V 260 V 200 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1.5" />
+  <path d="M 520 120 H 440 L 400 80 H 340 L 420 0 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 700 120 H 740 H 720 L 760 80 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <path d="M 340 260 V 200 H 420 V 120 L 360 60 L 420 120 " fill="none" stroke="rgba(15, 23, 42, 0.4)" stroke-width="1" />
+  <circle cx="540" cy="80" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="360" cy="320" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="220" cy="180" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="360" cy="60" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="20" cy="20" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="560" cy="60" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="220" cy="340" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="640" cy="280" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="140" cy="340" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="380" cy="260" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="660" cy="80" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="520" cy="300" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="640" cy="160" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="0" cy="260" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="560" cy="240" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="600" cy="220" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="760" cy="200" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="280" cy="80" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="680" cy="160" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="600" cy="360" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="220" cy="220" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="340" cy="80" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="660" cy="160" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="60" cy="140" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="600" cy="280" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="40" cy="100" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="400" cy="180" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="220" cy="400" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="640" cy="140" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="640" cy="240" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="680" cy="0" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="640" cy="300" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="500" cy="260" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="40" cy="240" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="280" cy="200" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="400" cy="380" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="340" cy="360" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="320" cy="280" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="780" cy="40" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="640" cy="260" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="140" cy="40" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="400" cy="40" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="320" cy="240" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="80" cy="160" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="580" cy="60" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="140" cy="280" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="400" cy="160" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="560" cy="160" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="640" cy="120" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="320" cy="60" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="280" cy="220" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="500" cy="260" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="580" cy="400" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="780" cy="100" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="40" cy="240" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="620" cy="120" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="120" cy="260" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="140" cy="220" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="160" cy="380" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="180" cy="320" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="580" cy="80" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="40" cy="380" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="740" cy="240" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="140" cy="380" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="760" cy="240" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="460" cy="20" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="80" cy="240" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="100" cy="340" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="0" cy="20" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="580" cy="360" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="780" cy="360" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="380" cy="260" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="400" cy="280" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="700" cy="360" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="180" cy="240" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="60" cy="140" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="660" cy="100" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="580" cy="200" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="660" cy="100" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="660" cy="300" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="480" cy="280" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="580" cy="340" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="760" cy="40" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="780" cy="400" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="320" cy="160" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="580" cy="220" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="700" cy="360" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="400" cy="400" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="80" cy="240" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="600" cy="380" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="500" cy="380" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="120" cy="260" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="380" cy="80" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="260" cy="400" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="320" cy="280" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="480" cy="300" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="200" cy="360" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="140" cy="80" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="20" cy="360" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="660" cy="320" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="140" cy="240" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="740" cy="180" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="660" cy="360" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="720" cy="100" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="320" cy="220" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="540" cy="200" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="480" cy="360" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="780" cy="180" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="320" cy="20" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="160" cy="0" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="380" cy="180" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="140" cy="60" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="160" cy="340" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="380" cy="120" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="780" cy="60" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="400" cy="120" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="520" cy="380" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="240" cy="200" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="640" cy="240" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="780" cy="320" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="780" cy="20" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="220" cy="260" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="740" cy="20" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="320" cy="100" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="320" cy="60" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="320" cy="340" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="580" cy="40" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="640" cy="400" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="760" cy="0" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="200" cy="300" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="640" cy="240" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="600" cy="180" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="720" cy="240" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="60" cy="120" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="460" cy="260" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="540" cy="200" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="80" cy="140" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="540" cy="260" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="780" cy="240" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="160" cy="0" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="680" cy="360" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="600" cy="100" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="440" cy="300" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="300" cy="140" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="520" cy="120" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="240" cy="80" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="780" cy="80" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="100" cy="220" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="360" cy="140" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="300" cy="380" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="180" cy="60" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="360" cy="400" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="680" cy="20" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="120" cy="180" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="380" cy="280" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="300" cy="300" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="0" cy="300" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="40" cy="0" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="240" cy="400" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="760" cy="0" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="320" cy="300" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="60" cy="380" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="360" cy="200" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="420" cy="200" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="220" cy="180" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="580" cy="200" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="200" cy="260" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="520" cy="320" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="580" cy="200" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="400" cy="320" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="220" cy="400" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="160" cy="300" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="260" cy="120" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="260" cy="200" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="680" cy="80" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="720" cy="200" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="200" cy="20" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="520" cy="220" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="560" cy="180" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="500" cy="360" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="260" cy="100" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="380" cy="60" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="160" cy="120" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="60" cy="240" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="560" cy="40" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="380" cy="400" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="340" cy="80" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="180" cy="300" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="260" cy="140" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="80" cy="240" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="800" cy="200" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="340" cy="0" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="360" cy="40" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="0" cy="100" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="180" cy="280" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="180" cy="320" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="660" cy="20" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="680" cy="260" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="620" cy="260" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="120" cy="100" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="40" cy="240" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="460" cy="100" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="420" cy="20" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="60" cy="140" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="440" cy="380" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="460" cy="140" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="440" cy="60" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="180" cy="280" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="120" cy="280" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="340" cy="80" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="320" cy="280" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="160" cy="100" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="220" cy="100" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="340" cy="320" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="220" cy="180" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="480" cy="220" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="680" cy="260" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="700" cy="360" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="480" cy="60" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="0" cy="200" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="420" cy="120" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="480" cy="380" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="520" cy="240" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="780" cy="60" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="520" cy="400" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="100" cy="140" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="760" cy="120" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="600" cy="200" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="560" cy="320" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="440" cy="80" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="580" cy="240" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="700" cy="340" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="360" cy="380" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="20" cy="360" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="600" cy="180" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="440" cy="320" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="540" cy="340" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="780" cy="300" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="420" cy="220" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="560" cy="360" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="320" cy="280" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="100" cy="200" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="240" cy="80" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="460" cy="400" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="80" cy="400" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="520" cy="100" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="540" cy="400" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="780" cy="60" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="20" cy="100" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="240" cy="0" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="480" cy="380" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="700" cy="180" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="520" cy="120" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="260" cy="60" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="320" cy="180" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="440" cy="60" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="60" cy="360" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="540" cy="300" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="460" cy="200" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="20" cy="220" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="100" cy="320" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="320" cy="180" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="520" cy="400" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="580" cy="220" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="500" cy="200" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="740" cy="380" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="80" cy="380" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="520" cy="280" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="300" cy="80" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="680" cy="200" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="620" cy="240" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="60" cy="40" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="240" cy="160" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="580" cy="80" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="300" cy="200" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="640" cy="180" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="360" cy="200" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="320" cy="160" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="20" cy="300" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="320" cy="380" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="420" cy="400" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="540" cy="0" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="160" cy="400" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="120" cy="340" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="520" cy="40" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="60" cy="240" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="40" cy="360" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="680" cy="220" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="700" cy="240" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="600" cy="400" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="80" cy="60" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="0" cy="380" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="200" cy="40" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="440" cy="120" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="600" cy="60" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="420" cy="160" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="680" cy="180" r="2" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="20" cy="20" r="2.5" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="0" cy="180" r="3" fill="rgba(15, 23, 42, 0.6)" />
+  <circle cx="340" cy="100" r="3" fill="rgba(15, 23, 42, 0.6)" />
+</svg>

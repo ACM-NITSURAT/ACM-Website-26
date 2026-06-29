@@ -79,20 +79,25 @@
   object-fit: cover;
   pointer-events: none;
   user-select: none;
-  /* Slightly darkened to push it further back in depth */
-  filter: brightness(0.75) contrast(1.05);
+  /* Removed expensive CSS filters (brightness/contrast) to vastly improve GPU performance */
 }
 
 /* --- Explore transition: blue energy shift --- */
 .heroBgBlue {
-  filter: brightness(1.5) saturate(1.5) contrast(1.1);
+  /* Removed filter: brightness/saturate/contrast on the entire background layer —
+     it forced re-rasterization of the video, grain, and vignette every frame.
+     The blue energy effect is now achieved via the ::after pseudo-element overlay. */
 }
 
 .heroBgBlue::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse 100% 100% at 50% 50%, rgba(75, 165, 228, 0.25) 0%, rgba(75, 165, 228, 0.05) 45%, transparent 80%);
+  background: radial-gradient(ellipse 100% 100% at 50% 50%,
+    rgba(75, 165, 228, 0.35) 0%,
+    rgba(75, 165, 228, 0.15) 35%,
+    rgba(75, 165, 228, 0.05) 55%,
+    transparent 80%);
   mix-blend-mode: screen;
   pointer-events: none;
   animation: centerFlare 2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
@@ -116,16 +121,19 @@
 }
 
 .blueLightTransition {
-  transition: filter 2s cubic-bezier(0.16, 1, 0.3, 1);
-  filter: brightness(1.5) saturate(1.5) contrast(1.1);
+  /* Removed filter: brightness/saturate/contrast — it forced re-rasterization
+     of the reel lighting layers (with mix-blend-mode) every frame during
+     the 2s transition. The visual effect is handled by the heroBgBlue overlay. */
+  transition: opacity 2s cubic-bezier(0.16, 1, 0.3, 1);
+  opacity: 0.7;
 }
 
 /* Film Grain — Barely visible cinematic texture */
 .heroFilmGrain {
   position: absolute;
   inset: 0;
-  opacity: 0.03;
-  mix-blend-mode: overlay;
+  /* Removed GPU-destroying mix-blend-mode: overlay, relying on standard opacity */
+  opacity: 0.04;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.5'/%3E%3C/svg%3E");
   background-size: 128px 128px;
 }
@@ -270,19 +278,16 @@
   0% {
     opacity: 1;
     transform: scale(1);
-    filter: brightness(1);
   }
 
   50% {
     opacity: 1;
     transform: scale(1.1);
-    filter: brightness(1.5);
   }
 
   100% {
-    opacity: 1;
+    opacity: 0;
     transform: scale(1.5);
-    filter: brightness(4);
   }
 }
 
@@ -652,6 +657,7 @@
 }
 
 @media (max-width: 1024px) {
+
   /* Shift the scene indicator slightly down on mobile */
   .sceneIndicator {
     margin-bottom: 16px;
@@ -703,14 +709,14 @@
 
 .headlineLine {
   display: block;
-  font-family: var(--font-display), 'Space Grotesk', sans-serif;
+  font-family: var(--font-progress), 'Monument Extended', var(--font-display), 'Space Grotesk', sans-serif;
   font-size: clamp(60px, 8vw, 110px);
-  font-weight: 700;
+  font-weight: 400;
   color: #fffdfa;
   letter-spacing: -0.03em;
   text-transform: uppercase;
   /* Protects text contrast and edge sharpness when the projector flash (screen blend mode) sweeps over */
-  text-shadow: 
+  text-shadow:
     0 4px 20px rgba(0, 0, 0, 0.6),
     0 0 40px rgba(0, 0, 0, 0.4);
   position: relative;
@@ -748,70 +754,152 @@
 
   .headlineWord:hover::before {
     /* Band 1, 3, 5 */
-    -webkit-mask-image: linear-gradient(to bottom, 
-      black 0%, black 25%, 
-      transparent 25%, transparent 40%, 
-      black 40%, black 65%, 
-      transparent 65%, transparent 80%, 
-      black 80%, black 100%
-    );
-    mask-image: linear-gradient(to bottom, 
-      black 0%, black 25%, 
-      transparent 25%, transparent 40%, 
-      black 40%, black 65%, 
-      transparent 65%, transparent 80%, 
-      black 80%, black 100%
-    );
+    -webkit-mask-image: linear-gradient(to bottom,
+        black 0%, black 25%,
+        transparent 25%, transparent 40%,
+        black 40%, black 65%,
+        transparent 65%, transparent 80%,
+        black 80%, black 100%);
+    mask-image: linear-gradient(to bottom,
+        black 0%, black 25%,
+        transparent 25%, transparent 40%,
+        black 40%, black 65%,
+        transparent 65%, transparent 80%,
+        black 80%, black 100%);
     animation: glitch-anim-before 0.3s infinite linear alternate-reverse;
   }
 
   .headlineWord:hover::after {
     /* Band 2, 4 */
-    -webkit-mask-image: linear-gradient(to bottom, 
-      transparent 0%, transparent 25%, 
-      black 25%, black 40%, 
-      transparent 40%, transparent 65%, 
-      black 65%, black 80%, 
-      transparent 80%, transparent 100%
-    );
-    mask-image: linear-gradient(to bottom, 
-      transparent 0%, transparent 25%, 
-      black 25%, black 40%, 
-      transparent 40%, transparent 65%, 
-      black 65%, black 80%, 
-      transparent 80%, transparent 100%
-    );
+    -webkit-mask-image: linear-gradient(to bottom,
+        transparent 0%, transparent 25%,
+        black 25%, black 40%,
+        transparent 40%, transparent 65%,
+        black 65%, black 80%,
+        transparent 80%, transparent 100%);
+    mask-image: linear-gradient(to bottom,
+        transparent 0%, transparent 25%,
+        black 25%, black 40%,
+        transparent 40%, transparent 65%,
+        black 65%, black 80%,
+        transparent 80%, transparent 100%);
     animation: glitch-anim-after 0.3s infinite linear alternate-reverse;
   }
 }
 
 /* Exactly matches the reference image: 5-6 blocky bands, small stutters, diagonal Magenta/Cyan split */
 @keyframes glitch-anim-before {
-  0% { transform: translate(-4px, 0); text-shadow: -3px -3px 0 #ff00ff, 3px 3px 0 #00ffff; }
-  10% { transform: translate(5px, 0); text-shadow: -2px -2px 0 #ff00ff, 4px 2px 0 #00ffff; }
-  20% { transform: translate(-3px, 0); text-shadow: -4px -3px 0 #ff00ff, 2px 4px 0 #00ffff; }
-  30% { transform: translate(6px, 0); text-shadow: -2px -4px 0 #ff00ff, 3px 2px 0 #00ffff; }
-  40% { transform: translate(-5px, 0); text-shadow: -3px -2px 0 #ff00ff, 4px 3px 0 #00ffff; }
-  50% { transform: translate(4px, 0); text-shadow: -4px -4px 0 #ff00ff, 2px 2px 0 #00ffff; }
-  60% { transform: translate(-6px, 0); text-shadow: -2px -3px 0 #ff00ff, 3px 4px 0 #00ffff; }
-  70% { transform: translate(3px, 0); text-shadow: -4px -2px 0 #ff00ff, 4px 2px 0 #00ffff; }
-  80% { transform: translate(-5px, 0); text-shadow: -3px -4px 0 #ff00ff, 2px 3px 0 #00ffff; }
-  90% { transform: translate(6px, 0); text-shadow: -2px -3px 0 #ff00ff, 4px 4px 0 #00ffff; }
-  100% { transform: translate(-4px, 0); text-shadow: -4px -4px 0 #ff00ff, 3px 3px 0 #00ffff; }
+  0% {
+    transform: translate(-4px, 0);
+    text-shadow: -3px -3px 0 #ff00ff, 3px 3px 0 #00ffff;
+  }
+
+  10% {
+    transform: translate(5px, 0);
+    text-shadow: -2px -2px 0 #ff00ff, 4px 2px 0 #00ffff;
+  }
+
+  20% {
+    transform: translate(-3px, 0);
+    text-shadow: -4px -3px 0 #ff00ff, 2px 4px 0 #00ffff;
+  }
+
+  30% {
+    transform: translate(6px, 0);
+    text-shadow: -2px -4px 0 #ff00ff, 3px 2px 0 #00ffff;
+  }
+
+  40% {
+    transform: translate(-5px, 0);
+    text-shadow: -3px -2px 0 #ff00ff, 4px 3px 0 #00ffff;
+  }
+
+  50% {
+    transform: translate(4px, 0);
+    text-shadow: -4px -4px 0 #ff00ff, 2px 2px 0 #00ffff;
+  }
+
+  60% {
+    transform: translate(-6px, 0);
+    text-shadow: -2px -3px 0 #ff00ff, 3px 4px 0 #00ffff;
+  }
+
+  70% {
+    transform: translate(3px, 0);
+    text-shadow: -4px -2px 0 #ff00ff, 4px 2px 0 #00ffff;
+  }
+
+  80% {
+    transform: translate(-5px, 0);
+    text-shadow: -3px -4px 0 #ff00ff, 2px 3px 0 #00ffff;
+  }
+
+  90% {
+    transform: translate(6px, 0);
+    text-shadow: -2px -3px 0 #ff00ff, 4px 4px 0 #00ffff;
+  }
+
+  100% {
+    transform: translate(-4px, 0);
+    text-shadow: -4px -4px 0 #ff00ff, 3px 3px 0 #00ffff;
+  }
 }
 
 @keyframes glitch-anim-after {
-  0% { transform: translate(4px, 0); text-shadow: -3px -3px 0 #ff00ff, 3px 3px 0 #00ffff; }
-  10% { transform: translate(-5px, 0); text-shadow: -4px -2px 0 #ff00ff, 2px 4px 0 #00ffff; }
-  20% { transform: translate(6px, 0); text-shadow: -2px -4px 0 #ff00ff, 4px 2px 0 #00ffff; }
-  30% { transform: translate(-3px, 0); text-shadow: -4px -3px 0 #ff00ff, 3px 3px 0 #00ffff; }
-  40% { transform: translate(5px, 0); text-shadow: -2px -2px 0 #ff00ff, 4px 4px 0 #00ffff; }
-  50% { transform: translate(-6px, 0); text-shadow: -4px -4px 0 #ff00ff, 2px 2px 0 #00ffff; }
-  60% { transform: translate(4px, 0); text-shadow: -3px -2px 0 #ff00ff, 4px 3px 0 #00ffff; }
-  70% { transform: translate(-4px, 0); text-shadow: -2px -4px 0 #ff00ff, 3px 2px 0 #00ffff; }
-  80% { transform: translate(5px, 0); text-shadow: -4px -3px 0 #ff00ff, 2px 4px 0 #00ffff; }
-  90% { transform: translate(-3px, 0); text-shadow: -3px -2px 0 #ff00ff, 4px 3px 0 #00ffff; }
-  100% { transform: translate(4px, 0); text-shadow: -4px -4px 0 #ff00ff, 3px 3px 0 #00ffff; }
+  0% {
+    transform: translate(4px, 0);
+    text-shadow: -3px -3px 0 #ff00ff, 3px 3px 0 #00ffff;
+  }
+
+  10% {
+    transform: translate(-5px, 0);
+    text-shadow: -4px -2px 0 #ff00ff, 2px 4px 0 #00ffff;
+  }
+
+  20% {
+    transform: translate(6px, 0);
+    text-shadow: -2px -4px 0 #ff00ff, 4px 2px 0 #00ffff;
+  }
+
+  30% {
+    transform: translate(-3px, 0);
+    text-shadow: -4px -3px 0 #ff00ff, 3px 3px 0 #00ffff;
+  }
+
+  40% {
+    transform: translate(5px, 0);
+    text-shadow: -2px -2px 0 #ff00ff, 4px 4px 0 #00ffff;
+  }
+
+  50% {
+    transform: translate(-6px, 0);
+    text-shadow: -4px -4px 0 #ff00ff, 2px 2px 0 #00ffff;
+  }
+
+  60% {
+    transform: translate(4px, 0);
+    text-shadow: -3px -2px 0 #ff00ff, 4px 3px 0 #00ffff;
+  }
+
+  70% {
+    transform: translate(-4px, 0);
+    text-shadow: -2px -4px 0 #ff00ff, 3px 2px 0 #00ffff;
+  }
+
+  80% {
+    transform: translate(5px, 0);
+    text-shadow: -4px -3px 0 #ff00ff, 2px 4px 0 #00ffff;
+  }
+
+  90% {
+    transform: translate(-3px, 0);
+    text-shadow: -3px -2px 0 #ff00ff, 4px 3px 0 #00ffff;
+  }
+
+  100% {
+    transform: translate(4px, 0);
+    text-shadow: -4px -4px 0 #ff00ff, 3px 3px 0 #00ffff;
+  }
 }
 
 /* The highlighted word gets the ACM brand blue */
@@ -852,11 +940,13 @@
   display: inline-flex;
   align-items: center;
   gap: 16px;
-  padding: 18px 32px;
+  padding: 16px 36px;
   background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 100px;
-  color: rgba(255, 255, 255, 0.88);
+  color: rgba(255, 255, 255, 0.85);
   font-family: var(--font-geist-sans), sans-serif;
   font-size: 13px;
   font-weight: 500;
@@ -865,10 +955,27 @@
   cursor: pointer;
   outline: none;
   text-decoration: none;
-  transition: border-color 0.5s ease, color 0.4s ease;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.04),
-    0 2px 12px rgba(0, 0, 0, 0.2);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: subtleBreathe 4s ease-in-out infinite;
+}
+
+@keyframes subtleBreathe {
+
+  0%,
+  100% {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.02),
+      0 2px 12px rgba(0, 0, 0, 0.2);
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  50% {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.05),
+      0 4px 20px rgba(0, 162, 255, 0.12);
+    /* Very faint ACM Azure glow */
+    border-color: rgba(255, 255, 255, 0.15);
+  }
 }
 
 .heroCtaActive {
@@ -910,33 +1017,50 @@
 
 .loadingDots {
   display: flex;
-  gap: 2px;
-  color: rgba(75, 165, 228, 0.8);
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  font-size: 0;
+  /* Hides the actual text periods in the DOM */
+  height: 18px;
 }
 
 .loadingDots span {
-  animation: blink 1.4s infinite both;
+  display: block;
+  width: 6px;
+  height: 6px;
+  background-color: rgba(0, 162, 255, 0.4);
+  border-radius: 50%;
+  animation: premiumDotSync 1.4s infinite ease-in-out both;
+}
+
+.loadingDots span:nth-child(1) {
+  animation-delay: -0.32s;
 }
 
 .loadingDots span:nth-child(2) {
-  animation-delay: 0.2s;
+  animation-delay: -0.16s;
 }
 
 .loadingDots span:nth-child(3) {
-  animation-delay: 0.4s;
+  animation-delay: 0s;
 }
 
-@keyframes blink {
-  0% {
-    opacity: 0.2;
-  }
+@keyframes premiumDotSync {
 
-  20% {
-    opacity: 1;
-  }
-
+  0%,
+  80%,
   100% {
-    opacity: 0.2;
+    transform: scale(0.6) translateY(0);
+    opacity: 0.4;
+    box-shadow: 0 0 0 rgba(0, 162, 255, 0);
+  }
+
+  40% {
+    transform: scale(1.2) translateY(-2px);
+    opacity: 1;
+    background-color: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 162, 255, 0.8);
   }
 }
 
@@ -1073,11 +1197,32 @@
   /* Zero-cost hardware accelerated levitation effect */
   animation: reelLevitate 12s ease-in-out infinite;
   will-change: transform;
+  pointer-events: none;
+  /* Ignore the invisible rectangular corners */
+}
+
+/* Perfect circle hitbox to ensure hovers only trigger on the actual reel */
+.filmReelHitbox {
+  position: absolute;
+  top: 5%;
+  left: 5%;
+  width: 90%;
+  height: 90%;
+  border-radius: 50%;
+  pointer-events: auto;
+  z-index: 50;
 }
 
 @keyframes reelLevitate {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-15px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-15px);
+  }
 }
 
 /* The rotating element — ONLY this spins */
@@ -1166,8 +1311,15 @@
 }
 
 @keyframes reelRimBreathe {
-  0%, 100% { opacity: 0.7; }
-  50% { opacity: 1.0; }
+
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+
+  50% {
+    opacity: 1.0;
+  }
 }
 
 /* Core Shadow — mass and weight */
@@ -1516,7 +1668,7 @@
     justify-items: center;
     text-align: center;
     padding: 100px 32px 40px;
-    gap: 24px;
+    gap: 16px;
   }
 
   .heroContent {
@@ -1527,6 +1679,7 @@
 
   .sceneIndicator {
     justify-content: center;
+    margin-bottom: 12px;
   }
 
   .heroHeadline {
@@ -1534,11 +1687,12 @@
   }
 
   .heroDivider {
-    margin: 24px auto 20px;
+    margin: 16px auto 16px;
   }
 
   .heroSubtext {
     text-align: center;
+    margin-bottom: 24px;
   }
 
   .filmReelContainer {
@@ -1548,10 +1702,12 @@
 
   .heroReelSide {
     order: -1;
+    margin-bottom: -24px;
   }
 
-  /* Hide evidence markers on small screens — they clutter */
-  .acmEvidence {
+  /* Hide extra HUD and evidence markers on small screens — they clutter */
+  .acmEvidence,
+  .heroHud {
     display: none;
   }
 
@@ -1568,7 +1724,15 @@
 @media (max-width: 520px) {
   .heroInner {
     padding: 80px 20px 32px;
-    gap: 20px;
+    gap: 12px;
+  }
+
+  .heroReelSide {
+    margin-bottom: -32px;
+  }
+
+  .sceneIndicator {
+    margin-bottom: 8px;
   }
 
   .headlineLine {
@@ -1577,6 +1741,7 @@
 
   .heroSubtext {
     font-size: 15px;
+    margin-bottom: 20px;
   }
 
   .filmReelContainer {
@@ -1599,5 +1764,28 @@
 
   .legendPin {
     font-size: 8px;
+  }
+}
+
+/* ============================================================
+   TOUCH DEVICES — GPU PERFORMANCE REDUCTION
+   Disable the heaviest animated effects on mobile GPUs.
+   ============================================================ */
+@media (hover: none) and (pointer: coarse) {
+  /* Disable CSS dust mote animations — 14 concurrent infinite keyframes */
+  .dustMote {
+    animation: none !important;
+    opacity: 0 !important;
+  }
+
+  /* Reduce CTA button backdrop-filter */
+  .exploreBtn {
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+
+  /* Simplify lightning arc filters */
+  .lightningArc {
+    filter: none;
   }
 }
