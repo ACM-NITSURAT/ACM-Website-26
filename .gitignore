@@ -3,6 +3,7 @@
 .vscode
 pnpm-lock.yaml
 package-lock.json
+bun.lock
 
 # dependencies
 /node_modules
