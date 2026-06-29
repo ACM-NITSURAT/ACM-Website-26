@@ -75,7 +75,7 @@ export default function OnboardingPage() {
 
     setSubmitting(true);
     try {
-      const idToken = await auth.currentUser!.getIdToken();
+      const idToken = await auth.currentUser!.getIdToken(/* forceRefresh */ true);
 
       const res = await fetch('/api/onboarding', {
         method: 'POST',
@@ -84,8 +84,9 @@ export default function OnboardingPage() {
       });
 
       if (!res.ok) {
-        console.error('[onboarding] server returned', res.status, await res.text());
-        setError('Please register using your institute email address (ending with .svnit.ac.in).');
+        const body = await res.json().catch(() => ({})) as { error?: string };
+        console.error('[onboarding] server returned', res.status, body);
+        setError(body.error ?? 'Something went wrong. Please try again.');
         return;
       }
 
