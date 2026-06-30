@@ -53,6 +53,7 @@ const TYPE_STYLES: Record<Event['type'], string> = {
   event:    'bg-violet-500/10 text-violet-400 border-violet-500/20',
   workshop: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
   meet:     'bg-cyan-500/10 text-cyan-400 border-cyan-500/20',
+  hackathon: 'bg-fuchsia-500/10 text-fuchsia-400 border-fuchsia-500/20',
 };
 
 // Ambient glow color behind the hero, tied to event type so it's meaningful, not decorative.
@@ -60,6 +61,7 @@ const TYPE_GLOW: Record<Event['type'], string> = {
   event:    'from-violet-600/25',
   workshop: 'from-amber-600/25',
   meet:     'from-cyan-600/25',
+  hackathon: 'from-fuchsia-600/25',
 };
 
 // Thumbnail border reflects live status at a glance.

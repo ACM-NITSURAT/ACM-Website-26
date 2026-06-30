@@ -87,7 +87,7 @@ export default function UserMenu() {
           <Link href="/leaderboard/link-profiles" className={styles.menuItem} onClick={() => setIsOpen(false)}>
             Link Coding Profiles
           </Link>
-          {role === 'admin' && (
+          {(role === 'core' || role === 'adviser') && (
             <Link href="/admin" className={styles.menuItem} onClick={() => setIsOpen(false)}>
               Admin Dashboard
             </Link>

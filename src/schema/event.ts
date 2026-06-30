@@ -30,7 +30,7 @@ export interface Event {
   eventThumbnail: string;
 
   /** Broad classification of the event format. */
-  type: 'event' | 'workshop' | 'meet';
+  type: 'event' | 'workshop' | 'meet' | 'hackathon';
 
   /**
    * Human-readable venue string.

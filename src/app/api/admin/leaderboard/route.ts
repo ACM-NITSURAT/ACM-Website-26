@@ -39,7 +39,7 @@ export async function GET(request: Request) {
         displayName: `${u.firstName} ${u.lastName}`,
         rollNumber: u.rollNumber,
         branch: u.branch,
-        currentYear: u.currentYear,
+        currentYear: entry?.currentYear || 1,
         score: entry?.acm?.score || 0,
         rank: entry?.acm?.overallRank || 0,
         lastSync: entry?.sync?.lastSync || null,
