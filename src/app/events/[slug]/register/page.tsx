@@ -34,15 +34,11 @@ function tsToDate(ts: unknown): string {
   });
 }
 
-import styles from './page.module.css';
-import aboutStyles from '@/components/sections/AboutSection.module.css';
-import FlashingGrid from '@/components/sections/FlashingGrid';
-
 // ── Shared styles ─────────────────────────────────────────────────────────────
 
-const inputCls = styles.consoleInput;
-const labelCls = styles.inputLabel;
-const selectCls = styles.consoleInput + ' ' + styles.consoleSelect;
+const inputCls = 'w-full bg-zinc-800/60 border border-zinc-700 rounded-lg px-3 py-2.5 text-sm text-white placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500 transition-colors';
+const labelCls = 'block text-sm font-medium text-zinc-300 mb-1.5';
+const selectCls = 'w-full bg-zinc-800/60 border border-zinc-700 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-zinc-500 transition-colors cursor-pointer';
 
 // ── Render a paragraph (display-only) field ───────────────────────────────────
 
@@ -108,17 +104,19 @@ function DynamicField({
         </label>
         <div className="flex flex-col gap-2.5">
           {(field as CheckboxField).options.map((opt) => (
-            <label key={opt} className={styles.checkboxLabel}>
+            <label key={opt} className="flex items-center gap-3 cursor-pointer group">
               <button type="button" role="checkbox" aria-checked={checked.includes(opt)}
                 onClick={() => toggle(opt)}
-                className={`${styles.checkboxBox} ${checked.includes(opt) ? styles.checkboxBoxActive : ''}`}>
+                className={`w-4 h-4 rounded border flex-shrink-0 transition-colors flex items-center justify-center ${
+                  checked.includes(opt) ? 'bg-white border-white' : 'bg-transparent border-zinc-600 group-hover:border-zinc-400'
+                }`}>
                 {checked.includes(opt) && (
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(139, 92, 246, 1)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#18181b" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
                 )}
               </button>
-              <span className={styles.checkboxText}>{opt}</span>
+              <span className="text-sm text-zinc-300">{opt}</span>
             </label>
           ))}
         </div>
@@ -158,34 +156,34 @@ function DynamicField({
 
 function AfterScreenView({ afterScreen, eventName }: { afterScreen: AfterScreen | null | undefined; eventName: string }) {
   return (
-    <div className={styles.statusPanel}>
-      <div className={`${styles.statusIcon} ${styles.statusIconInfo}`} style={{ color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.4)', background: 'rgba(16, 185, 129, 0.1)', boxShadow: '0 0 30px rgba(16, 185, 129, 0.2)' }}>
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <div className="flex flex-col items-center text-center gap-5 py-8">
+      <div className="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-400">
           <polyline points="20 6 9 17 4 12" />
         </svg>
       </div>
 
       <div>
-        <h2 className={styles.statusTitle}>
-          {afterScreen?.heading ? afterScreen.heading.toUpperCase() : "REGISTRATION SUCCESSFUL"}
+        <h2 className="text-xl font-semibold text-white mb-2">
+          {afterScreen?.heading || "You're registered!"}
         </h2>
         {!afterScreen?.heading && (
-          <p className={styles.statusDesc}>Data transmission complete. See you at {eventName}.</p>
+          <p className="text-sm text-zinc-400">We&apos;ll see you at {eventName}.</p>
         )}
       </div>
 
       {afterScreen?.body && (
         <div
-          className="prose prose-invert prose-sm max-w-lg w-full text-left font-mono"
+          className="prose prose-invert prose-sm max-w-lg w-full text-left"
           dangerouslySetInnerHTML={{ __html: afterScreen.body }}
         />
       )}
 
       <Link
         href="/events"
-        className={styles.statusBtn}
+        className="mt-2 inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-zinc-800 border border-zinc-700 text-sm text-zinc-300 hover:bg-zinc-700 hover:text-white transition-colors"
       >
-        RETURN TO INDEX
+        ← Back to events
       </Link>
     </div>
   );
@@ -266,8 +264,8 @@ function DefaultTeamFields({
           onChange={(e) => onTeamChange('teamName', e.target.value)}
           placeholder="e.g. Team Sigma" className={inputCls} />
       </div>
-      <div className="border border-white/10 bg-white/5 p-4 flex flex-col gap-3 rounded-[2px] mb-2">
-        <p className="font-mono text-[10px] tracking-widest text-zinc-500 uppercase">Leader (you)</p>
+      <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 flex flex-col gap-3">
+        <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wide">Leader (you)</p>
         <div>
           <label className={labelCls}>Name <span className="text-red-400">*</span></label>
           <input type="text" required value={teamValues.leaderName}
@@ -282,25 +280,25 @@ function DefaultTeamFields({
         </div>
       </div>
       <div className="flex flex-col gap-3">
-        <div className="flex items-center justify-between mb-2">
-          <p className="font-mono text-[10px] tracking-widest text-zinc-500 uppercase">
+        <div className="flex items-center justify-between">
+          <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wide">
             Members ({members.length} additional · {members.length + 1} total incl. leader)
           </p>
           {members.length < maxMembers && (
             <button type="button"
               onClick={() => onMembersChange([...members, defaultMember()])}
-              className="font-mono text-[10px] tracking-widest text-purple-400 hover:text-purple-300 flex items-center gap-1.5 transition-colors uppercase">
+              className="text-xs text-zinc-400 hover:text-zinc-200 flex items-center gap-1 transition-colors">
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
               </svg>
-              ADD MEMBER
+              Add member
             </button>
           )}
         </div>
         {members.map((m, i) => (
-          <div key={i} className="border border-white/10 bg-white/5 p-4 flex flex-col gap-3 rounded-[2px] mb-2">
+          <div key={i} className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 flex flex-col gap-3">
             <div className="flex items-center justify-between">
-              <span className="font-mono text-[10px] tracking-widest text-zinc-500 uppercase">MEMBER {i + 1}</span>
+              <span className="text-xs font-medium text-zinc-500">Member {i + 1}</span>
               {members.length > minMembers && (
                 <button type="button"
                   onClick={() => onMembersChange(members.filter((_, idx) => idx !== i))}
@@ -441,13 +439,12 @@ function RegistrationForm({ event, form }: { event: EventRow; form: EventForm | 
   }
 
   return (
-    <form onSubmit={handleSubmit} className={styles.formPanel}>
+    <form onSubmit={handleSubmit} className="flex flex-col gap-6">
       {/* Form title + description */}
       {form && (
         <div className="flex flex-col gap-3">
           {form.title && (
-            <h2 className={styles.formTitle}>
-              <span className={styles.formTitleIndicator} />
+            <h2 className="text-xl font-bold text-white leading-snug" style={{ fontFamily: 'var(--font-display)' }}>
               {form.title}
             </h2>
           )}
@@ -457,8 +454,6 @@ function RegistrationForm({ event, form }: { event: EventRow; form: EventForm | 
           )}
         </div>
       )}
-
-      <div className="flex flex-col gap-6 mt-4">
 
       {/* Default identity fields — rendered only when admin opted in */}
       {showDefaults && !isTeam && (
@@ -494,17 +489,16 @@ function RegistrationForm({ event, form }: { event: EventRow; form: EventForm | 
           ))}
         </div>
       )}
-      </div>
 
       {submitError && (
-        <div className="px-4 py-3 mt-4 rounded border border-red-500/20 bg-red-500/10 text-xs font-mono text-red-400 uppercase tracking-widest">
+        <div className="px-4 py-3 rounded-lg border border-red-500/20 bg-red-500/10 text-sm text-red-400">
           {submitError}
         </div>
       )}
 
-      <button type="submit" disabled={submitting} className={styles.submitBtn}>
-        <div className={styles.submitBtnScanline} />
-        {submitting ? 'TRANSMITTING…' : 'INITIALIZE'}
+      <button type="submit" disabled={submitting}
+        className="w-full bg-white text-zinc-900 font-semibold py-3.5 rounded-xl text-sm hover:bg-zinc-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+        {submitting ? 'Submitting…' : 'Submit'}
       </button>
     </form>
   );
@@ -515,21 +509,24 @@ function RegistrationForm({ event, form }: { event: EventRow; form: EventForm | 
 
 function AlreadyRegistered({ event }: { event: EventRow }) {
   return (
-    <div className={styles.statusPanel}>
-      <div className={`${styles.statusIcon} ${styles.statusIconInfo}`}>
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <div className="flex flex-col items-center text-center gap-5 py-8">
+      <div className="w-16 h-16 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-400">
           <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
           <polyline points="22 4 12 14.01 9 11.01" />
         </svg>
       </div>
       <div>
-        <h2 className={styles.statusTitle}>REGISTRATION CONFIRMED</h2>
-        <p className={styles.statusDesc}>
-          You are already registered for <strong>{event.eventName}</strong>. No further action is required.
+        <h2 className="text-xl font-semibold text-white mb-2">You&apos;re already registered</h2>
+        <p className="text-sm text-zinc-400 max-w-xs">
+          You have already signed up for <span className="text-zinc-200">{event.eventName}</span>. No need to register again.
         </p>
       </div>
-      <Link href={`/events/${event.slug}`} className={styles.statusBtn}>
-        ABORT SEQUENCE
+      <Link
+        href={`/events/${event.slug}`}
+        className="mt-2 inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-zinc-800 border border-zinc-700 text-sm text-zinc-300 hover:bg-zinc-700 hover:text-white transition-colors"
+      >
+        ← Back to event
       </Link>
     </div>
   );
@@ -539,14 +536,8 @@ function AlreadyRegistered({ event }: { event: EventRow }) {
 
 function LoadingSkeleton() {
   return (
-    <div className={styles.wrapper}>
-      <div className={aboutStyles.bgAtmosphere} aria-hidden="true">
-        <div className={aboutStyles.bgGrid} />
-        <FlashingGrid />
-        <div className={aboutStyles.bgGlow1} />
-        <div className={aboutStyles.bgGlow2} />
-      </div>
-      <div className={styles.inner}>
+    <div className="min-h-screen bg-zinc-950 pt-[74px]">
+      <div className="max-w-xl mx-auto px-4 sm:px-6 py-10">
         <div className="h-3 w-32 rounded bg-zinc-800 animate-pulse mb-8" />
         <div className="space-y-4">
           <div className="h-7 w-2/3 rounded bg-zinc-800 animate-pulse" />
@@ -646,30 +637,10 @@ export default function RegisterPage() {
   // Gate: meets / no-form types have no registration
   if (isMeet) {
     return (
-      <div className={styles.wrapper}>
-        <div className={aboutStyles.bgAtmosphere} aria-hidden="true">
-          <div className={aboutStyles.bgGrid} />
-          <FlashingGrid />
-          <div className={aboutStyles.bgGlow1} />
-          <div className={aboutStyles.bgGlow2} />
-        </div>
-        <div className={styles.inner}>
-          <div className={styles.statusPanel}>
-            <div className={`${styles.statusIcon} ${styles.statusIconInfo}`}>
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="12" /><line x1="12" y1="8" x2="12.01" y2="8" />
-              </svg>
-            </div>
-            <div>
-              <h2 className={styles.statusTitle}>REGISTRATION NOT APPLICABLE</h2>
-              <p className={styles.statusDesc}>
-                This event does not require a registration form.
-              </p>
-            </div>
-            <Link href={`/events/${slug}`} className={styles.statusBtn}>
-              RETURN TO EVENT
-            </Link>
-          </div>
+      <div className="min-h-screen bg-zinc-950 pt-[74px] flex items-center justify-center">
+        <div className="text-center max-w-sm px-4">
+          <p className="text-sm text-zinc-400 mb-4">This event does not have a registration form.</p>
+          <Link href={`/events/${slug}`} className="text-sm text-zinc-400 hover:text-zinc-200 transition-colors">← Back to event</Link>
         </div>
       </div>
     );
@@ -678,30 +649,13 @@ export default function RegisterPage() {
   // Gate: form not open
   if (isFinished || formClosed) {
     return (
-      <div className={styles.wrapper}>
-        <div className={aboutStyles.bgAtmosphere} aria-hidden="true">
-          <div className={aboutStyles.bgGrid} />
-          <FlashingGrid />
-          <div className={aboutStyles.bgGlow1} />
-          <div className={aboutStyles.bgGlow2} />
-        </div>
-        <div className={styles.inner}>
-          <div className={styles.statusPanel}>
-            <div className={`${styles.statusIcon} ${styles.statusIconWarning}`}>
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" />
-              </svg>
-            </div>
-            <div>
-              <h2 className={styles.statusTitle}>REGISTRATION CLOSED</h2>
-              <p className={styles.statusDesc}>
-                {isFinished ? 'This event has already concluded.' : 'Registration is not currently open.'} Check back later for updates.
-              </p>
-            </div>
-            <Link href={`/events/${slug}`} className={styles.statusBtn}>
-              RETURN TO EVENT
-            </Link>
-          </div>
+      <div className="min-h-screen bg-zinc-950 pt-[74px] flex items-center justify-center">
+        <div className="text-center max-w-sm px-4">
+          <p className="text-sm text-zinc-400 mb-1">
+            {isFinished ? 'This event has ended.' : 'Registration is not open yet.'}
+          </p>
+          <p className="text-xs text-zinc-600 mb-4">Check back later or follow us for updates.</p>
+          <Link href={`/events/${slug}`} className="text-sm text-zinc-400 hover:text-zinc-200 transition-colors">← Back to event</Link>
         </div>
       </div>
     );
@@ -710,144 +664,119 @@ export default function RegisterPage() {
   // Gate: form-capable event but no form built yet
   if (!form) {
     return (
-      <div className={styles.wrapper}>
-        <div className={aboutStyles.bgAtmosphere} aria-hidden="true">
-          <div className={aboutStyles.bgGrid} />
-          <FlashingGrid />
-          <div className={aboutStyles.bgGlow1} />
-          <div className={aboutStyles.bgGlow2} />
-        </div>
-        <div className={styles.inner}>
-          <div className={styles.statusPanel}>
-            <div className={`${styles.statusIcon} ${styles.statusIconInfo}`}>
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="12" /><line x1="12" y1="8" x2="12.01" y2="8" />
-              </svg>
-            </div>
-            <div>
-              <h2 className={styles.statusTitle}>SYSTEM STANDBY</h2>
-              <p className={styles.statusDesc}>
-                The registration interface is currently being configured and is not yet available.
-              </p>
-            </div>
-            <Link href={`/events/${slug}`} className={styles.statusBtn}>
-              RETURN TO EVENT
-            </Link>
-          </div>
+      <div className="min-h-screen bg-zinc-950 pt-[74px] flex items-center justify-center">
+        <div className="text-center max-w-sm px-4">
+          <p className="text-sm text-zinc-400 mb-4">The registration form isn&apos;t ready yet.</p>
+          <Link href={`/events/${slug}`} className="text-sm text-zinc-400 hover:text-zinc-200 transition-colors">← Back to event</Link>
         </div>
       </div>
     );
   }
 
   return (
-    <div className={styles.wrapper}>
-      {/* Background Atmosphere */}
-      <div className={aboutStyles.bgAtmosphere} aria-hidden="true">
-        <div className={aboutStyles.bgGrid} />
-        <FlashingGrid />
-        <div className={aboutStyles.bgGlow1} />
-        <div className={aboutStyles.bgGlow2} />
-      </div>
-
-      <div className={styles.inner}>
+    <div className="min-h-screen bg-zinc-950 pt-[74px] pb-16">
+      <div className="max-w-xl mx-auto px-4 sm:px-6 py-8">
 
         {/* Breadcrumb */}
-        <div className={styles.breadcrumbs}>
-          <Link href="/events" className={styles.breadcrumbLink}>EVENTS</Link>
-          <span className={styles.breadcrumbSeparator}>/</span>
-          <Link href={`/events/${slug}`} className={styles.breadcrumbLink}>
+        <div className="flex items-center gap-2 text-xs text-zinc-500 mb-6">
+          <Link href="/events" className="hover:text-zinc-300 transition-colors">Events</Link>
+          <span>/</span>
+          <Link href={`/events/${slug}`} className="hover:text-zinc-300 transition-colors truncate max-w-[8rem]">
             {event.eventName}
           </Link>
-          <span className={styles.breadcrumbSeparator}>/</span>
-          <span className={styles.breadcrumbCurrent}>REGISTER</span>
+          <span>/</span>
+          <span className="text-zinc-400">Register</span>
         </div>
 
         {/* Page header: title first, then full-width thumbnail below it */}
-        <div className={styles.headerBlock}>
+        <div className="mb-8 flex flex-col gap-4">
           <div>
-            <h1 className={styles.heading}>
+            <h1 className="text-2xl font-bold text-white leading-tight tracking-tight" style={{ fontFamily: 'var(--font-display)' }}>
               {event.eventName}
             </h1>
             {dateStr && (
-              <p className={styles.metaText}>{dateStr} · {event.location}</p>
+              <p className="text-xs text-zinc-500 mt-1.5">{dateStr} · {event.location}</p>
             )}
           </div>
 
           {/* Full-width thumbnail — below title, inside the content column */}
           {thumbSrc && (
-            <div className={styles.heroFrame}>
-              <div className={styles.heroVignette} />
+            <div className="relative w-full rounded-2xl overflow-hidden bg-zinc-800" style={{ aspectRatio: '16 / 9' }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={thumbSrc}
                 alt={event.eventName}
                 onError={() => setThumbError(true)}
-                className={styles.heroImage}
+                className="w-full h-full object-cover"
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none" />
             </div>
           )}
         </div>
 
         {/* Gate: invalid config — executives-only but anonymous form is logically broken */}
         {!event.isOpenToAll && event.unregisteredForm ? (
-          <div className={styles.statusPanel}>
-            <div className={`${styles.statusIcon} ${styles.statusIconWarning}`}>
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <div className="flex flex-col items-center text-center gap-5 py-8">
+            <div className="w-14 h-14 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="text-amber-400">
                 <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
                 <line x1="12" y1="9" x2="12" y2="13" /><line x1="12" y1="17" x2="12.01" y2="17" />
               </svg>
             </div>
             <div>
-              <h2 className={styles.statusTitle}>SYSTEM ERROR: EVENT MISCONFIGURED</h2>
-              <p className={styles.statusDesc}>
-                This event has an invalid configuration. Please contact the administrator.
+              <p className="text-base font-semibold text-white mb-1">Event misconfigured</p>
+              <p className="text-sm text-zinc-400 max-w-xs leading-relaxed">
+                This event has an invalid configuration. Please contact the organiser.
               </p>
             </div>
-            <Link href={`/events/${slug}`} className={styles.statusBtn}>
-              ABORT SEQUENCE
+            <Link href={`/events/${slug}`} className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors">
+              ← Back to event
             </Link>
           </div>
 
         ) : /* Gate: auth required but user not logged in */ !event.unregisteredForm && !user ? (
-          <div className={styles.statusPanel}>
-            <div className={`${styles.statusIcon} ${styles.statusIconError}`}>
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <div className="flex flex-col items-center text-center gap-5 py-8">
+            <div className="w-14 h-14 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="text-zinc-400">
                 <rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" />
               </svg>
             </div>
             <div>
-              <h2 className={styles.statusTitle}>ACCESS DENIED: LOGIN REQUIRED</h2>
-              <p className={styles.statusDesc}>
+              <p className="text-base font-semibold text-white mb-1">Login required</p>
+              <p className="text-sm text-zinc-400 max-w-xs leading-relaxed">
                 This event requires a verified SVNIT account to register. Please log in to continue.
               </p>
             </div>
             <Link
               href={`/login?redirect=${encodeURIComponent(`/events/${slug}/register`)}`}
-              className={styles.statusBtn} style={{ background: 'rgba(139, 92, 246, 0.1)', borderColor: 'rgba(139, 92, 246, 0.4)', color: '#fff' }}
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-white text-zinc-900 text-sm font-semibold hover:bg-zinc-200 transition-colors"
             >
-              AUTHENTICATE NOW
+              Log in to register
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
             </Link>
-            <Link href={`/events/${slug}`} className={styles.statusBtn}>
-              ABORT SEQUENCE
+            <Link href={`/events/${slug}`} className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors">
+              ← Back to event
             </Link>
           </div>
 
         ) : /* Gate: executives-only event but logged-in user is only a member */ !event.isOpenToAll && !event.unregisteredForm && role === 'member' ? (
-          <div className={styles.statusPanel}>
-            <div className={`${styles.statusIcon} ${styles.statusIconError}`}>
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <div className="flex flex-col items-center text-center gap-5 py-8">
+            <div className="w-14 h-14 rounded-full bg-violet-500/10 border border-violet-500/20 flex items-center justify-center">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="text-violet-400">
                 <circle cx="12" cy="8" r="4" /><path d="M6 20v-2a6 6 0 0 1 12 0v2" />
                 <line x1="17" y1="11" x2="19" y2="13" /><line x1="19" y1="11" x2="17" y2="13" />
               </svg>
             </div>
             <div>
-              <h2 className={styles.statusTitle}>ACCESS DENIED: INSUFFICIENT CLEARANCE</h2>
-              <p className={styles.statusDesc}>
-                This event is restricted to executives and above. Your current account lacks the required clearance level.
+              <p className="text-base font-semibold text-white mb-1">Executives only</p>
+              <p className="text-sm text-zinc-400 max-w-xs leading-relaxed">
+                This event is open to ACM executives and above only. Your current account doesn&apos;t have the required access.
               </p>
             </div>
-            <Link href={`/events/${slug}`} className={styles.statusBtn}>
-              ABORT SEQUENCE
+            <Link href={`/events/${slug}`} className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors">
+              ← Back to event
             </Link>
           </div>
 

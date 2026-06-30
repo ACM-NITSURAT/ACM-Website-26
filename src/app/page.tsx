@@ -44,25 +44,12 @@ export default function Home() {
   // Listen for loader completion
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const handleLoaderComplete = () => {
-        setIsLoaderComplete(true);
-        // Scroll to hash if present after loading
-        if (window.location.hash) {
-          const id = window.location.hash.substring(1);
-          setTimeout(() => {
-            const targetEl = document.querySelector(`[data-nav-section="${id}"]`) || document.getElementById(id);
-            if (targetEl) {
-              targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-          }, 100);
-        }
-      };
-
       if (sessionStorage.getItem('cinema-loaded') === '1') {
-        handleLoaderComplete();
+        setIsLoaderComplete(true);
       }
-      window.addEventListener('cinema-loader-complete', handleLoaderComplete);
-      return () => window.removeEventListener('cinema-loader-complete', handleLoaderComplete);
+      const handleComplete = () => setIsLoaderComplete(true);
+      window.addEventListener('cinema-loader-complete', handleComplete);
+      return () => window.removeEventListener('cinema-loader-complete', handleComplete);
     }
   }, []);
 
