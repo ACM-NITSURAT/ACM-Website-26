@@ -1,3 +1,11 @@
+@font-face {
+  font-family: 'Progress';
+  src: url('/ProgressPersonalUse-EaJdz.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 .wrapper {
   position: fixed;
   top: 0;
@@ -1652,167 +1660,6 @@
   text-transform: uppercase;
 }
 
-/* --- Continuous Blue & White Glitch Effect --- */
-.archivalGlitchText {
-  position: relative;
-  display: inline-block;
-  color: transparent !important;
-  /* Fix bounding box for Detunized font which overflows downwards */
-  padding-bottom: 0.4em;
-  margin-bottom: -0.4em;
-  line-height: 1;
-}
-
-.archivalGlitchText::before,
-.archivalGlitchText::after {
-  content: attr(data-text);
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 1;
-  pointer-events: none;
-  color: #ffffff;
-}
-
-.archivalGlitchText::before {
-  -webkit-mask-image: linear-gradient(to bottom,
-      black 0%, black 25%, transparent 25%, transparent 40%,
-      black 40%, black 65%, transparent 65%, transparent 80%,
-      black 80%, black 100%);
-  mask-image: linear-gradient(to bottom,
-      black 0%, black 25%, transparent 25%, transparent 40%,
-      black 40%, black 65%, transparent 65%, transparent 80%,
-      black 80%, black 100%);
-  animation: glitch-anim-before-blue 0.3s infinite linear alternate-reverse;
-}
-
-.archivalGlitchText::after {
-  -webkit-mask-image: linear-gradient(to bottom,
-      transparent 0%, transparent 25%, black 25%, black 40%,
-      transparent 40%, transparent 65%, black 65%, black 80%,
-      transparent 80%, transparent 100%);
-  mask-image: linear-gradient(to bottom,
-      transparent 0%, transparent 25%, black 25%, black 40%,
-      transparent 40%, transparent 65%, black 65%, black 80%,
-      transparent 80%, transparent 100%);
-  animation: glitch-anim-after-blue 0.3s infinite linear alternate-reverse;
-}
-
-@keyframes glitch-anim-before-blue {
-  0% {
-    transform: translate(-4px, 0);
-    text-shadow: -3px -3px 0 #ffffff, 3px 3px 0 #0066ff;
-  }
-
-  10% {
-    transform: translate(5px, 0);
-    text-shadow: -2px -2px 0 #ffffff, 4px 2px 0 #0066ff;
-  }
-
-  20% {
-    transform: translate(-3px, 0);
-    text-shadow: -4px -3px 0 #ffffff, 2px 4px 0 #0066ff;
-  }
-
-  30% {
-    transform: translate(6px, 0);
-    text-shadow: -2px -4px 0 #ffffff, 3px 2px 0 #0066ff;
-  }
-
-  40% {
-    transform: translate(-5px, 0);
-    text-shadow: -3px -2px 0 #ffffff, 4px 3px 0 #0066ff;
-  }
-
-  50% {
-    transform: translate(4px, 0);
-    text-shadow: -4px -4px 0 #ffffff, 2px 2px 0 #0066ff;
-  }
-
-  60% {
-    transform: translate(-6px, 0);
-    text-shadow: -2px -3px 0 #ffffff, 3px 4px 0 #0066ff;
-  }
-
-  70% {
-    transform: translate(3px, 0);
-    text-shadow: -4px -2px 0 #ffffff, 4px 2px 0 #0066ff;
-  }
-
-  80% {
-    transform: translate(-5px, 0);
-    text-shadow: -3px -4px 0 #ffffff, 2px 3px 0 #0066ff;
-  }
-
-  90% {
-    transform: translate(6px, 0);
-    text-shadow: -2px -3px 0 #ffffff, 4px 4px 0 #0066ff;
-  }
-
-  100% {
-    transform: translate(-4px, 0);
-    text-shadow: -4px -4px 0 #ffffff, 3px 3px 0 #0066ff;
-  }
-}
-
-@keyframes glitch-anim-after-blue {
-  0% {
-    transform: translate(4px, 0);
-    text-shadow: -3px -3px 0 #ffffff, 3px 3px 0 #0066ff;
-  }
-
-  10% {
-    transform: translate(-5px, 0);
-    text-shadow: -4px -2px 0 #ffffff, 2px 4px 0 #0066ff;
-  }
-
-  20% {
-    transform: translate(6px, 0);
-    text-shadow: -2px -4px 0 #ffffff, 4px 2px 0 #0066ff;
-  }
-
-  30% {
-    transform: translate(-3px, 0);
-    text-shadow: -4px -3px 0 #ffffff, 3px 3px 0 #0066ff;
-  }
-
-  40% {
-    transform: translate(5px, 0);
-    text-shadow: -2px -2px 0 #ffffff, 4px 4px 0 #0066ff;
-  }
-
-  50% {
-    transform: translate(-6px, 0);
-    text-shadow: -4px -4px 0 #ffffff, 2px 2px 0 #0066ff;
-  }
-
-  60% {
-    transform: translate(4px, 0);
-    text-shadow: -3px -2px 0 #ffffff, 4px 3px 0 #0066ff;
-  }
-
-  70% {
-    transform: translate(-4px, 0);
-    text-shadow: -2px -4px 0 #ffffff, 3px 2px 0 #0066ff;
-  }
-
-  80% {
-    transform: translate(5px, 0);
-    text-shadow: -4px -3px 0 #ffffff, 2px 4px 0 #0066ff;
-  }
-
-  90% {
-    transform: translate(-3px, 0);
-    text-shadow: -3px -2px 0 #ffffff, 4px 3px 0 #0066ff;
-  }
-
-  100% {
-    transform: translate(4px, 0);
-    text-shadow: -4px -4px 0 #ffffff, 3px 3px 0 #0066ff;
-  }
-}
 
 .archivalLogoWrapper {
   width: 80px;
@@ -2980,6 +2827,27 @@
   width: 22.8vw;
   height: 22.8vw;
   filter: drop-shadow(0 0 40px rgba(110, 181, 240, 0.3));
+}
+
+/* Header containing text above the logo */
+.mosaicHeader {
+  position: absolute;
+  bottom: calc(50% + 11.4vw + 40px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100vw;
+  font-family: 'Progress', var(--font-display), 'Space Grotesk', sans-serif;
+  font-size: clamp(32px, 5vw, 64px);
+  font-weight: normal;
+  letter-spacing: 0.15em;
+  color: #ffffff;
+  text-shadow: 0 0 20px rgba(110, 181, 240, 0.6);
+  text-transform: uppercase;
+  margin: 0;
+  opacity: 0;
+  will-change: transform, opacity;
+  text-align: center;
+  z-index: 20;
 }
 
 /* Footer containing Tagline & CTA */

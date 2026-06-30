@@ -1018,7 +1018,10 @@ export default function WalkThroughReel({ isVisible, onBack }: WalkThroughReelPr
       }
 
       /* --- Scene 2: The Deep Space Monoliths --- */
-      const isMobileDevice = window.innerWidth < 860;
+      /* Use the same query as our CSS touch overrides so JS and CSS agree.
+         Tablets in landscape (1024px+) were missed by the old width < 860 check,
+         causing JS to apply transforms while CSS told the GPU not to expect them. */
+      const isTouchDevice = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
 
       if (scene2Ref.current) {
         const enterE = scene2Blend;
@@ -1030,8 +1033,9 @@ export default function WalkThroughReel({ isVisible, onBack }: WalkThroughReelPr
         scene2Ref.current.style.visibility =
           enterE > 0.01 && scene3Blend < 0.98 ? 'visible' : 'hidden';
         scene2Ref.current.style.opacity = String(enterE * (1 - exitFade) * (1 - scene3Blend));
-        // On mobile, skip the container-level scale/translate to prevent subpixel jitter
-        if (!isMobileDevice) {
+        // On touch devices, skip the container-level scale/translate to prevent
+        // subpixel jitter and GPU compositing conflicts with CSS will-change overrides
+        if (!isTouchDevice) {
           const scale = 1.18 - enterE * 0.18;
           const pushY = (1 - enterE) * 8;
           scene2Ref.current.style.transform = `scale(${scale}) translateY(${pushY}vh)`;
@@ -1293,6 +1297,8 @@ export default function WalkThroughReel({ isVisible, onBack }: WalkThroughReelPr
 
   return (
     <div className={`${styles.wrapper} ${isVisible ? styles.visible : ''}`}>
+
+
       {/* P2: Projector flash — position:fixed, mounted at wrapper root OUTSIDE all transformed containers.
           This ensures it covers the full viewport even when parent elements have CSS transforms. */}
       <div ref={projectorFlashRef} className={styles.projectorFlash} />
@@ -1449,13 +1455,13 @@ export default function WalkThroughReel({ isVisible, onBack }: WalkThroughReelPr
           <div className={styles.bgParallax} aria-hidden="true">
             <div className={styles.scene2BgImages}>
               <div className={styles.bgImageWrapper}>
-                <Image src="/dotslash/Dotslash9-winners.webp" alt="bg1" fill style={{ objectFit: 'cover' }} />
+                <Image src="/dotslash/Dotslash9-winners.webp" alt="bg1" fill style={{ objectFit: 'cover' }} sizes="100vw" />
               </div>
               <div className={styles.bgImageWrapper}>
-                <Image src="/dotslash/Dotslash9-team.webp" alt="bg2" fill style={{ objectFit: 'cover' }} />
+                <Image src="/dotslash/Dotslash9-team.webp" alt="bg2" fill style={{ objectFit: 'cover' }} sizes="100vw" />
               </div>
               <div className={styles.bgImageWrapper}>
-                <Image src="/dotslash/DSC_2163 (1).webp" alt="bg3" fill style={{ objectFit: 'cover' }} />
+                <Image src="/dotslash/DSC_2163 (1).webp" alt="bg3" fill style={{ objectFit: 'cover' }} sizes="100vw" />
               </div>
             </div>
             <div className={styles.bgGlow} />
@@ -1532,9 +1538,9 @@ export default function WalkThroughReel({ isVisible, onBack }: WalkThroughReelPr
           </div>
 
           <div ref={archivalLogoRef} className={styles.archivalFinal} aria-hidden="true">
-            <p className={styles.archivalFinalTop}>THIS IS</p>
+            <p className={styles.archivalFinalTop}>WE ARE</p>
             <p className={styles.archivalFinalMain}>
-              <span className={styles.archivalGlitchText} data-text="ACM">ACM</span> NIT SURAT
+              ACM NIT SURAT
             </p>
             <p className={styles.archivalFinalSub}>BUILT BY STUDENTS. FOR STUDENTS. SINCE 2005.</p>
           </div>
@@ -1732,7 +1738,7 @@ export default function WalkThroughReel({ isVisible, onBack }: WalkThroughReelPr
                 ref={(el) => { dotslashImagesRef.current[i] = el; }}
                 className={styles.dotslashGalleryImgWrapper}
               >
-                <Image src={src} alt={`Dotslash ${i}`} fill style={{ objectFit: 'cover' }} />
+                <Image src={src} alt={`Dotslash ${i}`} fill style={{ objectFit: 'cover' }} sizes="(max-width: 768px) 100vw, 33vw" />
               </div>
             ))}
           </div>
@@ -1788,7 +1794,7 @@ export default function WalkThroughReel({ isVisible, onBack }: WalkThroughReelPr
 
           {/* Header above logo */}
           <h2 ref={mosaicHeaderRef} className={styles.mosaicHeader}>
-            WE ARE ACM NIT SURAT.
+            THE LEGACY CONTINUES.
           </h2>
 
           {/* Tagline + CTA below logo */}

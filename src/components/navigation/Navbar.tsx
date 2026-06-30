@@ -474,6 +474,7 @@ export default function Navbar() {
               width={34} 
               height={34} 
               className={styles.svnitImg}
+              style={{ width: 'auto', height: 'auto' }}
             />
           </div>
         </Link>
