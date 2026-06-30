@@ -131,7 +131,7 @@ function ContestCard({ contest }: { contest: UpcomingContest }) {
           <div className={styles.readoutDivider} />
           <div className={styles.readoutBlock}>
             <span className={styles.readoutLabel}>DURATION</span>
-            <span className={styles.readoutValue}>{Math.floor(contest.duration / 60)}m</span>
+            <span className={styles.readoutValue}>{duration}</span>
           </div>
         </div>
         <div className={styles.actionArrow}>
