@@ -104,22 +104,62 @@ export default function Navbar() {
   const plateRef = useRef<HTMLDivElement>(null);
   const navItemRefs = useRef<(HTMLElement | null)[]>([]);
   const prevSectionRef = useRef<string>('hero');
+  const pendingScrollRef = useRef<string | null>(null);
+
+  // --- Cross-page hash navigation: scroll after pathname changes to '/' ---
+  useEffect(() => {
+    if (pathname === '/' && pendingScrollRef.current) {
+      const targetSection = pendingScrollRef.current;
+      pendingScrollRef.current = null;
+
+      // For hero, just scroll to top
+      if (targetSection === 'hero') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+
+      // Poll for the target element (sections may not be rendered yet)
+      let attempts = 0;
+      const maxAttempts = 50; // ~2.5s max wait
+      const checkAndScroll = () => {
+        const targetEl = document.querySelector(`[data-nav-section="${targetSection}"]`);
+        if (targetEl) {
+          targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else if (attempts < maxAttempts) {
+          attempts++;
+          requestAnimationFrame(checkAndScroll);
+        }
+      };
+      // Give the page a moment to render
+      setTimeout(checkAndScroll, 300);
+    }
+  }, [pathname]);
 
   // Global navigation handler for cinematic transitions
   const handleNavClick = useCallback((e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>, href: string, section: string) => {
     // If it's a hash link on the current home page, smooth scroll
     if (pathname === '/' && href.startsWith('/#')) {
       e.preventDefault();
-      const targetEl = document.querySelector(`[data-nav-section="${section}"]`);
-      if (targetEl) {
-        targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (section === 'hero') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        const targetEl = document.querySelector(`[data-nav-section="${section}"]`);
+        if (targetEl) {
+          targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
       }
+    }
+    // If it's a hash link but we're NOT on the home page, navigate to / then scroll
+    else if (pathname !== '/' && href.startsWith('/#')) {
+      e.preventDefault();
+      pendingScrollRef.current = section;
+      router.push('/');
     }
     
     // For cross-page navigation, we let Next.js <Link> handle the default behavior.
     setIsMobileStripOpen(false);
     setIsExpanded(false);
-  }, [pathname]);
+  }, [pathname, router]);
 
   // --- Reduced motion detection (preserved) ---
   useEffect(() => {

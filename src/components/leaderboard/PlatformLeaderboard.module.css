@@ -6,8 +6,18 @@
 
 .controls {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
   gap: 12px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  .controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }
 
 .errorBanner {
@@ -16,28 +26,34 @@
   justify-content: space-between;
   gap: 12px;
   padding: 12px 16px;
-  border-radius: 10px;
-  background: rgba(239, 68, 68, 0.08);
+  border-radius: 2px;
+  background: rgba(239, 68, 68, 0.05);
   border: 1px solid rgba(239, 68, 68, 0.2);
   color: #fca5a5;
-  font-size: 0.8125rem;
+  font-family: var(--font-geist-mono), 'Courier New', monospace;
+  font-size: 11px;
 }
 
 .retryBtn {
-  padding: 6px 14px;
-  border-radius: 6px;
+  padding: 8px 16px;
+  border-radius: 2px;
   border: 1px solid rgba(239, 68, 68, 0.3);
   background: rgba(239, 68, 68, 0.1);
   color: #fca5a5;
-  font-size: 0.75rem;
-  font-weight: 500;
+  font-family: var(--font-geist-mono), 'Courier New', monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 600;
   cursor: pointer;
-  transition: background 0.15s ease;
+  transition: all 0.3s ease;
   white-space: nowrap;
 }
 
 .retryBtn:hover {
-  background: rgba(239, 68, 68, 0.18);
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.6);
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.2);
 }
 
 .pagination {
@@ -50,28 +66,38 @@
 
 .pageBtn {
   padding: 8px 16px;
-  border-radius: 8px;
-  border: 1px solid rgba(63, 63, 70, 0.4);
-  background: rgba(24, 24, 27, 0.6);
-  color: #a1a1aa;
-  font-size: 0.8125rem;
-  font-weight: 500;
+  border-radius: 2px;
+  border: 1px solid rgba(14, 165, 233, 0.2);
+  background: rgba(14, 165, 233, 0.05);
+  color: rgba(14, 165, 233, 0.8);
+  font-family: var(--font-geist-mono), 'Courier New', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.3s ease;
 }
 
 .pageBtn:hover:not(:disabled) {
-  background: rgba(39, 39, 42, 0.6);
-  color: #d4d4d8;
+  background: rgba(14, 165, 233, 0.15);
+  border-color: rgba(14, 165, 233, 0.6);
+  color: #0ea5e9;
+  box-shadow: 0 0 15px rgba(14, 165, 233, 0.2);
 }
 
 .pageBtn:disabled {
   opacity: 0.3;
   cursor: not-allowed;
+  border-color: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.02);
+  color: rgba(255, 255, 255, 0.4);
 }
 
 .pageInfo {
-  color: #52525b;
-  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.4);
+  font-family: var(--font-geist-mono), 'Courier New', monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
   font-variant-numeric: tabular-nums;
 }

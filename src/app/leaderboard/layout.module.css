@@ -1,29 +1,110 @@
+/* ============================================================
+   LEADERBOARD LAYOUT — Cinematic Redesign
+   Adopts the technical blueprint & terminal aesthetics.
+   ============================================================ */
+
 .wrapper {
+  position: relative;
   min-height: 100vh;
-  background: linear-gradient(180deg, #09090b 0%, #0a0a0f 100%);
-  padding-top: 80px; /* Navbar height */
+  background-color: transparent;
+  z-index: 10;
 }
 
-/* ── Header ─────────────────────────────────────────────────────────────────── */
+/* ── Background Atmosphere ─────────────────────────────────────────────────── */
+
+.bgAtmosphere {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 0;
+  pointer-events: none;
+  mask-image: radial-gradient(ellipse 90% 80% at 50% 50%, black 40%, transparent 90%);
+  -webkit-mask-image: radial-gradient(ellipse 90% 80% at 50% 50%, black 40%, transparent 90%);
+}
+
+/* 1. Faint technical blueprint grid */
+.bgGrid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(14, 165, 233, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(14, 165, 233, 0.1) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+.bgGlow1,
+.bgGlow2 {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(14, 165, 233, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.bgGlow1 {
+  width: 600px;
+  height: 600px;
+  top: 8%;
+  left: -5%;
+  animation: driftSlow1 25s ease-in-out infinite alternate;
+}
+
+.bgGlow2 {
+  width: 500px;
+  height: 500px;
+  bottom: 12%;
+  right: -8%;
+  animation: driftSlow2 35s ease-in-out infinite alternate;
+}
+
+@keyframes driftSlow1 {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(80px, 40px); }
+}
+
+@keyframes driftSlow2 {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(-60px, -50px); }
+}
+
+.globalNavBg {
+  position: sticky;
+  top: 0;
+  height: 74px;
+  width: 100%;
+  z-index: 45;
+  background: rgba(7, 6, 10, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
 
 .header {
-  position: sticky;
-  top: 74px;
+  position: relative;
   z-index: 40;
-  background: rgba(9, 9, 11, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(63, 63, 70, 0.4);
+  background: rgba(7, 6, 10, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.stickyTabsWrapper {
+  position: sticky;
+  top: 74px; /* Sticks right below the global navbar */
+  z-index: 40;
+  background: rgba(7, 6, 10, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(14, 165, 233, 0.2);
 }
 
 .headerContent {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 24px 24px 0;
+  padding: 24px 24px 16px;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   gap: 16px;
+  position: relative;
+  z-index: 2;
 }
 
 .titleRow {
@@ -33,24 +114,25 @@
 }
 
 .title {
-  font-family: var(--font-display), system-ui, sans-serif;
+  font-family: var(--font-display), 'Space Grotesk', sans-serif;
   font-size: 1.75rem;
-  font-weight: 700;
-  color: #fafafa;
-  letter-spacing: -0.02em;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+  text-shadow: 0 0 30px rgba(255, 255, 255, 0.15);
 }
 
 .titleAccent {
-  background: linear-gradient(135deg, #2563eb 0%, #60a5fa 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: rgba(14, 165, 233, 0.9);
+  text-shadow: 0 0 15px rgba(14, 165, 233, 0.4);
 }
 
 .subtitle {
-  font-size: 0.875rem;
-  color: #71717a;
-  font-weight: 400;
+  font-family: var(--font-geist-mono), 'Courier New', monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
 }
 
 /* ── Link Profiles CTA ──────────────────────────────────────────────────────── */
@@ -60,21 +142,24 @@
   align-items: center;
   gap: 6px;
   padding: 8px 16px;
-  border-radius: 8px;
-  background: rgba(37, 99, 235, 0.12);
-  border: 1px solid rgba(37, 99, 235, 0.25);
-  color: #60a5fa;
-  font-size: 0.8125rem;
-  font-weight: 500;
+  border-radius: 2px;
+  background: rgba(14, 165, 233, 0.12);
+  border: 1px solid rgba(14, 165, 233, 0.4);
+  color: #0ea5e9;
+  font-family: var(--font-geist-mono), 'Courier New', monospace;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  font-weight: 600;
+  text-transform: uppercase;
   text-decoration: none;
   transition: all 0.2s ease;
   white-space: nowrap;
 }
 
 .linkProfilesCta:hover {
-  background: rgba(37, 99, 235, 0.2);
-  border-color: rgba(37, 99, 235, 0.4);
-  transform: translateY(-1px);
+  background: rgba(14, 165, 233, 0.25);
+  border-color: rgba(14, 165, 233, 0.8);
+  box-shadow: 0 0 15px rgba(14, 165, 233, 0.2);
 }
 
 /* ── Tabs ────────────────────────────────────────────────────────────────────── */
@@ -88,6 +173,8 @@
   overflow-x: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  position: relative;
+  z-index: 2;
 }
 
 .tabs::-webkit-scrollbar {
@@ -97,31 +184,28 @@
 .tab {
   position: relative;
   padding: 12px 20px;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: #71717a;
+  font-family: var(--font-geist-mono), 'Courier New', monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.4);
   text-decoration: none;
   white-space: nowrap;
-  transition: color 0.2s ease;
+  transition: color 0.2s ease, background 0.2s ease;
+  border-bottom: 2px solid transparent;
 }
 
 .tab:hover {
-  color: #a1a1aa;
+  color: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.02);
 }
 
 .tabActive {
-  color: #fafafa;
-}
-
-.tabActive::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 20px;
-  right: 20px;
-  height: 2px;
-  background: linear-gradient(90deg, #2563eb, #60a5fa);
-  border-radius: 1px 1px 0 0;
+  color: #0ea5e9;
+  background: rgba(14, 165, 233, 0.05);
+  border-bottom: 2px solid #0ea5e9;
+  text-shadow: 0 0 10px rgba(14, 165, 233, 0.3);
 }
 
 /* ── Main ───────────────────────────────────────────────────────────────────── */
@@ -130,6 +214,8 @@
   max-width: 1280px;
   margin: 0 auto;
   padding: 24px;
+  position: relative;
+  z-index: 2;
 }
 
 /* ── Responsive ─────────────────────────────────────────────────────────────── */
@@ -150,11 +236,12 @@
 
   .tabs {
     padding: 0 16px;
+    margin-top: 12px;
   }
 
   .tab {
     padding: 10px 14px;
-    font-size: 0.75rem;
+    font-size: 10px;
   }
 
   .main {

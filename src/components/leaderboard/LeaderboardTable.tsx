@@ -123,7 +123,7 @@ export default function LeaderboardTable({
               {showRank && (
                 <th className={styles.th} style={{ width: '60px', textAlign: 'center' }}>#</th>
               )}
-              <th className={styles.th} style={{ minWidth: '200px' }}>Student</th>
+              <th className={styles.th} style={{ minWidth: '160px' }}>Student</th>
               {columns.map((col) => (
                 <th
                   key={col.key}
@@ -206,54 +206,6 @@ export default function LeaderboardTable({
         </table>
       </div>
 
-      {/* Mobile cards */}
-      <div className={styles.mobileCards}>
-        {sortedEntries.map((entry, index) => {
-          const rank = entry.acm.overallRank || index + 1;
-          return (
-            <Link
-              key={entry.uid}
-              href={`/leaderboard/student/${entry.slug}`}
-              className={`${styles.mobileCard} ${rank <= 3 ? styles[`rank${rank}`] : ''}`}
-            >
-              <div className={styles.mobileCardHeader}>
-                <RankBadge rank={rank} />
-                <div className={styles.avatar}>
-                  {entry.profileImageUrl ? (
-                    <Image
-                      src={entry.profileImageUrl}
-                      alt={entry.displayName}
-                      width={32}
-                      height={32}
-                      className={styles.avatarImg}
-                    />
-                  ) : (
-                    <span className={styles.avatarFallback}>
-                      {entry.displayName.charAt(0).toUpperCase()}
-                    </span>
-                  )}
-                </div>
-                <div className={styles.studentInfo}>
-                  <span className={styles.studentName}>{entry.displayName}</span>
-                  <span className={styles.studentMeta}>
-                    {entry.rollNumber}
-                  </span>
-                </div>
-              </div>
-              <div className={styles.mobileCardStats}>
-                {columns.map((col) => (
-                  <div key={col.key} className={styles.mobileCardStat}>
-                    <span className={styles.mobileStatLabel}>{col.label}</span>
-                    <span className={styles.mobileStatValue}>
-                      {col.render ? col.render(entry) : col.getValue(entry)}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </Link>
-          );
-        })}
-      </div>
     </>
   );
 }

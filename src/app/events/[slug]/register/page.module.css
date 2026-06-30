@@ -236,6 +236,11 @@
   padding-right: 40px;
 }
 
+.consoleSelect option {
+  background-color: #07060a;
+  color: #fff;
+}
+
 /* Checkbox */
 .checkboxLabel {
   display: flex;

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth, auth } from '@/lib/firebase';
 import styles from './page.module.css';
+import FlashingGrid from '@/components/sections/FlashingGrid';
 
 interface UserData {
   id: string;
@@ -172,46 +173,57 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className={styles.container}>
-      <div className={styles.wrapper}>
-        <div className={styles.header}>
-          <h1 className={styles.title}>Account Settings</h1>
-          <p className={styles.subtitle}>Manage your profile details and link coding accounts.</p>
+    <div className={styles.wrapper}>
+      {/* Background Atmosphere */}
+      <div className={styles.bgAtmosphere} aria-hidden="true">
+        <div className={styles.bgGrid} />
+        <FlashingGrid />
+        <div className={styles.bgGlow1} />
+        <div className={styles.bgGlow2} />
+      </div>
+
+      <div className={styles.inner}>
+        <div className={styles.headerBlock}>
+          <h1 className={styles.heading}>Account Settings</h1>
+          <p className={styles.metaText}>MANAGE YOUR PROFILE DETAILS AND LINK CODING ACCOUNTS.</p>
         </div>
 
         <div className={styles.layout}>
           {/* Left Column: Personal Details & Readonly info */}
-          <div className={styles.card}>
-            <h2 className={styles.cardTitle}>Personal Details</h2>
+          <div className={styles.formPanel}>
+            <h2 className={styles.formTitle}>
+              <span className={styles.formTitleIndicator} />
+              PERSONAL DETAILS
+            </h2>
             <form onSubmit={handleSaveDetails} className={styles.form}>
               <div className={styles.inputGroup}>
-                <label className={styles.label}>First Name</label>
+                <label className={styles.inputLabel}>First Name</label>
                 <input
                   type="text"
                   required
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
-                  className={styles.input}
+                  className={styles.consoleInput}
                 />
               </div>
 
               <div className={styles.inputGroup}>
-                <label className={styles.label}>Last Name</label>
+                <label className={styles.inputLabel}>Last Name</label>
                 <input
                   type="text"
                   required
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
-                  className={styles.input}
+                  className={styles.consoleInput}
                 />
               </div>
 
               <div className={styles.inputGroup}>
-                <label className={styles.label}>Gender</label>
+                <label className={styles.inputLabel}>Gender</label>
                 <select
                   value={gender}
                   onChange={(e) => setGender(e.target.value as any)}
-                  className={styles.select}
+                  className={`${styles.consoleInput} ${styles.consoleSelect}`}
                 >
                   <option value="male">Male</option>
                   <option value="female">Female</option>
@@ -224,28 +236,29 @@ export default function ProfilePage() {
                 disabled={isSavingDetails}
                 className={styles.submitBtn}
               >
-                {isSavingDetails ? 'Saving...' : 'Save Details'}
+                <div className={styles.submitBtnScanline} />
+                {isSavingDetails ? 'SAVING...' : 'SAVE DETAILS'}
               </button>
             </form>
 
             {/* Read-only details */}
             <div className="space-y-4 pt-4 border-t border-zinc-800/40">
-              <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">SVNIT Student Info</h3>
+              <h3 className="font-mono text-[10px] text-zinc-500 uppercase tracking-widest mb-4">SVNIT Student Info</h3>
               <div className="grid grid-cols-2 gap-4">
                 <div className={styles.inputGroup}>
-                  <span className={styles.label}>Roll Number</span>
+                  <span className={styles.inputLabel}>Roll Number</span>
                   <div className={styles.readonlyValue}>{dbUser.rollNumber || '—'}</div>
                 </div>
                 <div className={styles.inputGroup}>
-                  <span className={styles.label}>Branch</span>
+                  <span className={styles.inputLabel}>Branch</span>
                   <div className={styles.readonlyValue}>{dbUser.branch || '—'}</div>
                 </div>
                 <div className={styles.inputGroup}>
-                  <span className={styles.label}>Graduation Year</span>
+                  <span className={styles.inputLabel}>Graduation Year</span>
                   <div className={styles.readonlyValue}>{dbUser.graduationBatch || '—'}</div>
                 </div>
                 <div className={styles.inputGroup}>
-                  <span className={styles.label}>Email Address</span>
+                  <span className={styles.inputLabel}>Email Address</span>
                   <div className={styles.readonlyValue}>{dbUser.email}</div>
                 </div>
               </div>
@@ -265,12 +278,15 @@ export default function ProfilePage() {
           </div>
 
           {/* Right Column: Platform Linking */}
-          <div className={styles.card}>
-            <h2 className={styles.cardTitle}>Coding Platform Connections</h2>
+          <div className={styles.formPanel}>
+            <h2 className={styles.formTitle}>
+              <span className={styles.formTitleIndicator} />
+              CODING PLATFORM CONNECTIONS
+            </h2>
             <div className="flex flex-col gap-4">
               
               {/* LeetCode */}
-              <div className={styles.platformItem}>
+              <div className={`${styles.platformItem} ${dbUser.leetcodeUsername ? styles.platformItemLinked : ''}`}>
                 <div className={styles.platformHeader}>
                   <span className={styles.platformName}>LeetCode</span>
                   <span className={`${styles.platformStatus} ${dbUser.leetcodeUsername ? styles.statusLinked : styles.statusUnlinked}`}>
@@ -284,7 +300,7 @@ export default function ProfilePage() {
                     value={leetcode}
                     onChange={(e) => setLeetcode(e.target.value)}
                     disabled={!!dbUser.leetcodeUsername || linkingPlatform === 'leetcode'}
-                    className={styles.platformInput}
+                    className={styles.consoleInput}
                   />
                   {dbUser.leetcodeUsername ? (
                     <button
@@ -298,7 +314,7 @@ export default function ProfilePage() {
                     <button
                       onClick={() => handleLinkPlatform('leetcode', 'link')}
                       disabled={linkingPlatform === 'leetcode'}
-                      className={styles.actionBtn}
+                      className={`${styles.actionBtn} ${styles.primaryBtn}`}
                     >
                       {linkingPlatform === 'leetcode' ? 'Linking...' : 'Link'}
                     </button>
@@ -307,7 +323,7 @@ export default function ProfilePage() {
               </div>
 
               {/* Codeforces */}
-              <div className={styles.platformItem}>
+              <div className={`${styles.platformItem} ${dbUser.codeforcesHandle ? styles.platformItemLinked : ''}`}>
                 <div className={styles.platformHeader}>
                   <span className={styles.platformName}>Codeforces</span>
                   <span className={`${styles.platformStatus} ${dbUser.codeforcesHandle ? styles.statusLinked : styles.statusUnlinked}`}>
@@ -321,7 +337,7 @@ export default function ProfilePage() {
                     value={codeforces}
                     onChange={(e) => setCodeforces(e.target.value)}
                     disabled={!!dbUser.codeforcesHandle || linkingPlatform === 'codeforces'}
-                    className={styles.platformInput}
+                    className={styles.consoleInput}
                   />
                   {dbUser.codeforcesHandle ? (
                     <button
@@ -335,7 +351,7 @@ export default function ProfilePage() {
                     <button
                       onClick={() => handleLinkPlatform('codeforces', 'link')}
                       disabled={linkingPlatform === 'codeforces'}
-                      className={styles.actionBtn}
+                      className={`${styles.actionBtn} ${styles.primaryBtn}`}
                     >
                       {linkingPlatform === 'codeforces' ? 'Linking...' : 'Link'}
                     </button>
@@ -344,7 +360,7 @@ export default function ProfilePage() {
               </div>
 
               {/* CodeChef */}
-              <div className={styles.platformItem}>
+              <div className={`${styles.platformItem} ${dbUser.codechefUsername ? styles.platformItemLinked : ''}`}>
                 <div className={styles.platformHeader}>
                   <span className={styles.platformName}>CodeChef</span>
                   <span className={`${styles.platformStatus} ${dbUser.codechefUsername ? styles.statusLinked : styles.statusUnlinked}`}>
@@ -358,7 +374,7 @@ export default function ProfilePage() {
                     value={codechef}
                     onChange={(e) => setCodechef(e.target.value)}
                     disabled={!!dbUser.codechefUsername || linkingPlatform === 'codechef'}
-                    className={styles.platformInput}
+                    className={styles.consoleInput}
                   />
                   {dbUser.codechefUsername ? (
                     <button
@@ -372,7 +388,7 @@ export default function ProfilePage() {
                     <button
                       onClick={() => handleLinkPlatform('codechef', 'link')}
                       disabled={linkingPlatform === 'codechef'}
-                      className={styles.actionBtn}
+                      className={`${styles.actionBtn} ${styles.primaryBtn}`}
                     >
                       {linkingPlatform === 'codechef' ? 'Linking...' : 'Link'}
                     </button>
@@ -381,7 +397,7 @@ export default function ProfilePage() {
               </div>
 
               {/* GitHub */}
-              <div className={styles.platformItem}>
+              <div className={`${styles.platformItem} ${dbUser.githubUsername ? styles.platformItemLinked : ''}`}>
                 <div className={styles.platformHeader}>
                   <span className={styles.platformName}>GitHub</span>
                   <span className={`${styles.platformStatus} ${dbUser.githubUsername ? styles.statusLinked : styles.statusUnlinked}`}>
@@ -395,7 +411,7 @@ export default function ProfilePage() {
                     value={github}
                     onChange={(e) => setGithub(e.target.value)}
                     disabled={!!dbUser.githubUsername || linkingPlatform === 'github'}
-                    className={styles.platformInput}
+                    className={styles.consoleInput}
                   />
                   {dbUser.githubUsername ? (
                     <button
@@ -409,7 +425,7 @@ export default function ProfilePage() {
                     <button
                       onClick={() => handleLinkPlatform('github', 'link')}
                       disabled={linkingPlatform === 'github'}
-                      className={styles.actionBtn}
+                      className={`${styles.actionBtn} ${styles.primaryBtn}`}
                     >
                       {linkingPlatform === 'github' ? 'Linking...' : 'Link'}
                     </button>

@@ -49,10 +49,10 @@
 /* Theme variable overrides for different sections */
 .themeAbout { --theme-main: 245, 158, 11; --theme-light: 251, 191, 36; --theme-glow: 252, 211, 77; }
 .themeEvents { --theme-main: 139, 92, 246; --theme-light: 167, 139, 250; --theme-glow: 196, 181, 253; }
-.themeLeaderboard { --theme-main: 16, 185, 129; --theme-light: 52, 211, 153; --theme-glow: 110, 231, 183; }
+.themeLeaderboard { --theme-main: 14, 165, 233; --theme-light: 56, 189, 248; --theme-glow: 125, 211, 252; }
 .themeProjects { --theme-main: 244, 63, 94; --theme-light: 251, 113, 133; --theme-glow: 253, 164, 175; }
 .themeTeam { --theme-main: 59, 130, 246; --theme-light: 96, 165, 250; --theme-glow: 147, 197, 253; }
-.themeProfile { --theme-main: 168, 85, 247; --theme-light: 192, 132, 252; --theme-glow: 216, 180, 254; }
+.themeProfile { --theme-main: 6, 182, 212; --theme-light: 34, 211, 238; --theme-glow: 103, 232, 249; }
 .themeAdmin { --theme-main: 239, 68, 68; --theme-light: 248, 113, 113; --theme-glow: 252, 165, 165; }
 
 
@@ -70,6 +70,15 @@
   pointer-events: auto;
   transition: filter 0.4s ease;
   flex-shrink: 0;
+
+  /* Glassmorphic pill background for visibility */
+  background: rgba(7, 6, 10, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 8px 20px 8px 12px;
+  border-radius: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 .brandBlock:hover {
@@ -133,7 +142,7 @@
   width: 1px;
   height: 24px;
   background: rgba(255, 255, 255, 0.1);
-  margin: 0 12px;
+  margin: 0 4px;
 }
 
 .brandLogoSvnit {
@@ -1165,16 +1174,24 @@
     display: none;
   }
 
-  /* Mobile scene strip */
-  .mobileSceneStrip {
-    display: none; /* shown via JS toggle */
-    position: fixed;
-    top: 58px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 99;
-    pointer-events: auto;
+  .timecode {
+    display: none; /* Hide timecode on mobile to save horizontal space */
+  }
 
+  .sceneNumber {
+    margin-right: 6px;
+  }
+
+  /* Mobile scene strip - converted to vertical dropdown */
+  .mobileSceneStrip {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: calc(100% + 12px);
+    right: 0;
+    z-index: 99;
+    pointer-events: none;
+    
     /* Same metal plate aesthetic */
     background:
       repeating-linear-gradient(
@@ -1190,103 +1207,81 @@
         rgba(12, 12, 18, 0.98) 100%
       );
     border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 6px;
+    border-radius: 8px;
     box-shadow:
       inset 0 0 0 1px rgba(255, 255, 255, 0.02),
-      0 4px 16px rgba(0, 0, 0, 0.5),
-      0 12px 40px rgba(0, 0, 0, 0.3);
+      0 8px 24px rgba(0, 0, 0, 0.6),
+      0 12px 40px rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(20px) saturate(140%);
     -webkit-backdrop-filter: blur(20px) saturate(140%);
 
-    max-width: 90vw;
-    overflow-x: auto;
-    overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
+    width: 200px;
+    overflow: hidden;
 
     /* Smooth reveal */
     opacity: 0;
-    transform: translateX(-50%) translateY(-8px);
+    transform: translateY(-8px);
     transition:
       opacity 0.3s cubic-bezier(0.25, 1, 0.5, 1),
       transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
   }
 
-  .mobileSceneStrip::-webkit-scrollbar {
-    display: none;
-  }
-
   .mobileSceneStrip.mobileStripOpen {
-    display: flex;
     opacity: 1;
-    transform: translateX(-50%) translateY(0);
+    transform: translateY(0);
+    pointer-events: auto;
   }
 
   .mobileSceneItem {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
-    gap: 2px;
-    padding: 10px 18px;
-    flex-shrink: 0;
+    gap: 4px;
+    padding: 12px 20px;
     cursor: pointer;
     text-decoration: none;
     background: none;
     border: none;
     position: relative;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
   }
 
-  .mobileSceneItem + .mobileSceneItem {
-    border-left: 1px solid rgba(255, 255, 255, 0.04);
+  .mobileSceneItem:last-child {
+    border-bottom: none;
   }
 
   .mobileSceneCode {
     font-family: var(--font-geist-mono), 'Courier New', monospace;
-    font-size: 7px;
+    font-size: 8px;
     font-weight: 400;
     letter-spacing: 1.5px;
-    color: rgba(255, 255, 255, 0.18);
+    color: rgba(255, 255, 255, 0.25);
     text-transform: uppercase;
     line-height: 1;
   }
 
   .mobileSceneLabel {
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 10px;
-    font-weight: 500;
+    font-size: 11px;
+    font-weight: 600;
     letter-spacing: 2px;
-    color: rgba(255, 255, 255, 0.4);
+    color: rgba(255, 255, 255, 0.5);
     text-transform: uppercase;
     line-height: 1;
   }
 
+  .mobileSceneItem.mobileSceneActive {
+    background: rgba(255, 255, 255, 0.03);
+  }
+
   .mobileSceneItem.mobileSceneActive .mobileSceneCode {
-    color: rgba(var(--theme-main), 0.6);
+    color: rgba(var(--theme-main), 0.7);
   }
 
   .mobileSceneItem.mobileSceneActive .mobileSceneLabel {
     color: rgba(255, 255, 255, 0.95);
     text-shadow: 0 0 12px rgba(var(--theme-glow), 0.15);
-  }
-
-  /* Warm projection reflection on top of strip */
-  .mobileSceneStrip::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 10%;
-    right: 10%;
-    height: 1px;
-    background: linear-gradient(
-      90deg,
-      transparent 0%,
-      rgba(var(--theme-light), 0.12) 30%,
-      rgba(var(--theme-main), 0.18) 50%,
-      rgba(var(--theme-light), 0.12) 70%,
-      transparent 100%
-    );
-    z-index: 5;
   }
 }
 

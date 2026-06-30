@@ -1,31 +1,58 @@
-.container {
-  min-height: calc(100vh - 74px);
-  padding: 40px 24px 120px;
-  background: #09090b;
-}
+/* ============================================================
+   PROFILE PAGE — Cinematic Redesign
+   Adopts the technical blueprint & terminal aesthetics.
+   ============================================================ */
 
 .wrapper {
+  position: relative;
+  min-height: 100vh;
+  padding-top: 74px;
+  padding-bottom: 64px;
+  background-color: transparent;
+  z-index: 10;
+}
+
+.inner {
   max-width: 1100px;
   margin: 0 auto;
+  padding: 40px 24px;
+  position: relative;
+  z-index: 2;
 }
 
-.header {
+/* ============================================================
+   HEADER BLOCK (Event Title)
+   ============================================================ */
+.headerBlock {
   margin-bottom: 40px;
+  background: rgba(7, 6, 10, 0.6);
+  backdrop-filter: blur(8px);
+  padding: 32px;
+  border-radius: 4px;
+  border: 1px solid rgba(6, 182, 212, 0.1);
 }
 
-.title {
-  font-size: 1.875rem;
-  font-weight: 700;
+.heading {
+  font-family: var(--font-display), 'Space Grotesk', sans-serif;
+  font-size: clamp(24px, 4vw, 36px);
+  font-weight: 800;
   color: #ffffff;
-  letter-spacing: -0.025em;
+  letter-spacing: -0.01em;
+  margin: 0 0 8px;
+  line-height: 1.1;
+  text-shadow: 0 0 30px rgba(255, 255, 255, 0.15);
 }
 
-.subtitle {
-  font-size: 0.875rem;
-  color: #a1a1aa;
-  margin-top: 4px;
+.metaText {
+  font-family: var(--font-geist-mono), 'Courier New', monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.5);
 }
 
+/* ============================================================
+   LAYOUT
+   ============================================================ */
 .layout {
   display: grid;
   grid-template-cols: 1fr;
@@ -38,25 +65,53 @@
   }
 }
 
-.card {
-  background: rgba(24, 24, 27, 0.4);
-  border: 1px solid rgba(39, 39, 42, 0.6);
-  border-radius: 16px;
+/* ============================================================
+   FORM PANEL (Console)
+   ============================================================ */
+.formPanel {
+  background: #07060a;
+  border: 1px solid rgba(6, 182, 212, 0.2);
+  border-radius: 2px;
   padding: 32px;
+  position: relative;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   gap: 24px;
 }
 
-.cardTitle {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #ffffff;
-  border-bottom: 1px solid rgba(39, 39, 42, 0.4);
-  padding-bottom: 16px;
-  margin-bottom: 8px;
+.formPanel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(6, 182, 212, 0.8), transparent);
 }
 
+.formTitle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--font-geist-mono), 'Courier New', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+  padding-bottom: 16px;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+.formTitleIndicator {
+  width: 4px;
+  height: 12px;
+  background: rgba(6, 182, 212, 0.8);
+  box-shadow: 0 0 8px rgba(6, 182, 212, 0.5);
+}
+
+/* Form structure */
 .form {
   display: flex;
   flex-direction: column;
@@ -69,97 +124,191 @@
   gap: 8px;
 }
 
-.label {
-  font-size: 0.75rem;
-  font-weight: 500;
+/* Inputs */
+.inputLabel {
+  font-family: var(--font-geist-mono), 'Courier New', monospace;
+  font-size: 10px;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #a1a1aa;
+  color: rgba(6, 182, 212, 0.8);
+  margin-bottom: 4px;
+  display: block;
 }
 
-.input, .select {
-  background: rgba(9, 9, 11, 0.8);
-  border: 1px solid #27272a;
-  border-radius: 8px;
-  padding: 10px 14px;
-  color: #f4f4f5;
-  font-size: 0.875rem;
-  transition: all 0.15s ease;
+.consoleInput {
   width: 100%;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 2px solid rgba(6, 182, 212, 0.4);
+  border-radius: 2px;
+  padding: 14px 16px;
+  font-family: var(--font-geist-mono), 'Courier New', monospace;
+  font-size: 13px;
+  color: #fff;
+  transition: all 0.3s ease;
 }
 
-.input:focus, .select:focus {
+.consoleInput::placeholder {
+  color: rgba(255, 255, 255, 0.2);
+}
+
+.consoleInput:focus {
   outline: none;
-  border-color: #3f3f46;
-  box-shadow: 0 0 0 2px rgba(63, 63, 70, 0.15);
+  background: rgba(6, 182, 212, 0.05);
+  border-color: rgba(6, 182, 212, 0.4);
+  border-bottom-color: rgba(6, 182, 212, 1);
+  box-shadow: 0 8px 24px -12px rgba(6, 182, 212, 0.3);
 }
 
-.input:disabled, .select:disabled {
+.consoleInput:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+  border-bottom-color: rgba(255, 255, 255, 0.1);
 }
 
-.readonlyValue {
-  font-size: 0.875rem;
-  color: #d4d4d8;
-  padding: 10px 14px;
-  background: rgba(24, 24, 27, 0.6);
-  border: 1px solid rgba(39, 39, 42, 0.4);
-  border-radius: 8px;
-}
-
-.submitBtn {
-  margin-top: 12px;
-  background: #f4f4f5;
-  color: #09090b;
-  border: none;
-  border-radius: 8px;
-  padding: 11px;
-  font-size: 0.875rem;
-  font-weight: 600;
+.consoleSelect {
   cursor: pointer;
-  transition: background-color 0.15s ease;
-  width: 100%;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(6, 182, 212, 0.8)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  padding-right: 40px;
 }
 
-.submitBtn:hover {
-  background: #ffffff;
+.consoleSelect option {
+  background-color: #07060a;
+  color: #fff;
+}
+
+/* Readonly values */
+.readonlyValue {
+  background: rgba(255, 255, 255, 0.01);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  padding: 14px 16px;
+  font-family: var(--font-geist-mono), 'Courier New', monospace;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* ============================================================
+   SUBMIT BUTTON (Scanline style)
+   ============================================================ */
+.submitBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  padding: 16px;
+  margin-top: 16px;
+  background: rgba(6, 182, 212, 0.15);
+  border: 1px solid rgba(6, 182, 212, 0.4);
+  border-radius: 2px;
+  color: #fff;
+  font-family: var(--font-geist-mono), 'Courier New', monospace;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.submitBtn:hover:not(:disabled) {
+  background: rgba(6, 182, 212, 0.3);
+  border-color: rgba(6, 182, 212, 0.8);
+  box-shadow: 0 0 30px rgba(6, 182, 212, 0.3);
 }
 
 .submitBtn:disabled {
-  opacity: 0.5;
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.3);
   cursor: not-allowed;
 }
 
+.submitBtnScanline {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: rgba(6, 182, 212, 0.9);
+  box-shadow: 0 0 12px rgba(6, 182, 212, 0.6);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.submitBtn:hover:not(:disabled) .submitBtnScanline {
+  opacity: 1;
+  animation: btnScan 2s linear infinite;
+}
+
+@keyframes btnScan {
+  0% { transform: translateY(0); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(64px); opacity: 0; }
+}
+
+/* Secondary Button */
 .viewProfileBtn {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid #27272a;
-  background: transparent;
-  color: #f4f4f5;
-  padding: 11px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  border-radius: 8px;
-  text-decoration: none;
-  transition: all 0.15s ease;
+  margin-top: 16px;
+  font-family: var(--font-geist-mono), 'Courier New', monospace;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 14px 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  color: rgba(255, 255, 255, 0.8);
+  transition: all 0.3s ease;
   width: 100%;
 }
 
 .viewProfileBtn:hover {
-  background: rgba(24, 24, 27, 0.6);
-  border-color: #3f3f46;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #fff;
 }
 
+/* ============================================================
+   PLATFORM CONNECTION ITEMS
+   ============================================================ */
 .platformItem {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding: 16px;
-  border-radius: 12px;
-  background: rgba(9, 9, 11, 0.4);
-  border: 1px solid rgba(39, 39, 42, 0.3);
+  padding: 20px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.01);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.platformItemLinked {
+  background: rgba(16, 185, 129, 0.03);
+  border-color: rgba(16, 185, 129, 0.15);
+}
+
+.platformItemLinked::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 2px;
+  height: 100%;
+  background: rgba(16, 185, 129, 0.8);
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
 }
 
 .platformHeader {
@@ -169,66 +318,76 @@
 }
 
 .platformName {
-  font-size: 0.875rem;
+  font-family: var(--font-display), 'Space Grotesk', sans-serif;
+  font-size: 15px;
   font-weight: 600;
-  color: #f4f4f5;
+  color: #fff;
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
 .platformStatus {
-  font-size: 0.75rem;
-  font-weight: 500;
+  font-family: var(--font-geist-mono), 'Courier New', monospace;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .statusLinked {
-  color: #22c55e;
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.statusLinked::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
 }
 
 .statusUnlinked {
-  color: #71717a;
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.statusUnlinked::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ef4444;
+  box-shadow: 0 0 8px #ef4444;
 }
 
 .platformInputWrapper {
   display: flex;
-  gap: 8px;
-}
-
-.platformInput {
-  flex: 1;
-  background: rgba(9, 9, 11, 0.8);
-  border: 1px solid #27272a;
-  border-radius: 6px;
-  padding: 8px 12px;
-  color: #f4f4f5;
-  font-size: 0.8125rem;
-}
-
-.platformInput:focus {
-  outline: none;
-  border-color: #3f3f46;
-}
-
-.platformInput:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  gap: 12px;
 }
 
 .actionBtn {
-  background: rgba(39, 39, 42, 0.8);
-  border: 1px solid rgba(63, 63, 70, 0.4);
-  color: #f4f4f5;
-  font-size: 0.75rem;
-  font-weight: 500;
-  border-radius: 6px;
-  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-geist-mono), 'Courier New', monospace;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 0 16px;
+  border-radius: 2px;
+  font-weight: 600;
+  transition: all 0.3s ease;
   cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.actionBtn:hover {
-  background: #27272a;
+  white-space: nowrap;
 }
 
 .actionBtn:disabled {
@@ -236,21 +395,83 @@
   cursor: not-allowed;
 }
 
+.primaryBtn {
+  background: rgba(6, 182, 212, 0.15);
+  border: 1px solid rgba(6, 182, 212, 0.4);
+  color: #fff;
+}
+
+.primaryBtn:hover:not(:disabled) {
+  background: rgba(6, 182, 212, 0.3);
+  border-color: rgba(6, 182, 212, 0.8);
+  box-shadow: 0 0 15px rgba(6, 182, 212, 0.3);
+}
+
 .dangerBtn {
-  background: rgba(127, 29, 29, 0.2);
-  border-color: rgba(220, 38, 38, 0.3);
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
   color: #f87171;
 }
 
-.dangerBtn:hover {
-  background: rgba(127, 29, 29, 0.4);
+.dangerBtn:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.6);
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.2);
 }
 
-.loadingContainer {
-  min-height: calc(100vh - 74px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #09090b;
-  color: #71717a;
+/* ============================================================
+   BACKGROUND ATMOSPHERE
+   ============================================================ */
+.bgAtmosphere {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  mask-image: radial-gradient(ellipse 90% 80% at 50% 50%, black 40%, transparent 90%);
+  -webkit-mask-image: radial-gradient(ellipse 90% 80% at 50% 50%, black 40%, transparent 90%);
+}
+
+/* 1. Faint technical blueprint grid */
+.bgGrid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(6, 182, 212, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(6, 182, 212, 0.1) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+.bgGlow1,
+.bgGlow2 {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(6, 182, 212, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.bgGlow1 {
+  width: 600px;
+  height: 600px;
+  top: 8%;
+  left: -5%;
+  animation: driftSlow1 25s ease-in-out infinite alternate;
+}
+
+.bgGlow2 {
+  width: 500px;
+  height: 500px;
+  bottom: 12%;
+  right: -8%;
+  animation: driftSlow2 35s ease-in-out infinite alternate;
+}
+
+@keyframes driftSlow1 {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(80px, 40px); }
+}
+
+@keyframes driftSlow2 {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(-60px, -50px); }
 }

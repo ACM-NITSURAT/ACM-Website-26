@@ -13,6 +13,7 @@ import React from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/firebase';
+import FlashingGrid from '@/components/sections/FlashingGrid';
 import styles from './layout.module.css';
 
 const TABS = [
@@ -31,6 +32,41 @@ export default function LeaderboardLayout({
 }) {
   const pathname = usePathname();
   const { user } = useAuth();
+  const [hasLinkedProfiles, setHasLinkedProfiles] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!user) return;
+
+    const checkLinkedProfiles = async () => {
+      try {
+        const { auth } = await import('@/lib/firebase/auth');
+        const token = await auth.currentUser?.getIdToken();
+        if (!token) return;
+
+        const res = await fetch('/api/leaderboard/link-profiles', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          const userData = data.user;
+          
+          if (userData && (
+            userData.leetcodeUsername || 
+            userData.codeforcesHandle || 
+            userData.codechefUsername || 
+            userData.githubUsername
+          )) {
+            setHasLinkedProfiles(true);
+          }
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    checkLinkedProfiles();
+  }, [user]);
 
   // Determine active tab
   const activeTab = TABS.find((tab) => {
@@ -44,7 +80,17 @@ export default function LeaderboardLayout({
                     pathname.includes('/link-profiles');
 
   return (
-    <div className={styles.wrapper}>
+    <div className={styles.wrapper} data-flashing-container="true">
+      {/* Background Atmosphere */}
+      <div className={styles.bgAtmosphere} aria-hidden="true">
+        <div className={styles.bgGrid} />
+        <FlashingGrid />
+        <div className={styles.bgGlow1} />
+        <div className={styles.bgGlow2} />
+      </div>
+
+      <div className={styles.globalNavBg} aria-hidden="true" />
+
       {/* Header */}
       <header className={styles.header}>
         <div className={styles.headerContent}>
@@ -57,7 +103,7 @@ export default function LeaderboardLayout({
             </p>
           </div>
 
-          {user && (
+          {user && !hasLinkedProfiles && (
             <Link href="/leaderboard/link-profiles" className={styles.linkProfilesCta}>
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
@@ -67,8 +113,11 @@ export default function LeaderboardLayout({
           )}
         </div>
 
-        {/* Tab navigation */}
-        {!isSubPage && (
+      </header>
+
+      {/* Tab navigation */}
+      {!isSubPage && (
+        <div className={styles.stickyTabsWrapper}>
           <nav className={styles.tabs} aria-label="Leaderboard navigation">
             {TABS.map((tab) => (
               <Link
@@ -80,8 +129,8 @@ export default function LeaderboardLayout({
               </Link>
             ))}
           </nav>
-        )}
-      </header>
+        </div>
+      )}
 
       {/* Page content */}
       <main className={styles.main}>

@@ -88,7 +88,7 @@ export default function OverallLeaderboardPage() {
       getValue: (e) => e.acm.score.toFixed(1),
       getSortValue: (e) => e.acm.score,
       render: (e) => (
-        <span style={{ color: '#60a5fa', fontWeight: 600 }}>{e.acm.score.toFixed(1)}</span>
+        <span style={{ color: '#0ea5e9', fontWeight: 600 }}>{e.acm.score.toFixed(1)}</span>
       ),
     },
     {
