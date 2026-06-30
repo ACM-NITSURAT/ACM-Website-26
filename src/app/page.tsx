@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from "react";
+import { useRouter } from 'next/navigation';
 import CinemaLoader from "@/components/loading/CinemaLoader";
 import HeroSection from "@/components/sections/HeroSection";
 import ProjectorTransition from "@/components/transitions/ProjectorTransition";
@@ -27,6 +28,7 @@ export default function Home() {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isLoaderComplete, setIsLoaderComplete] = useState(false);
   const timersRef = useRef<NodeJS.Timeout[]>([]);
+  const router = useRouter();
 
   // Keep track of latest state for the event listener without causing re-renders
   const stateRef = useRef(transitionState);
@@ -129,7 +131,7 @@ export default function Home() {
   useEffect(() => {
     const handleNavRouteClicked = (e: Event) => {
       const customEvent = e as CustomEvent<string>;
-      // const targetHref = customEvent.detail;
+      const targetHref = customEvent.detail;
       
       // If we are currently in the reel experience, trigger the reverse flash first
       if (stateRef.current === 'intro') {
@@ -139,13 +141,19 @@ export default function Home() {
         
         // Wait for the reverse flash to finish (500ms) before pretending to scroll
         setTimeout(() => {
-          // In a full implementation, we would scroll to the section here.
-          // For now, we return to hero.
-          window.scrollTo({ top: 0, behavior: 'smooth' });
+          if (targetHref) {
+            router.push(targetHref);
+          } else {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }
         }, 550);
       } else {
         // If already on Hero, just scroll
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        if (targetHref) {
+          router.push(targetHref);
+        } else {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
       }
     };
 

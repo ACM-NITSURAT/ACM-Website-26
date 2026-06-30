@@ -66,15 +66,19 @@ export default function LeaderboardTable({
     const col = columns.find((c) => c.key === sortKey);
     if (!col) return entries;
 
-    const accessor = col.getSortValue ?? ((e: LeaderboardEntry) => {
-      const val = col.getValue(e);
-      return typeof val === 'number' ? val : 0;
-    });
+    const accessor = col.getSortValue ?? ((e: LeaderboardEntry) => col.getValue(e));
 
     return [...entries].sort((a, b) => {
       const aVal = accessor(a);
       const bVal = accessor(b);
-      return sortOrder === 'desc' ? bVal - aVal : aVal - bVal;
+      
+      if (typeof aVal === 'string' && typeof bVal === 'string') {
+        return sortOrder === 'desc' ? bVal.localeCompare(aVal) : aVal.localeCompare(bVal);
+      }
+
+      const numA = typeof aVal === 'number' ? aVal : Number(aVal) || 0;
+      const numB = typeof bVal === 'number' ? bVal : Number(bVal) || 0;
+      return sortOrder === 'desc' ? numB - numA : numA - numB;
     });
   }, [entries, sortKey, sortOrder, columns]);
 

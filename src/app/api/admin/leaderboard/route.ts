@@ -27,14 +27,15 @@ export async function GET(request: Request) {
       return NextResponse.json({ success: true, students: [] });
     }
 
-    // Now fetch their leaderboard entries
-    const students = [];
-    for (const uid of uids) {
-      const u = usersMap.get(uid)!;
-      const entrySnap = await adminDb.doc(`leaderboard/${uid}`).get();
-      const entry = entrySnap.data() as LeaderboardEntry | undefined;
+    // Now fetch their leaderboard entries concurrently
+    const refs = uids.map(uid => adminDb.doc(`leaderboard/${uid}`));
+    const entrySnaps = await adminDb.getAll(...refs);
 
-      students.push({
+    const students = uids.map((uid, i) => {
+      const u = usersMap.get(uid)!;
+      const entry = entrySnaps[i].data() as LeaderboardEntry | undefined;
+
+      return {
         uid,
         displayName: `${u.firstName} ${u.lastName}`,
         rollNumber: u.rollNumber,
@@ -49,8 +50,8 @@ export async function GET(request: Request) {
           codechef: u.codechefUsername || null,
           github: u.githubUsername || null,
         }
-      });
-    }
+      };
+    });
 
     // Sort by score descending
     students.sort((a, b) => b.score - a.score);

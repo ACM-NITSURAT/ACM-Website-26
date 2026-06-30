@@ -66,7 +66,7 @@ export default function AdminDashboard() {
             <Link
               key={card.href}
               href={card.href}
-              className="group relative bg-[#12121a]/80 backdrop-blur-md border border-white/5 rounded-2xl p-6 overflow-hidden transition-all duration-300 hover:border-indigo-500/50 hover: hover:-translate-y-1"
+              className="group relative bg-[#12121a]/80 backdrop-blur-md border border-white/5 rounded-2xl p-6 overflow-hidden transition-all duration-300 hover:border-indigo-500/50 hover:-translate-y-1"
             >
               {/* Hover Glow */}
               <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/0 via-indigo-500/0 to-indigo-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
