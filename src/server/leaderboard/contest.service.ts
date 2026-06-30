@@ -12,80 +12,92 @@ import { FIRESTORE_PATHS } from '@/config/leaderboard';
 import { fetchJsonWithRetry } from './utils';
 import type { UpcomingContest } from '@/schema/leaderboard';
 
-const KONTESTS_API = 'https://kontests.net/api/v1/all';
-
-// ── Response Types ────────────────────────────────────────────────────────────
-
-interface KontestsResponse {
-  name: string;
-  url: string;
-  start_time: string;
-  end_time: string;
-  duration: string; // in seconds as a string
-  site: string;
-  in_24_hours: string;
-  status: string;
-}
-
-// ── Platform name mapping ─────────────────────────────────────────────────────
-
-/**
- * Maps Kontests API `site` values to our platform identifiers.
- * Non-matching sites are kept as-is for display purposes.
- */
-const SITE_TO_PLATFORM: Record<string, string> = {
-  'CodeForces':      'codeforces',
-  'CodeForces::Gym': 'codeforces',
-  'CodeChef':        'codechef',
-  'LeetCode':        'leetcode',
-  'HackerRank':      'hackerrank',
-  'HackerEarth':     'hackerearth',
-  'AtCoder':         'atcoder',
-  'TopCoder':        'topcoder',
-  'CS Academy':      'csacademy',
-  'Kick Start':      'kickstart',
-};
-
 // ── Fetch & Store ─────────────────────────────────────────────────────────────
 
 /**
- * Fetch upcoming contests from Kontests API and store in Firestore.
+ * Fetch upcoming contests directly from platforms (Codeforces, LeetCode, CodeChef).
  * Automatically cleans up expired contests.
  */
 export async function syncUpcomingContests(): Promise<{ added: number; removed: number }> {
-  // 1. Fetch from Kontests API
-  const { data } = await fetchJsonWithRetry<KontestsResponse[]>(
-    KONTESTS_API,
-    { timeoutMs: 15_000 },
-  );
-
   const now = new Date();
   const contests: UpcomingContest[] = [];
 
-  for (const raw of data) {
-    const startTime = new Date(raw.start_time);
-    const endTime = new Date(raw.end_time);
+  // 1. Fetch Codeforces
+  try {
+    const cfRes = await fetchJsonWithRetry<any>('https://codeforces.com/api/contest.list?gym=false');
+    if (cfRes.data?.result) {
+      const upcoming = cfRes.data.result.filter((c: any) => c.phase === 'BEFORE');
+      for (const raw of upcoming) {
+        const startTime = new Date(raw.startTimeSeconds * 1000);
+        const endTime = new Date((raw.startTimeSeconds + raw.durationSeconds) * 1000);
+        contests.push({
+          id: generateContestId('codeforces', raw.name, startTime.toISOString()),
+          platform: 'codeforces',
+          name: raw.name,
+          startTime: startTime.toISOString(),
+          endTime: endTime.toISOString(),
+          duration: raw.durationSeconds,
+          url: `https://codeforces.com/contests/${raw.id}`,
+          isActive: false, // it's 'BEFORE'
+          lastFetched: now.toISOString(),
+        });
+      }
+    }
+  } catch (err) {
+    console.error('[sync] CF contests failed:', err);
+  }
 
-    // Skip contests that have already ended
-    if (endTime <= now) continue;
-
-    const platform = SITE_TO_PLATFORM[raw.site] ?? raw.site.toLowerCase().replace(/\s+/g, '_');
-    const duration = parseInt(raw.duration, 10) || 0;
-
-    // Generate a stable ID from platform + name + start time
-    const id = generateContestId(platform, raw.name, raw.start_time);
-
-    contests.push({
-      id,
-      platform,
-      name: raw.name,
-      startTime: startTime.toISOString(),
-      endTime: endTime.toISOString(),
-      duration,
-      url: raw.url,
-      isActive: startTime <= now && endTime > now,
-      lastFetched: now.toISOString(),
+  // 2. Fetch LeetCode
+  try {
+    const lcRes = await fetchJsonWithRetry<any>('https://leetcode.com/graphql', {
+      method: 'POST',
+      body: { query: 'query { topTwoContests { title titleSlug startTime duration } }' },
     });
+    if (lcRes.data?.data?.topTwoContests) {
+      for (const raw of lcRes.data.data.topTwoContests) {
+        const startTime = new Date(raw.startTime * 1000);
+        const endTime = new Date((raw.startTime + raw.duration) * 1000);
+        if (endTime <= now) continue;
+        contests.push({
+          id: generateContestId('leetcode', raw.title, startTime.toISOString()),
+          platform: 'leetcode',
+          name: raw.title,
+          startTime: startTime.toISOString(),
+          endTime: endTime.toISOString(),
+          duration: raw.duration,
+          url: `https://leetcode.com/contest/${raw.titleSlug}`,
+          isActive: startTime <= now && endTime > now,
+          lastFetched: now.toISOString(),
+        });
+      }
+    }
+  } catch (err) {
+    console.error('[sync] LC contests failed:', err);
+  }
+
+  // 3. Fetch CodeChef
+  try {
+    const ccRes = await fetchJsonWithRetry<any>('https://www.codechef.com/api/list/contests/all');
+    if (ccRes.data?.future_contests) {
+      for (const raw of ccRes.data.future_contests) {
+        const startTime = new Date(raw.contest_start_date_iso);
+        const endTime = new Date(raw.contest_end_date_iso);
+        if (endTime <= now) continue;
+        contests.push({
+          id: generateContestId('codechef', raw.contest_name, startTime.toISOString()),
+          platform: 'codechef',
+          name: raw.contest_name,
+          startTime: startTime.toISOString(),
+          endTime: endTime.toISOString(),
+          duration: parseInt(raw.contest_duration, 10) * 60, // CC returns duration in mins usually, wait, from node it was "180" for a 3 hr contest. So * 60 to get seconds.
+          url: `https://www.codechef.com/${raw.contest_code}`,
+          isActive: startTime <= now && endTime > now,
+          lastFetched: now.toISOString(),
+        });
+      }
+    }
+  } catch (err) {
+    console.error('[sync] CC contests failed:', err);
   }
 
   // 2. Write to Firestore (batch)

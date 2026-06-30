@@ -17,6 +17,28 @@ import { NextResponse } from 'next/server';
 import { verifyIdToken } from '@/lib/firebase-admin/auth';
 import adminDb from '@/lib/firebase-admin/firestore';
 import type { User } from '@/schema/user';
+import { syncUserByUid } from '@/server/leaderboard/sync.service';
+
+export async function GET(request: Request) {
+  try {
+    const authHeader = request.headers.get('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return NextResponse.json({ error: 'Missing token' }, { status: 401 });
+    }
+    const token = authHeader.split('Bearer ')[1];
+    const decoded = await verifyIdToken(token);
+    const uid = decoded.uid;
+
+    const snap = await adminDb.doc(`users/${uid}`).get();
+    if (!snap.exists) {
+      return NextResponse.json({ user: null });
+    }
+    return NextResponse.json({ user: snap.data() });
+  } catch (err) {
+    console.error('[GET link-profiles]', err);
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+}
 
 export async function POST(request: Request) {
   try {
@@ -52,6 +74,11 @@ export async function POST(request: Request) {
 
     // Save to user document
     await adminDb.doc(`users/${uid}`).update(update);
+
+    // Trigger immediate leaderboard sync so the changes reflect instantly
+    // We run this without awaiting so it doesn't block the UI response if we want it fast,
+    // but the user expects the UI to be refreshed right after so we should await it.
+    await syncUserByUid(uid);
 
     return NextResponse.json({ success: true });
   } catch (err) {

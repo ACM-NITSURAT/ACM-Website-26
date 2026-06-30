@@ -7,8 +7,8 @@
  * This module is side-effect free and runs in both server and browser contexts.
  */
 
-/** Matches any email ending with @*.svnit.ac.in */
-const SVNIT_EMAIL_REGEX = /^[^\s@]+@[^\s@]*\.svnit\.ac\.in$/i;
+/** Matches any email ending with @svnit.ac.in or @subdomain.svnit.ac.in */
+const SVNIT_EMAIL_REGEX = /^[^\s@]+@([a-z0-9-]+\.)*svnit\.ac\.in$/i;
 
 /**
  * Returns true if the email conforms to the SVNIT domain pattern.

@@ -51,7 +51,7 @@ export default function LinkProfilesPage() {
         const token = await auth.currentUser?.getIdToken();
         if (!token) return;
 
-        const res = await fetch('/api/onboarding', {
+        const res = await fetch('/api/leaderboard/link-profiles', {
           headers: { Authorization: `Bearer ${token}` },
         });
 
