@@ -23,16 +23,6 @@ export const PUBLIC_ROUTES: readonly string[] = [
   '/events',
   '/events/*',
 
-  // ── Leaderboard (public — editing profiles requires auth) ─────────────────
-  '/leaderboard',
-  '/leaderboard/leetcode',
-  '/leaderboard/codeforces',
-  '/leaderboard/codechef',
-  '/leaderboard/github',
-  '/leaderboard/contests',
-  '/leaderboard/student/*',
-  '/leaderboard/compare',
-
   // ── Auth pages ────────────────────────────────────────────────────────────
   '/login',
   '/register',

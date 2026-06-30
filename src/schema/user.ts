@@ -62,39 +62,6 @@ export interface User {
    */
   isSuperAdmin: boolean;
 
-  // ── Leaderboard fields ──────────────────────────────────────────────────
-
-  /**
-   * Canonical branch code derived from the roll number / email.
-   * e.g. 'CSE', 'ECE', 'AI'. See `src/config/leaderboard.ts` for the full mapping.
-   * Null if the email doesn't follow the standard SVNIT format.
-   */
-  branch: string | null;
-
-  /**
-   * Expected graduation year derived from the roll number / email.
-   * e.g. 2028. Null if unparseable.
-   */
-  graduationBatch: number | null;
-
-  /**
-   * URL-friendly slug for the student's leaderboard profile.
-   * Format: "firstname-lastname-rollnumber" (e.g. "siddharth-sheth-u24cs024").
-   * Generated on account creation. Null until leaderboard data exists.
-   */
-  leaderboardSlug: string | null;
-
-  // ── Coding platform usernames (null = not linked) ─────────────────────
-
-  /** LeetCode username */
-  leetcodeUsername: string | null;
-  /** Codeforces handle */
-  codeforcesHandle: string | null;
-  /** CodeChef username */
-  codechefUsername: string | null;
-  /** GitHub username */
-  githubUsername: string | null;
-
   /** UTC timestamp of when the account was first created. */
   registrationTimestamp: Timestamp;
 }
