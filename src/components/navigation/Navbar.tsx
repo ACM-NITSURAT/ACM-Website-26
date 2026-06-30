@@ -3,18 +3,19 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import styles from './Navbar.module.css';
 
 /* ============================================================
    NAV SECTIONS — Each section is a "scene" in the production
    ============================================================ */
 const NAV_SECTIONS = [
-  { label: 'Hero',     scene: 'SC.01', section: 'hero',     href: '/#hero' },
-  { label: 'About',    scene: 'SC.02', section: 'about',    href: '/#about' },
-  { label: 'Events',   scene: 'SC.03', section: 'events',   href: '/events' },
-  { label: 'Projects', scene: 'SC.04', section: 'projects', href: '/projects' },
-  { label: 'Team',     scene: 'SC.05', section: 'team',     href: '/#team' },
+  { label: 'Hero',        scene: 'SC.01', section: 'hero',        href: '/#hero' },
+  { label: 'About',       scene: 'SC.02', section: 'about',       href: '/#about' },
+  { label: 'Events',      scene: 'SC.03', section: 'events',      href: '/events' },
+  { label: 'Leaderboard', scene: 'SC.04', section: 'leaderboard', href: '/leaderboard' },
+  { label: 'Projects',    scene: 'SC.05', section: 'projects',    href: '/projects' },
+  { label: 'Team',        scene: 'SC.06', section: 'team',        href: '/#team' },
 ];
 
 /* ============================================================
@@ -23,11 +24,12 @@ const NAV_SECTIONS = [
    the timecode scrambles through random digits before settling.
    ============================================================ */
 const SECTION_TIMECODES: Record<string, string> = {
-  hero:     '00:00:01',
-  about:    '00:02:18',
-  events:   '00:04:32',
-  projects: '00:06:45',
-  team:     '00:08:57',
+  hero:        '00:00:01',
+  about:       '00:02:18',
+  events:      '00:04:32',
+  leaderboard: '00:05:40',
+  projects:    '00:06:45',
+  team:        '00:08:57',
 };
 
 /** Linearly interpolate between a and b */
@@ -62,6 +64,7 @@ function lerp(a: number, b: number, t: number) {
 
 export default function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [isScrolled, setIsScrolled] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [reducedMotion, setReducedMotion] = useState(false);
@@ -98,11 +101,19 @@ export default function Navbar() {
   const navItemRefs = useRef<(HTMLElement | null)[]>([]);
   const prevSectionRef = useRef<string>('hero');
 
-  // Global navigation handler for cinematic transitions (preserved)
+  // Global navigation handler for cinematic transitions
   const handleNavClick = useCallback((e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>, href: string, section: string) => {
     e.preventDefault();
     
-    // If it's a hash link on current page, smooth scroll
+    // If we are not on the home page, or it's not a hash link
+    if (pathname !== '/' || !href.startsWith('/#')) {
+      router.push(href);
+      setIsMobileStripOpen(false);
+      setIsExpanded(false);
+      return;
+    }
+    
+    // If it's a hash link on the current home page, smooth scroll
     if (href.startsWith('/#')) {
       const targetEl = document.querySelector(`[data-nav-section="${section}"]`);
       if (targetEl) {
@@ -113,11 +124,11 @@ export default function Navbar() {
       }
     }
     
-    // Otherwise dispatch event for page transitions
+    // Otherwise dispatch event for page transitions (legacy)
     window.dispatchEvent(new CustomEvent('nav-route-clicked', { detail: href }));
     setIsMobileStripOpen(false);
     setIsExpanded(false);
-  }, []);
+  }, [pathname, router]);
 
   // --- Reduced motion detection (preserved) ---
   useEffect(() => {

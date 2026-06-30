@@ -1,0 +1,287 @@
+/* ── Table ───────────────────────────────────────────────────────────────────── */
+
+.tableWrapper {
+  display: block;
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid rgba(63, 63, 70, 0.3);
+  background: rgba(24, 24, 27, 0.5);
+  backdrop-filter: blur(8px);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+}
+
+.th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding: 12px 16px;
+  background: rgba(24, 24, 27, 0.95);
+  border-bottom: 1px solid rgba(63, 63, 70, 0.4);
+  color: #71717a;
+  font-weight: 500;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.thSortable {
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.15s ease;
+}
+
+.thSortable:hover {
+  color: #a1a1aa;
+}
+
+.thContent {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.sortArrow {
+  font-size: 0.625rem;
+  color: #60a5fa;
+}
+
+.tr {
+  border-bottom: 1px solid rgba(39, 39, 42, 0.5);
+  transition: background 0.15s ease;
+}
+
+.tr:hover {
+  background: rgba(39, 39, 42, 0.4);
+}
+
+.tr:last-child {
+  border-bottom: none;
+}
+
+/* Top 3 glow effects */
+.rank1 { background: rgba(234, 179, 8, 0.04); }
+.rank1:hover { background: rgba(234, 179, 8, 0.08); }
+.rank2 { background: rgba(148, 163, 184, 0.04); }
+.rank2:hover { background: rgba(148, 163, 184, 0.08); }
+.rank3 { background: rgba(180, 83, 9, 0.04); }
+.rank3:hover { background: rgba(180, 83, 9, 0.08); }
+
+.td {
+  padding: 12px 16px;
+  color: #d4d4d8;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.tdRank {
+  padding: 12px 16px;
+  text-align: center;
+  width: 60px;
+}
+
+.tdStudent {
+  padding: 10px 16px;
+}
+
+/* ── Student Cell ───────────────────────────────────────────────────────────── */
+
+.studentLink {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #27272a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.avatarFallback {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #a1a1aa;
+}
+
+.studentInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.studentName {
+  color: #fafafa;
+  font-weight: 500;
+  font-size: 0.8125rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.studentMeta {
+  color: #52525b;
+  font-size: 0.6875rem;
+}
+
+/* ── Rank Badge ─────────────────────────────────────────────────────────────── */
+
+.rankBadge {
+  font-size: 1.125rem;
+  line-height: 1;
+}
+
+.gold { filter: drop-shadow(0 0 6px rgba(234, 179, 8, 0.4)); }
+.silver { filter: drop-shadow(0 0 6px rgba(148, 163, 184, 0.3)); }
+.bronze { filter: drop-shadow(0 0 6px rgba(180, 83, 9, 0.3)); }
+
+.rankNumber {
+  font-size: 0.8125rem;
+  color: #52525b;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Skeleton ───────────────────────────────────────────────────────────────── */
+
+.skeleton {
+  padding: 8px 0;
+}
+
+.skeletonRow {
+  display: flex;
+  gap: 16px;
+  padding: 14px 16px;
+  align-items: center;
+}
+
+.skeletonCell {
+  height: 16px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #1c1c20 25%, #27272a 50%, #1c1c20 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── Empty State ────────────────────────────────────────────────────────────── */
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 24px;
+  gap: 12px;
+}
+
+.emptyIcon {
+  opacity: 0.5;
+}
+
+.emptyText {
+  color: #71717a;
+  font-size: 0.9375rem;
+  font-weight: 500;
+}
+
+.emptyHint {
+  color: #3f3f46;
+  font-size: 0.8125rem;
+}
+
+/* ── Mobile Cards ───────────────────────────────────────────────────────────── */
+
+.mobileCards {
+  display: none;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mobileCard {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(63, 63, 70, 0.3);
+  background: rgba(24, 24, 27, 0.5);
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.mobileCard:hover {
+  background: rgba(39, 39, 42, 0.4);
+  border-color: rgba(63, 63, 70, 0.5);
+}
+
+.mobileCardHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mobileCardStats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.mobileCardStat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mobileStatLabel {
+  font-size: 0.625rem;
+  color: #52525b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.mobileStatValue {
+  font-size: 0.8125rem;
+  color: #d4d4d8;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Responsive ─────────────────────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .tableWrapper {
+    display: none;
+  }
+
+  .mobileCards {
+    display: flex;
+  }
+}

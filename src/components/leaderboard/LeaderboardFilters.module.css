@@ -1,0 +1,63 @@
+.filtersRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.filterGroup {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.select {
+  padding: 8px 32px 8px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(63, 63, 70, 0.4);
+  background: rgba(24, 24, 27, 0.6);
+  color: #a1a1aa;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 5l3 3 3-3' stroke='%2352525b' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  transition: border-color 0.15s ease;
+}
+
+.select:hover {
+  border-color: rgba(63, 63, 70, 0.6);
+}
+
+.select:focus {
+  border-color: rgba(37, 99, 235, 0.5);
+}
+
+.clearFilters {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  background: rgba(239, 68, 68, 0.1);
+  color: #f87171;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.clearFilters:hover {
+  background: rgba(239, 68, 68, 0.18);
+}
+
+@media (max-width: 640px) {
+  .filterGroup {
+    width: 100%;
+  }
+  
+  .select {
+    flex: 1;
+    min-width: 100px;
+  }
+}
