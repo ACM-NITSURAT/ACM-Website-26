@@ -33,6 +33,12 @@ const PERMISSIONS = {
 
   /** Mark attendance for event participants */
   markAttendance:             ['core', 'adviser'],
+
+  /** Force sync, recalculate scores, manage leaderboard config */
+  manageLeaderboard:          ['core', 'adviser'],
+
+  /** View the leaderboard (public pages also accessible without auth) */
+  viewLeaderboard:            ['member', 'executive', 'core', 'adviser'],
 } as const satisfies Record<string, Role[]>;
 
 export type Permission = keyof typeof PERMISSIONS;

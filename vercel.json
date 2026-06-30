@@ -1,0 +1,16 @@
+{
+  "crons": [
+    {
+      "path": "/api/leaderboard/sync",
+      "schedule": "0 */6 * * *"
+    },
+    {
+      "path": "/api/leaderboard/contests/sync",
+      "schedule": "0 */3 * * *"
+    },
+    {
+      "path": "/api/leaderboard/sync/snapshots",
+      "schedule": "0 0 * * 0"
+    }
+  ]
+}

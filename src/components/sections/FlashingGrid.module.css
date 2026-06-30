@@ -1,14 +1,16 @@
 .gridContainer {
   position: absolute;
   inset: 0;
-  z-index: 0; /* Ensures it sits above .bgGrid but behind content */
+  z-index: 0;
+  /* Ensures it sits above .bgGrid but behind content */
   pointer-events: none;
   overflow: hidden;
 }
 
 .gridCell {
   position: absolute;
-  width: 60px; /* Matches GRID_SIZE */
+  width: 60px;
+  /* Matches GRID_SIZE */
   height: 60px;
   background-color: transparent;
   border: 1px solid rgba(37, 99, 235, 0.8);
@@ -27,9 +29,11 @@
   0% {
     opacity: 0;
   }
+
   10% {
     opacity: 0.4;
   }
+
   100% {
     opacity: 0;
   }

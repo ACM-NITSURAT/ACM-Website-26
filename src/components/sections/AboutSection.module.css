@@ -32,6 +32,8 @@
   z-index: 0;
   pointer-events: none;
   overflow: hidden;
+  mask-image: radial-gradient(ellipse 90% 80% at 50% 50%, black 40%, transparent 90%);
+  -webkit-mask-image: radial-gradient(ellipse 90% 80% at 50% 50%, black 40%, transparent 90%);
 }
 
 /* 1. Faint technical blueprint grid */
@@ -42,7 +44,6 @@
     linear-gradient(rgba(37, 99, 235, 0.15) 1px, transparent 1px),
     linear-gradient(90deg, rgba(37, 99, 235, 0.15) 1px, transparent 1px);
   background-size: 60px 60px;
-  mask-image: radial-gradient(ellipse 90% 80% at 50% 50%, black 40%, transparent 90%);
 }
 
 /* 2. Living Wireframe Scene (Replaces ambient SVGs) */
@@ -584,8 +585,7 @@
   box-shadow: 0 0 12px rgba(37, 99, 235, 0.4);
   z-index: 4;
   opacity: 0;
-  animation: scanSweep 1.5s linear infinite;
-  animation-play-state: paused;
+  transition: opacity 0.3s ease;
 }
 
 @keyframes scanSweep {

@@ -4,6 +4,7 @@ import type { DecodedIdToken } from 'firebase-admin/auth';
 import adminDb from './firestore';
 import adminApp from './app';
 import type { User } from '@/schema/user';
+import { parseRollNumber, generateSlug } from '@/lib/validators/roll-number-parser';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -54,6 +55,8 @@ async function resolveRole(email: string, existingRole?: Role): Promise<Role> {
  *  - Creates /users/{uid} with all schema defaults.
  *  - Resolves role from /dict/executives or defaults to 'member'.
  *  - Writes role as a Firebase Custom Claim on the JWT.
+ *  - Parses branch and graduation year from the email.
+ *  - Generates a URL-friendly leaderboard slug.
  *
  * On subsequent sign-ins:
  *  - Re-evaluates role (catches promotions/demotions in the dict).
@@ -83,17 +86,31 @@ export async function syncUser(token: DecodedIdToken): Promise<SyncUserResult> {
     const [firstName = '', ...rest] = (name ?? '').split(' ');
     const lastName = rest.join(' ');
 
+    // Parse institutional data from the email
+    const parsed = parseRollNumber(email);
+    const rollNumber = email.split('@')[0].toLowerCase();
+    const slug = generateSlug(firstName, lastName, rollNumber);
+
     const newUser: Omit<User, 'id'> = {
       firstName,
       lastName,
       email:                email.toLowerCase().trim(),
-      rollNumber:           email.split('@')[0].toLowerCase(),
+      rollNumber,
       gender:               'other',
       profileImageUrl:      picture ?? '',
       role,
       position:             null,
       isOnboardingCompleted: false,
       isSuperAdmin:         false,
+      // Leaderboard fields — derived from email
+      branch:               parsed?.branchCode ?? null,
+      graduationBatch:      parsed?.graduationYear ?? null,
+      leaderboardSlug:      slug,
+      // Platform usernames — not linked yet
+      leetcodeUsername:      null,
+      codeforcesHandle:     null,
+      codechefUsername:      null,
+      githubUsername:        null,
       registrationTimestamp: FieldValue.serverTimestamp() as never,
     };
 
