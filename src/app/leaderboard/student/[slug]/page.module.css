@@ -250,6 +250,42 @@
   text-align: right;
 }
 
+/* ── Placeholders ───────────────────────────────────────────────────────────── */
+
+.placeholders {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.placeholderCard {
+  border: 1px dashed rgba(63, 63, 70, 0.4);
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+  background: rgba(24, 24, 27, 0.2);
+}
+
+.placeholderCard h3 {
+  font-size: 0.9375rem;
+  color: #71717a;
+  margin-bottom: 4px;
+}
+
+.placeholderCard p {
+  font-size: 0.8125rem;
+  color: #52525b;
+  font-style: italic;
+}
+
+.statCardBadgeRow {
+  display: flex;
+  margin-top: -4px;
+  margin-bottom: 8px;
+}
+
+
 /* ── Skeleton ───────────────────────────────────────────────────────────────── */
 
 .skeletonHeader {

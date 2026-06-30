@@ -11,7 +11,7 @@ import styles from './LeaderboardTable.module.css';
 
 export interface Column {
   key: string;
-  label: string;
+  label: React.ReactNode;
   /** Accessor function to get value from entry */
   getValue: (entry: LeaderboardEntry) => string | number;
   /** Sort accessor — returns number for numeric sort */
@@ -22,6 +22,8 @@ export interface Column {
   width?: string;
   /** Text alignment */
   align?: 'left' | 'center' | 'right';
+  /** Optional custom CSS class for responsive hiding */
+  className?: string;
 }
 
 interface LeaderboardTableProps {
@@ -125,7 +127,7 @@ export default function LeaderboardTable({
               {columns.map((col) => (
                 <th
                   key={col.key}
-                  className={`${styles.th} ${styles.thSortable}`}
+                  className={`${styles.th} ${styles.thSortable} ${col.className || ''}`}
                   style={{ width: col.width, textAlign: col.align ?? 'right' }}
                   onClick={() => handleSort(col.key)}
                 >
@@ -182,7 +184,7 @@ export default function LeaderboardTable({
                         <div className={styles.studentInfo}>
                           <span className={styles.studentName}>{entry.displayName}</span>
                           <span className={styles.studentMeta}>
-                            {entry.branch} · Year {entry.currentYear}
+                            {entry.rollNumber}
                           </span>
                         </div>
                       </Link>
@@ -190,7 +192,7 @@ export default function LeaderboardTable({
                     {columns.map((col) => (
                       <td
                         key={col.key}
-                        className={styles.td}
+                        className={`${styles.td} ${col.className || ''}`}
                         style={{ textAlign: col.align ?? 'right' }}
                       >
                         {col.render ? col.render(entry) : col.getValue(entry)}
@@ -234,12 +236,12 @@ export default function LeaderboardTable({
                 <div className={styles.studentInfo}>
                   <span className={styles.studentName}>{entry.displayName}</span>
                   <span className={styles.studentMeta}>
-                    {entry.branch} · Year {entry.currentYear}
+                    {entry.rollNumber}
                   </span>
                 </div>
               </div>
               <div className={styles.mobileCardStats}>
-                {columns.slice(0, 3).map((col) => (
+                {columns.map((col) => (
                   <div key={col.key} className={styles.mobileCardStat}>
                     <span className={styles.mobileStatLabel}>{col.label}</span>
                     <span className={styles.mobileStatValue}>

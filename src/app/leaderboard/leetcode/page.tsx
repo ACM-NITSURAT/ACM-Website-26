@@ -3,8 +3,17 @@
 import PlatformLeaderboard from '@/components/leaderboard/PlatformLeaderboard';
 import DeltaBadge from '@/components/leaderboard/DeltaBadge';
 import type { Column } from '@/components/leaderboard/LeaderboardTable';
+import PlatformBadge from '@/components/leaderboard/PlatformBadge';
+import { formatCompactNumber } from '@/lib/utils/formatters';
 
 const columns: Column[] = [
+  {
+    key: 'leetcode.badge',
+    label: 'Badge',
+    getValue: () => 0,
+    render: (e) => <PlatformBadge platform="leetcode" stats={e.leetcode} />,
+    align: 'left' as const,
+  },
   {
     key: 'leetcode.rating',
     label: 'Rating',
@@ -17,6 +26,20 @@ const columns: Column[] = [
     ),
   },
   {
+    key: 'leetcode.globalRank',
+    label: 'Global Rank',
+    getValue: (e) => e.leetcode?.globalRank ?? '—',
+    getSortValue: (e) => e.leetcode?.globalRank ?? 9999999, // Sort unranked at bottom (ASC sort needed actually, but default is DESC)
+    render: (e) => e.leetcode?.globalRank ? formatCompactNumber(e.leetcode.globalRank) : '—',
+    className: 'hideOnTablet',
+  },
+  {
+    key: 'leetcode.contestCount',
+    label: 'Contests',
+    getValue: (e) => e.leetcode?.contestCount ?? '—',
+    getSortValue: (e) => e.leetcode?.contestCount ?? 0,
+  },
+  {
     key: 'leetcode.totalSolved',
     label: 'Solved',
     getValue: (e) => e.leetcode?.totalSolved ?? '—',
@@ -26,6 +49,7 @@ const columns: Column[] = [
     key: 'leetcode.breakdown',
     label: 'E / M / H',
     getValue: () => '',
+    className: 'hideOnMobile',
     render: (e) => {
       if (!e.leetcode) return '—';
       return (
@@ -38,23 +62,6 @@ const columns: Column[] = [
         </span>
       );
     },
-  },
-  {
-    key: 'leetcode.contestCount',
-    label: 'Contests',
-    getValue: (e) => e.leetcode?.contestCount ?? '—',
-    getSortValue: (e) => e.leetcode?.contestCount ?? 0,
-  },
-  {
-    key: 'delta',
-    label: 'Weekly',
-    getValue: () => 0,
-    render: (e) => (
-      <DeltaBadge
-        current={e.leetcode?.rating ?? null}
-        previous={e.previousSnapshot?.lcRating ?? null}
-      />
-    ),
   },
 ];
 

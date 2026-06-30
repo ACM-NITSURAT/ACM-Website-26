@@ -12,6 +12,8 @@ import LeaderboardTable, { type Column } from '@/components/leaderboard/Leaderbo
 import LeaderboardSearch from '@/components/leaderboard/LeaderboardSearch';
 import LeaderboardFilters from '@/components/leaderboard/LeaderboardFilters';
 import DeltaBadge from '@/components/leaderboard/DeltaBadge';
+import PlatformBadge from '@/components/leaderboard/PlatformBadge';
+import { LeetCodeIcon, CodeforcesIcon, CodeChefIcon, GitHubIcon } from '@/components/leaderboard/PlatformIcons';
 import type { LeaderboardEntry } from '@/schema/leaderboard';
 import styles from './page.module.css';
 
@@ -68,15 +70,6 @@ export default function OverallLeaderboardPage() {
 
   const columns: Column[] = [
     {
-      key: 'acm.score',
-      label: 'ACM Score',
-      getValue: (e) => e.acm.score.toFixed(1),
-      getSortValue: (e) => e.acm.score,
-      render: (e) => (
-        <span style={{ color: '#60a5fa', fontWeight: 600 }}>{e.acm.score.toFixed(1)}</span>
-      ),
-    },
-    {
       key: 'branch',
       label: 'Branch',
       getValue: (e) => e.branch,
@@ -90,16 +83,42 @@ export default function OverallLeaderboardPage() {
       align: 'center' as const,
     },
     {
-      key: 'delta',
-      label: 'Weekly',
-      getValue: () => 0,
+      key: 'acm.score',
+      label: 'ACM Score',
+      getValue: (e) => e.acm.score.toFixed(1),
+      getSortValue: (e) => e.acm.score,
       render: (e) => (
-        <DeltaBadge
-          current={e.acm.score}
-          previous={e.previousSnapshot?.acmScore ?? null}
-          precision={1}
-        />
+        <span style={{ color: '#60a5fa', fontWeight: 600 }}>{e.acm.score.toFixed(1)}</span>
       ),
+    },
+    {
+      key: 'leetcode',
+      label: <LeetCodeIcon style={{ fontSize: '1.25rem' }} aria-label="LeetCode" />,
+      getValue: () => 0,
+      render: (e) => <PlatformBadge platform="leetcode" stats={e.leetcode} />,
+      align: 'center',
+      className: 'hideOnMobile', // Hide on mobile maybe? No, let's just keep them all for now or maybe hide on tablet.
+    },
+    {
+      key: 'codeforces',
+      label: <CodeforcesIcon style={{ fontSize: '1.25rem' }} aria-label="Codeforces" />,
+      getValue: () => 0,
+      render: (e) => <PlatformBadge platform="codeforces" stats={e.codeforces} />,
+      align: 'center',
+    },
+    {
+      key: 'codechef',
+      label: <CodeChefIcon style={{ fontSize: '1.25rem' }} aria-label="CodeChef" />,
+      getValue: () => 0,
+      render: (e) => <PlatformBadge platform="codechef" stats={e.codechef} />,
+      align: 'center',
+    },
+    {
+      key: 'github',
+      label: <GitHubIcon style={{ fontSize: '1.25rem' }} aria-label="GitHub" />,
+      getValue: () => 0,
+      render: (e) => <PlatformBadge platform="github" stats={e.github} />,
+      align: 'center',
     },
   ];
 

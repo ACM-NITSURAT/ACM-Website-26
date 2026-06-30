@@ -1,9 +1,18 @@
 'use client';
 
 import PlatformLeaderboard from '@/components/leaderboard/PlatformLeaderboard';
+import PlatformBadge from '@/components/leaderboard/PlatformBadge';
+import { formatCompactNumber } from '@/lib/utils/formatters';
 import type { Column } from '@/components/leaderboard/LeaderboardTable';
 
 const columns: Column[] = [
+  {
+    key: 'codechef.stars',
+    label: 'Stars',
+    getValue: () => 0,
+    render: (e) => <PlatformBadge platform="codechef" stats={e.codechef} />,
+    align: 'left' as const,
+  },
   {
     key: 'codechef.currentRating',
     label: 'Rating',
@@ -16,32 +25,25 @@ const columns: Column[] = [
     ),
   },
   {
-    key: 'codechef.stars',
-    label: 'Stars',
-    getValue: (e) => e.codechef?.stars ?? '—',
-    getSortValue: (e) => e.codechef?.stars ?? 0,
-    render: (e) => {
-      if (!e.codechef) return '—';
-      return <span style={{ color: '#eab308' }}>{'★'.repeat(e.codechef.stars)}</span>;
-    },
-  },
-  {
     key: 'codechef.highestRating',
-    label: 'Highest',
+    label: 'Highest Rating',
     getValue: (e) => e.codechef?.highestRating ?? '—',
     getSortValue: (e) => e.codechef?.highestRating ?? 0,
+    className: 'hideOnTablet',
+  },
+  {
+    key: 'codechef.globalRank',
+    label: 'Global Rank',
+    getValue: (e) => e.codechef?.globalRank ?? '—',
+    getSortValue: (e) => e.codechef?.globalRank ?? 9999999,
+    render: (e) => e.codechef?.globalRank ? formatCompactNumber(e.codechef.globalRank) : '—',
+    className: 'hideOnMobile',
   },
   {
     key: 'codechef.contestCount',
     label: 'Contests',
     getValue: (e) => e.codechef?.contestCount ?? '—',
     getSortValue: (e) => e.codechef?.contestCount ?? 0,
-  },
-  {
-    key: 'codechef.globalRank',
-    label: 'Global Rank',
-    getValue: (e) => e.codechef?.globalRank ?? '—',
-    getSortValue: (e) => e.codechef?.globalRank ?? Infinity,
   },
 ];
 

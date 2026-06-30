@@ -1,10 +1,18 @@
 'use client';
 
 import PlatformLeaderboard from '@/components/leaderboard/PlatformLeaderboard';
-import DeltaBadge from '@/components/leaderboard/DeltaBadge';
+import PlatformBadge from '@/components/leaderboard/PlatformBadge';
+import { formatCompactNumber } from '@/lib/utils/formatters';
 import type { Column } from '@/components/leaderboard/LeaderboardTable';
 
 const columns: Column[] = [
+  {
+    key: 'codeforces.badge',
+    label: 'Rank',
+    getValue: () => 0,
+    render: (e) => <PlatformBadge platform="codeforces" stats={e.codeforces} />,
+    align: 'left' as const,
+  },
   {
     key: 'codeforces.currentRating',
     label: 'Rating',
@@ -17,27 +25,18 @@ const columns: Column[] = [
     ),
   },
   {
-    key: 'codeforces.currentRank',
-    label: 'Rank',
-    getValue: (e) => e.codeforces?.currentRank ?? '—',
-    align: 'left' as const,
-    render: (e) => {
-      const rank = e.codeforces?.currentRank ?? '—';
-      const color = getCFRankColor(rank);
-      return <span style={{ color, fontWeight: 500, fontSize: '0.75rem' }}>{rank}</span>;
-    },
-  },
-  {
     key: 'codeforces.maxRating',
-    label: 'Max',
+    label: 'Max Rating',
     getValue: (e) => e.codeforces?.maxRating ?? '—',
     getSortValue: (e) => e.codeforces?.maxRating ?? 0,
+    className: 'hideOnTablet',
   },
   {
-    key: 'codeforces.problemsSolved',
-    label: 'Solved',
-    getValue: (e) => e.codeforces?.problemsSolved ?? '—',
-    getSortValue: (e) => e.codeforces?.problemsSolved ?? 0,
+    key: 'codeforces.maxRank',
+    label: 'Max Rank',
+    getValue: (e) => e.codeforces?.maxRank ?? '—',
+    align: 'center' as const,
+    className: 'hideOnMobile',
   },
   {
     key: 'codeforces.contestCount',
@@ -46,31 +45,14 @@ const columns: Column[] = [
     getSortValue: (e) => e.codeforces?.contestCount ?? 0,
   },
   {
-    key: 'delta',
-    label: 'Weekly',
-    getValue: () => 0,
-    render: (e) => (
-      <DeltaBadge
-        current={e.codeforces?.currentRating ?? null}
-        previous={e.previousSnapshot?.cfRating ?? null}
-      />
-    ),
+    key: 'codeforces.problemsSolved',
+    label: 'Solved',
+    getValue: (e) => e.codeforces?.problemsSolved ?? '—',
+    getSortValue: (e) => e.codeforces?.problemsSolved ?? 0,
+    render: (e) => e.codeforces?.problemsSolved ? formatCompactNumber(e.codeforces.problemsSolved) : '—',
   },
 ];
 
-function getCFRankColor(rank: string): string {
-  const r = rank.toLowerCase();
-  if (r.includes('legendary')) return '#ff0000';
-  if (r.includes('international grandmaster')) return '#ff0000';
-  if (r.includes('grandmaster')) return '#ff0000';
-  if (r.includes('international master')) return '#ff8c00';
-  if (r.includes('master')) return '#ff8c00';
-  if (r.includes('candidate master')) return '#aa00aa';
-  if (r.includes('expert')) return '#0000ff';
-  if (r.includes('specialist')) return '#03a89e';
-  if (r.includes('pupil')) return '#008000';
-  return '#808080';
-}
 
 export default function CodeforcesPage() {
   return <PlatformLeaderboard platform="codeforces" columns={columns} />;

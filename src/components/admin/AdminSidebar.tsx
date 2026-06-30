@@ -36,6 +36,16 @@ const NAV_ITEMS: NavItem[] = [
       </svg>
     ),
   },
+  {
+    label: 'Leaderboard',
+    href: '/admin/leaderboard',
+    matchPrefix: '/admin/leaderboard',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 20v-8M6 20V16M18 20V8" />
+      </svg>
+    ),
+  },
 ];
 
 function NavLink({ item, expanded }: { item: NavItem; expanded: boolean }) {

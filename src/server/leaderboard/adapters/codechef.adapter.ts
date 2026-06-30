@@ -11,37 +11,69 @@
 
 import type { PlatformAdapter, ValidationResult, FetchStatsResult } from './types';
 import type { CodeChefStats } from '@/schema/leaderboard';
-import { fetchJsonWithRetry, clamp0to100, safeDivide } from '../utils';
-
-const CODECHEF_API = 'https://codechef-api.vercel.app/handle';
-
-// ── Response Types ────────────────────────────────────────────────────────────
-
-interface CCApiResponse {
-  success: boolean;
-  profile?: string;
-  name?: string;
-  currentRating?: number;
-  highestRating?: number;
-  stars?: string;
-  countryRank?: number;
-  globalRank?: number;
-  countryName?: string;
-  ratingData?: Array<{
-    code: string;
-    name: string;
-    rating: string;
-    rank: string;
-  }>;
-}
+import { clamp0to100, safeDivide } from '../utils';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function parseStars(starsStr: string | undefined): number {
   if (!starsStr) return 0;
-  // Format: "3★" or "3 stars" etc.
   const match = starsStr.match(/(\d+)/);
   return match ? parseInt(match[1], 10) : 0;
+}
+
+async function fetchCodeChefProfile(username: string) {
+  try {
+    const res = await fetch(`https://www.codechef.com/users/${encodeURIComponent(username)}`, {
+      headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36' },
+      cache: 'no-store'
+    });
+    
+    if (res.status === 404) {
+      return { success: false, error: 'User not found' };
+    }
+    
+    const html = await res.text();
+    
+    const nameMatch = html.match(/class="m-username--link"[^>]*>([^<]+)/i) || html.match(/<h1[^>]*>([^<]+)<\/h1>/i) || html.match(/class="h2-style"[^>]*>([^<]+)<\/h2>/i);
+    const ratingMatch = html.match(/class="rating-number"[^>]*>\s*(\d+)/);
+    const highestMatch = html.match(/Highest Rating[\s\S]*?(?:<[^>]+>\s*)*(\d+)/i);
+    const globalRankMatch = html.match(/Global Rank[\s\S]*?<a[^>]*>\s*([0-9]+)/i);
+
+    let contestCount = 0;
+    const contestsMatch = html.match(/"all":\[(.*?)\]/);
+    if (contestsMatch && contestsMatch[1]) {
+      try {
+        const arr = JSON.parse(`[${contestsMatch[1]}]`);
+        contestCount = arr.length;
+      } catch (e) {}
+    }
+
+    if (!nameMatch && !ratingMatch) {
+       return { success: false, error: 'Profile not found or invalid' };
+    }
+
+    const currentRating = ratingMatch ? parseInt(ratingMatch[1], 10) : 0;
+    
+    let starsNum = 1;
+    if (currentRating >= 2500) starsNum = 7;
+    else if (currentRating >= 2200) starsNum = 6;
+    else if (currentRating >= 2000) starsNum = 5;
+    else if (currentRating >= 1800) starsNum = 4;
+    else if (currentRating >= 1600) starsNum = 3;
+    else if (currentRating >= 1400) starsNum = 2;
+
+    return {
+      success: true,
+      name: nameMatch ? nameMatch[1].trim() : username,
+      currentRating,
+      highestRating: highestMatch ? parseInt(highestMatch[1], 10) : currentRating,
+      stars: `${starsNum}★`,
+      globalRank: globalRankMatch ? parseInt(globalRankMatch[1], 10) : 0,
+      contestCount
+    };
+  } catch (err) {
+    return { success: false, error: err instanceof Error ? err.message : 'Fetch failed' };
+  }
 }
 
 // ── Adapter Implementation ────────────────────────────────────────────────────
@@ -50,61 +82,40 @@ export class CodeChefAdapter implements PlatformAdapter<CodeChefStats> {
   readonly platform = 'codechef' as const;
 
   async validateUsername(username: string): Promise<ValidationResult> {
-    try {
-      const { data, status } = await fetchJsonWithRetry<CCApiResponse>(
-        `${CODECHEF_API}/${encodeURIComponent(username)}`,
-        { timeoutMs: 10_000 },
-      );
+    const data = await fetchCodeChefProfile(username);
 
-      if (status !== 200 || !data.success) {
-        return { valid: false, error: 'Username not found on CodeChef' };
-      }
-
-      return {
-        valid: true,
-        preview: {
-          displayName: data.name || username,
-          rating: data.currentRating,
-          rank: data.stars || 'Unrated',
-        },
-      };
-    } catch (err) {
-      return {
-        valid: false,
-        error: err instanceof Error ? err.message : 'Failed to validate CodeChef username',
-      };
+    if (!data.success) {
+      return { valid: false, error: data.error || 'Username not found on CodeChef' };
     }
+
+    return {
+      valid: true,
+      preview: {
+        displayName: data.name || username,
+        rating: data.currentRating,
+        rank: data.stars || 'Unrated',
+      },
+    };
   }
 
   async fetchStats(username: string): Promise<FetchStatsResult<CodeChefStats>> {
-    try {
-      const { data, status } = await fetchJsonWithRetry<CCApiResponse>(
-        `${CODECHEF_API}/${encodeURIComponent(username)}`,
-        { timeoutMs: 15_000 },
-      );
+    const data = await fetchCodeChefProfile(username);
 
-      if (status !== 200 || !data.success) {
-        return { success: false, error: 'Username not found on CodeChef' };
-      }
-
-      const contestCount = data.ratingData?.length ?? 0;
-
-      const stats: CodeChefStats = {
-        username,
-        currentRating: data.currentRating ?? 0,
-        highestRating: data.highestRating ?? 0,
-        stars: parseStars(data.stars),
-        contestCount,
-        globalRank: data.globalRank ?? 0,
-        lastUpdated: new Date().toISOString(),
-      };
-
-      return { success: true, stats };
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Unknown error';
-      const rateLimited = message.includes('429') || message.includes('rate');
-      return { success: false, error: message, rateLimited };
+    if (!data.success) {
+      return { success: false, error: data.error || 'Username not found on CodeChef' };
     }
+
+    const stats: CodeChefStats = {
+      username,
+      currentRating: data.currentRating ?? 0,
+      highestRating: data.highestRating ?? 0,
+      stars: parseStars(data.stars),
+      contestCount: data.contestCount ?? 0,
+      globalRank: data.globalRank ?? 0,
+      lastUpdated: new Date().toISOString(),
+    };
+
+    return { success: true, stats };
   }
 
   calculateNormalizedScore(stats: CodeChefStats): number {

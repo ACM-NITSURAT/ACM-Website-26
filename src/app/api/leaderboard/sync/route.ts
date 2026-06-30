@@ -9,20 +9,27 @@
 
 import { NextResponse } from 'next/server';
 import { runFullSync } from '@/server/leaderboard/sync.service';
+import { requirePermission } from '@/server/guard';
 
 export const maxDuration = 300; // 5 minutes — Vercel Pro limit
 
 export async function POST(request: Request) {
-  // Verify cron secret
+  // Allow if valid CRON_SECRET
   const authHeader = request.headers.get('authorization');
   const cronSecret = process.env.CRON_SECRET;
+  let isAuthorized = false;
 
-  if (!cronSecret) {
-    console.error('[sync] CRON_SECRET not configured');
-    return NextResponse.json({ error: 'Server misconfigured' }, { status: 500 });
+  if (cronSecret && authHeader === `Bearer ${cronSecret}`) {
+    isAuthorized = true;
+  } else {
+    // Check for admin permission
+    const auth = await requirePermission(request, 'manageLeaderboard');
+    if (!auth.error) {
+      isAuthorized = true;
+    }
   }
 
-  if (authHeader !== `Bearer ${cronSecret}`) {
+  if (!isAuthorized) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

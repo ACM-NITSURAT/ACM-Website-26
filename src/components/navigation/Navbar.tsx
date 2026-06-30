@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
+import UserMenu from './UserMenu';
 import styles from './Navbar.module.css';
 
 /* ============================================================
@@ -491,9 +492,10 @@ export default function Navbar() {
         </Link>
 
         {/* ============================================================
-            RIGHT: NOW SHOWING Plate — Cinematic scene indicator
+            RIGHT: NOW SHOWING Plate & User Menu
             ============================================================ */}
-        <div className={styles.plateWrapper}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div className={styles.plateWrapper}>
           <div
             ref={plateRef}
           className={`${styles.plate} ${isExpanded ? styles.expanded : ''} ${
@@ -600,11 +602,15 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Hover hint — positioned absolutely below plate */}
-        <span className={styles.hoverHint} aria-hidden="true">
-          hover to navigate
-        </span>
-      </div>
+          {/* Hover hint — positioned absolutely below plate */}
+          <span className={styles.hoverHint} aria-hidden="true">
+            hover to navigate
+          </span>
+        </div>
+
+          {/* FAR RIGHT: User Avatar */}
+          <UserMenu />
+        </div>
 
         {/* ============================================================
             MOBILE: Horizontal scrollable scene strip

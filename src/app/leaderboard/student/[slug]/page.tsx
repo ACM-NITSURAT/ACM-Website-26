@@ -17,6 +17,8 @@ import Link from 'next/link';
 import { PLATFORMS, type Platform, ALL_PLATFORMS } from '@/config/leaderboard';
 import type { LeaderboardEntry } from '@/schema/leaderboard';
 import DeltaBadge from '@/components/leaderboard/DeltaBadge';
+import PlatformBadge from '@/components/leaderboard/PlatformBadge';
+import { formatCompactNumber } from '@/lib/utils/formatters';
 import styles from './page.module.css';
 
 export default function StudentProfilePage() {
@@ -121,6 +123,30 @@ export default function StudentProfilePage() {
           Last synced: {new Date(entry.sync.lastSync).toLocaleString('en-IN')}
         </p>
       )}
+
+      {/* Future Placeholders */}
+      <div className={styles.placeholders}>
+        <div className={styles.placeholderCard}>
+          <h3>Rating History</h3>
+          <p>Coming soon...</p>
+        </div>
+        <div className={styles.placeholderCard}>
+          <h3>Contest History</h3>
+          <p>Coming soon...</p>
+        </div>
+        <div className={styles.placeholderCard}>
+          <h3>Achievement Timeline</h3>
+          <p>Coming soon...</p>
+        </div>
+        <div className={styles.placeholderCard}>
+          <h3>Activity Feed</h3>
+          <p>Coming soon...</p>
+        </div>
+        <div className={styles.placeholderCard}>
+          <h3>Monthly Progress</h3>
+          <p>Coming soon...</p>
+        </div>
+      </div>
     </div>
   );
 }
@@ -155,11 +181,16 @@ function PlatformCard({ platform, entry }: { platform: Platform; entry: Leaderbo
           ↗
         </a>
       </div>
+      <div className={styles.statCardBadgeRow}>
+        <PlatformBadge platform={platform} stats={stats} />
+      </div>
 
       <div className={styles.statGrid}>
         {platform === 'leetcode' && entry.leetcode && (
           <>
+            <StatItem label="Username" value={entry.leetcode.username} />
             <StatItem label="Rating" value={entry.leetcode.rating} color={meta.color} />
+            <StatItem label="Global Rank" value={formatCompactNumber(entry.leetcode.globalRank)} />
             <StatItem label="Solved" value={entry.leetcode.totalSolved} />
             <StatItem label="Easy" value={entry.leetcode.easySolved} color="#22c55e" />
             <StatItem label="Medium" value={entry.leetcode.mediumSolved} color="#eab308" />
@@ -169,28 +200,31 @@ function PlatformCard({ platform, entry }: { platform: Platform; entry: Leaderbo
         )}
         {platform === 'codeforces' && entry.codeforces && (
           <>
+            <StatItem label="Handle" value={entry.codeforces.handle} />
             <StatItem label="Rating" value={entry.codeforces.currentRating} color={meta.color} />
             <StatItem label="Max Rating" value={entry.codeforces.maxRating} />
-            <StatItem label="Rank" value={entry.codeforces.currentRank} />
+            <StatItem label="Max Rank" value={entry.codeforces.maxRank} />
             <StatItem label="Solved" value={entry.codeforces.problemsSolved} />
             <StatItem label="Contests" value={entry.codeforces.contestCount} />
           </>
         )}
         {platform === 'codechef' && entry.codechef && (
           <>
+            <StatItem label="Username" value={entry.codechef.username} />
             <StatItem label="Rating" value={entry.codechef.currentRating} color={meta.color} />
-            <StatItem label="Stars" value={'★'.repeat(entry.codechef.stars)} color="#eab308" />
             <StatItem label="Highest" value={entry.codechef.highestRating} />
+            <StatItem label="Global Rank" value={formatCompactNumber(entry.codechef.globalRank)} />
             <StatItem label="Contests" value={entry.codechef.contestCount} />
           </>
         )}
         {platform === 'github' && entry.github && (
           <>
-            <StatItem label="Commits" value={entry.github.totalCommits.toLocaleString()} color="#22c55e" />
-            <StatItem label="Stars" value={entry.github.starsReceived} color="#eab308" />
+            <StatItem label="Username" value={entry.github.username} />
             <StatItem label="Repos" value={entry.github.publicRepos} />
-            <StatItem label="PRs" value={entry.github.pullRequests} />
-            <StatItem label="Followers" value={entry.github.followers} />
+            <StatItem label="Commits" value={formatCompactNumber(entry.github.totalCommits)} color="#22c55e" />
+            <StatItem label="Stars" value={formatCompactNumber(entry.github.starsReceived)} color="#eab308" />
+            <StatItem label="PRs" value={formatCompactNumber(entry.github.pullRequests)} />
+            <StatItem label="Followers" value={formatCompactNumber(entry.github.followers)} />
           </>
         )}
       </div>

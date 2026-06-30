@@ -248,6 +248,20 @@
   gap: 10px;
 }
 
+/* ── Responsive Hiding ──────────────────────────────────────────────────────── */
+
+@media (max-width: 1024px) {
+  .hideOnTablet {
+    display: none !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .hideOnMobile {
+    display: none !important;
+  }
+}
+
 .mobileCardStats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

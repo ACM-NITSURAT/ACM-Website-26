@@ -9,7 +9,7 @@
 
 import adminDb from '@/lib/firebase-admin/firestore';
 import { FIRESTORE_PATHS } from '@/config/leaderboard';
-import { fetchJsonWithRetry } from './utils';
+import { fetchJsonWithRetry, postJsonWithRetry } from './utils';
 import type { UpcomingContest } from '@/schema/leaderboard';
 
 // ── Fetch & Store ─────────────────────────────────────────────────────────────
@@ -49,9 +49,8 @@ export async function syncUpcomingContests(): Promise<{ added: number; removed: 
 
   // 2. Fetch LeetCode
   try {
-    const lcRes = await fetchJsonWithRetry<any>('https://leetcode.com/graphql', {
-      method: 'POST',
-      body: { query: 'query { topTwoContests { title titleSlug startTime duration } }' },
+    const lcRes = await postJsonWithRetry<any>('https://leetcode.com/graphql', {
+      query: 'query { topTwoContests { title titleSlug startTime duration } }',
     });
     if (lcRes.data?.data?.topTwoContests) {
       for (const raw of lcRes.data.data.topTwoContests) {
