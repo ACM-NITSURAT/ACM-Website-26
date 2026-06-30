@@ -23,6 +23,7 @@ const TABS = [
   { label: 'CodeChef',   href: '/leaderboard/codechef',   platform: 'codechef' },
   { label: 'GitHub',     href: '/leaderboard/github',     platform: 'github' },
   { label: 'Contests',   href: '/leaderboard/contests',   platform: null },
+  { label: 'Compare',    href: '/leaderboard/compare',    platform: null },
 ] as const;
 
 export default function LeaderboardLayout({
@@ -74,9 +75,8 @@ export default function LeaderboardLayout({
     return pathname.startsWith(tab.href);
   });
 
-  // Don't show tabs on student profile, compare, or link-profiles pages
+  // Don't show tabs on student profile or link-profiles pages
   const isSubPage = pathname.includes('/student/') ||
-                    pathname.includes('/compare') ||
                     pathname.includes('/link-profiles');
 
   return (

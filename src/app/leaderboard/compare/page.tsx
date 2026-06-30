@@ -124,7 +124,7 @@ export default function ComparePage() {
           {/* Headers */}
           <div className={styles.compareHeaders}>
             <CompareHeader student={studentA} />
-            <CompareHeader student={studentB} />
+            <CompareHeader student={studentB} isPlayerB />
           </div>
 
           {/* ACM Score */}
@@ -155,10 +155,10 @@ export default function ComparePage() {
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
-function CompareHeader({ student }: { student: LeaderboardEntry }) {
+function CompareHeader({ student, isPlayerB }: { student: LeaderboardEntry, isPlayerB?: boolean }) {
   return (
     <div className={styles.compareHeaderCard}>
-      <div className={styles.headerAvatar}>
+      <div className={styles.headerAvatar} style={{ borderColor: isPlayerB ? '#34d399' : '#818cf8', borderWidth: '2px', borderStyle: 'solid' }}>
         {student.profileImageUrl ? (
           <Image src={student.profileImageUrl} alt={student.displayName} width={40} height={40} className={styles.headerAvatarImg} />
         ) : (
@@ -166,7 +166,7 @@ function CompareHeader({ student }: { student: LeaderboardEntry }) {
         )}
       </div>
       <div>
-        <div className={styles.headerName}>{student.displayName}</div>
+        <div className={styles.headerName} style={{ color: isPlayerB ? '#34d399' : '#818cf8' }}>{student.displayName}</div>
         <div className={styles.headerMeta}>{student.branch} · Year {student.currentYear}</div>
       </div>
     </div>
@@ -190,15 +190,36 @@ function CompareRow({
   const isBWinner = numB > numA;
   const isTie = numA === numB;
 
+  const showBars = numA >= 0 && numB >= 0 && (numA > 0 || numB > 0);
+  const max = Math.max(numA, numB, 1);
+  const pctA = showBars ? (numA / max) * 100 : 0;
+  const pctB = showBars ? (numB / max) * 100 : 0;
+
   return (
     <div className={styles.compareRow}>
-      <span className={`${styles.compareValue} ${isAWinner ? styles.winner : isTie ? '' : styles.loser}`}>
-        {valueA}
-      </span>
+      <div className={`${styles.compareSide} ${styles.sideA}`}>
+        {showBars && (
+          <div className={styles.barContainerA}>
+            <div className={styles.barFillA} style={{ width: `${pctA}%` }} />
+          </div>
+        )}
+        <span className={`${styles.compareValue} ${isAWinner ? styles.winnerA : isTie ? '' : styles.loser}`}>
+          {valueA}
+        </span>
+      </div>
+      
       <span className={styles.compareLabel}>{label}</span>
-      <span className={`${styles.compareValue} ${isBWinner ? styles.winner : isTie ? '' : styles.loser}`}>
-        {valueB}
-      </span>
+      
+      <div className={`${styles.compareSide} ${styles.sideB}`}>
+        <span className={`${styles.compareValue} ${isBWinner ? styles.winnerB : isTie ? '' : styles.loser}`}>
+          {valueB}
+        </span>
+        {showBars && (
+          <div className={styles.barContainerB}>
+            <div className={styles.barFillB} style={{ width: `${pctB}%` }} />
+          </div>
+        )}
+      </div>
     </div>
   );
 }
