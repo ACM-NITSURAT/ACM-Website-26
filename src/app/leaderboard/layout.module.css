@@ -1,0 +1,250 @@
+/* ============================================================
+   LEADERBOARD LAYOUT — Cinematic Redesign
+   Adopts the technical blueprint & terminal aesthetics.
+   ============================================================ */
+
+.wrapper {
+  position: relative;
+  min-height: 100vh;
+  background-color: transparent;
+  z-index: 10;
+}
+
+/* ── Background Atmosphere ─────────────────────────────────────────────────── */
+
+.bgAtmosphere {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 0;
+  pointer-events: none;
+  mask-image: radial-gradient(ellipse 90% 80% at 50% 50%, black 40%, transparent 90%);
+  -webkit-mask-image: radial-gradient(ellipse 90% 80% at 50% 50%, black 40%, transparent 90%);
+}
+
+/* 1. Faint technical blueprint grid */
+.bgGrid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(14, 165, 233, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(14, 165, 233, 0.1) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+.bgGlow1,
+.bgGlow2 {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(14, 165, 233, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.bgGlow1 {
+  width: 600px;
+  height: 600px;
+  top: 8%;
+  left: -5%;
+  animation: driftSlow1 25s ease-in-out infinite alternate;
+}
+
+.bgGlow2 {
+  width: 500px;
+  height: 500px;
+  bottom: 12%;
+  right: -8%;
+  animation: driftSlow2 35s ease-in-out infinite alternate;
+}
+
+@keyframes driftSlow1 {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(80px, 40px); }
+}
+
+@keyframes driftSlow2 {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(-60px, -50px); }
+}
+
+.globalNavBg {
+  position: sticky;
+  top: 0;
+  height: 74px;
+  width: 100%;
+  z-index: 45;
+  background: rgba(7, 6, 10, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.header {
+  position: relative;
+  z-index: 40;
+  background: rgba(7, 6, 10, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.stickyTabsWrapper {
+  position: sticky;
+  top: 74px; /* Sticks right below the global navbar */
+  z-index: 40;
+  background: rgba(7, 6, 10, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(14, 165, 233, 0.2);
+}
+
+.headerContent {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 24px 24px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  position: relative;
+  z-index: 2;
+}
+
+.titleRow {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.title {
+  font-family: var(--font-display), 'Space Grotesk', sans-serif;
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+  text-shadow: 0 0 30px rgba(255, 255, 255, 0.15);
+}
+
+.titleAccent {
+  color: rgba(14, 165, 233, 0.9);
+  text-shadow: 0 0 15px rgba(14, 165, 233, 0.4);
+}
+
+.subtitle {
+  font-family: var(--font-geist-mono), 'Courier New', monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+}
+
+/* ── Link Profiles CTA ──────────────────────────────────────────────────────── */
+
+.linkProfilesCta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 2px;
+  background: rgba(14, 165, 233, 0.12);
+  border: 1px solid rgba(14, 165, 233, 0.4);
+  color: #0ea5e9;
+  font-family: var(--font-geist-mono), 'Courier New', monospace;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  font-weight: 600;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.linkProfilesCta:hover {
+  background: rgba(14, 165, 233, 0.25);
+  border-color: rgba(14, 165, 233, 0.8);
+  box-shadow: 0 0 15px rgba(14, 165, 233, 0.2);
+}
+
+/* ── Tabs ────────────────────────────────────────────────────────────────────── */
+
+.tabs {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  position: relative;
+  z-index: 2;
+}
+
+.tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.tab {
+  position: relative;
+  padding: 12px 20px;
+  font-family: var(--font-geist-mono), 'Courier New', monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.4);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.2s ease, background 0.2s ease;
+  border-bottom: 2px solid transparent;
+}
+
+.tab:hover {
+  color: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.tabActive {
+  color: #0ea5e9;
+  background: rgba(14, 165, 233, 0.05);
+  border-bottom: 2px solid #0ea5e9;
+  text-shadow: 0 0 10px rgba(14, 165, 233, 0.3);
+}
+
+/* ── Main ───────────────────────────────────────────────────────────────────── */
+
+.main {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 24px;
+  position: relative;
+  z-index: 2;
+}
+
+/* ── Responsive ─────────────────────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .headerContent {
+    flex-direction: column;
+    padding: 16px 16px 0;
+  }
+
+  .title {
+    font-size: 1.375rem;
+  }
+
+  .linkProfilesCta {
+    align-self: flex-start;
+  }
+
+  .tabs {
+    padding: 0 16px;
+    margin-top: 12px;
+  }
+
+  .tab {
+    padding: 10px 14px;
+    font-size: 10px;
+  }
+
+  .main {
+    padding: 16px;
+  }
+}

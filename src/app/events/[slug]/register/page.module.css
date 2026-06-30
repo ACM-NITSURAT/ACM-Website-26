@@ -1,0 +1,432 @@
+/* ============================================================
+   REGISTER PAGE — Cinematic Redesign
+   
+   Adopts the technical blueprint & terminal aesthetics.
+   ============================================================ */
+
+.wrapper {
+  position: relative;
+  min-height: 100vh;
+  padding-top: 74px;
+  padding-bottom: 64px;
+  background-color: transparent;
+  z-index: 10;
+}
+
+.inner {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 40px 24px;
+  position: relative;
+  z-index: 2;
+}
+
+/* ============================================================
+   BREADCRUMBS
+   ============================================================ */
+.breadcrumbs {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-geist-mono), 'Courier New', monospace;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(139, 92, 246, 0.6);
+  margin-bottom: 32px;
+  background: rgba(7, 6, 10, 0.6);
+  backdrop-filter: blur(8px);
+  padding: 12px 20px;
+  border-radius: 4px;
+  border: 1px solid rgba(139, 92, 246, 0.1);
+}
+
+.breadcrumbLink {
+  color: rgba(255, 255, 255, 0.5);
+  transition: color 0.3s ease;
+}
+
+.breadcrumbLink:hover {
+  color: #fff;
+  text-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+}
+
+.breadcrumbSeparator {
+  color: rgba(139, 92, 246, 0.3);
+}
+
+.breadcrumbCurrent {
+  color: rgba(139, 92, 246, 0.9);
+}
+
+/* ============================================================
+   HEADER BLOCK (Event Title)
+   ============================================================ */
+.headerBlock {
+  margin-bottom: 40px;
+  background: rgba(7, 6, 10, 0.6);
+  backdrop-filter: blur(8px);
+  padding: 32px;
+  border-radius: 4px;
+  border: 1px solid rgba(139, 92, 246, 0.1);
+}
+
+.heading {
+  font-family: var(--font-display), 'Space Grotesk', sans-serif;
+  font-size: clamp(24px, 4vw, 36px);
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+  margin: 0 0 8px;
+  line-height: 1.1;
+  text-shadow: 0 0 30px rgba(255, 255, 255, 0.15);
+}
+
+.metaText {
+  font-family: var(--font-geist-mono), 'Courier New', monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Hero Frame for register page */
+.heroFrame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #07060a;
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  border-radius: 2px;
+  margin-top: 24px;
+  overflow: hidden;
+}
+
+.heroFrame::before {
+  content: '';
+  position: absolute;
+  inset: 12px;
+  z-index: 5;
+  pointer-events: none;
+  background:
+    linear-gradient(rgba(139, 92, 246, 0.6), rgba(139, 92, 246, 0.6)) top left,
+    linear-gradient(rgba(139, 92, 246, 0.6), rgba(139, 92, 246, 0.6)) top left,
+    linear-gradient(rgba(139, 92, 246, 0.6), rgba(139, 92, 246, 0.6)) top right,
+    linear-gradient(rgba(139, 92, 246, 0.6), rgba(139, 92, 246, 0.6)) top right,
+    linear-gradient(rgba(139, 92, 246, 0.6), rgba(139, 92, 246, 0.6)) bottom left,
+    linear-gradient(rgba(139, 92, 246, 0.6), rgba(139, 92, 246, 0.6)) bottom left,
+    linear-gradient(rgba(139, 92, 246, 0.6), rgba(139, 92, 246, 0.6)) bottom right,
+    linear-gradient(rgba(139, 92, 246, 0.6), rgba(139, 92, 246, 0.6)) bottom right;
+  background-size:
+    16px 2px, 2px 16px,
+    16px 2px, 2px 16px,
+    16px 2px, 2px 16px,
+    16px 2px, 2px 16px;
+  background-repeat: no-repeat;
+}
+
+.heroImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(0.9) contrast(1.1);
+  position: relative;
+  z-index: 1;
+}
+
+.heroVignette {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: radial-gradient(circle at center, transparent 30%, rgba(2, 1, 4, 0.8) 100%);
+  box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.9);
+}
+
+/* ============================================================
+   FORM PANEL (Console)
+   ============================================================ */
+.formPanel {
+  background: #07060a;
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  border-radius: 2px;
+  padding: 32px;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 32px;
+}
+
+.formPanel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.8), transparent);
+}
+
+.formTitle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--font-geist-mono), 'Courier New', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+.formTitleIndicator {
+  width: 4px;
+  height: 12px;
+  background: rgba(139, 92, 246, 0.8);
+  box-shadow: 0 0 8px rgba(139, 92, 246, 0.5);
+}
+
+/* Inputs */
+.inputLabel {
+  font-family: var(--font-geist-mono), 'Courier New', monospace;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(139, 92, 246, 0.8);
+  margin-bottom: 8px;
+  display: block;
+}
+
+.consoleInput {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 2px solid rgba(139, 92, 246, 0.4);
+  border-radius: 2px;
+  padding: 14px 16px;
+  font-family: var(--font-geist-mono), 'Courier New', monospace;
+  font-size: 13px;
+  color: #fff;
+  transition: all 0.3s ease;
+}
+
+.consoleInput::placeholder {
+  color: rgba(255, 255, 255, 0.2);
+}
+
+.consoleInput:focus {
+  outline: none;
+  background: rgba(139, 92, 246, 0.05);
+  border-color: rgba(139, 92, 246, 0.4);
+  border-bottom-color: rgba(139, 92, 246, 1);
+  box-shadow: 0 8px 24px -12px rgba(139, 92, 246, 0.3);
+}
+
+.consoleInputError {
+  border-bottom-color: rgba(239, 68, 68, 0.8);
+}
+
+.consoleSelect {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(139, 92, 246, 0.8)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  padding-right: 40px;
+}
+
+.consoleSelect option {
+  background-color: #07060a;
+  color: #fff;
+}
+
+/* Checkbox */
+.checkboxLabel {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  cursor: pointer;
+  group: true;
+}
+
+.checkboxBox {
+  width: 18px;
+  height: 18px;
+  border-radius: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.02);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.checkboxBoxActive {
+  background: rgba(139, 92, 246, 0.2);
+  border-color: rgba(139, 92, 246, 0.8);
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.3);
+}
+
+.checkboxText {
+  font-family: var(--font-display), 'Space Grotesk', sans-serif;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.4;
+}
+
+/* Error Text */
+.errorText {
+  font-family: var(--font-geist-mono), 'Courier New', monospace;
+  font-size: 10px;
+  color: #f87171;
+  margin-top: 6px;
+}
+
+/* ============================================================
+   SUBMIT BUTTON (Scanline style)
+   ============================================================ */
+.submitBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  padding: 16px;
+  margin-top: 32px;
+  background: rgba(139, 92, 246, 0.15);
+  border: 1px solid rgba(139, 92, 246, 0.4);
+  border-radius: 2px;
+  color: #fff;
+  font-family: var(--font-geist-mono), 'Courier New', monospace;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.submitBtn:hover:not(:disabled) {
+  background: rgba(139, 92, 246, 0.3);
+  border-color: rgba(139, 92, 246, 0.8);
+  box-shadow: 0 0 30px rgba(139, 92, 246, 0.3);
+}
+
+.submitBtn:disabled {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.3);
+  cursor: not-allowed;
+}
+
+.submitBtnScanline {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: rgba(139, 92, 246, 0.9);
+  box-shadow: 0 0 12px rgba(139, 92, 246, 0.6);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.submitBtn:hover:not(:disabled) .submitBtnScanline {
+  opacity: 1;
+  animation: btnScan 2s linear infinite;
+}
+
+@keyframes btnScan {
+  0% { transform: translateY(0); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(64px); opacity: 0; }
+}
+
+/* ============================================================
+   STATUS SCREENS (Access Denied / Already Registered)
+   ============================================================ */
+.statusPanel {
+  background: rgba(7, 6, 10, 0.6);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  padding: 48px 32px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.statusIcon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.statusIconInfo {
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  color: #60a5fa;
+  box-shadow: 0 0 30px rgba(59, 130, 246, 0.2);
+}
+
+.statusIconWarning {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #fbbf24;
+  box-shadow: 0 0 30px rgba(245, 158, 11, 0.2);
+}
+
+.statusIconError {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #f87171;
+  box-shadow: 0 0 30px rgba(239, 68, 68, 0.2);
+}
+
+.statusTitle {
+  font-family: var(--font-geist-mono), 'Courier New', monospace;
+  font-size: 14px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #fff;
+  font-weight: 600;
+}
+
+.statusDesc {
+  font-family: var(--font-display), 'Space Grotesk', sans-serif;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.6);
+  max-width: 320px;
+  line-height: 1.5;
+}
+
+.statusBtn {
+  margin-top: 16px;
+  font-family: var(--font-geist-mono), 'Courier New', monospace;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  color: rgba(255, 255, 255, 0.8);
+  transition: all 0.3s ease;
+}
+
+.statusBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #fff;
+}

@@ -122,7 +122,7 @@ function TipTapToolbar({ editor }: { editor: Editor }) {
   }
 
   return (
-    <div className="flex flex-wrap items-center gap-0.5 px-2 py-1.5 border-b border-zinc-700 bg-zinc-800/50">
+    <div className="flex flex-wrap items-center gap-0.5 px-3 py-2 border-b border-white/5 bg-[#12121a]/80 backdrop-blur-xl">
       <ToolbarBtn onClick={() => editor.chain().focus().toggleBold().run()} active={editor.isActive('bold')} title="Bold">
         <strong>B</strong>
       </ToolbarBtn>
@@ -135,14 +135,14 @@ function TipTapToolbar({ editor }: { editor: Editor }) {
       <ToolbarBtn onClick={() => editor.chain().focus().toggleStrike().run()} active={editor.isActive('strike')} title="Strikethrough">
         <span className="line-through">S</span>
       </ToolbarBtn>
-      <span className="w-px h-4 bg-zinc-700 mx-0.5" />
+      <span className="w-px h-4 bg-white/10 mx-1.5" />
       <ToolbarBtn onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} active={editor.isActive('heading', { level: 2 })} title="Heading 2">
         H2
       </ToolbarBtn>
       <ToolbarBtn onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} active={editor.isActive('heading', { level: 3 })} title="Heading 3">
         H3
       </ToolbarBtn>
-      <span className="w-px h-4 bg-zinc-700 mx-0.5" />
+      <span className="w-px h-4 bg-white/10 mx-1.5" />
       <ToolbarBtn onClick={() => editor.chain().focus().toggleBulletList().run()} active={editor.isActive('bulletList')} title="Bullet list">
         •≡
       </ToolbarBtn>
@@ -152,7 +152,7 @@ function TipTapToolbar({ editor }: { editor: Editor }) {
       <ToolbarBtn onClick={() => editor.chain().focus().toggleBlockquote().run()} active={editor.isActive('blockquote')} title="Blockquote">
         ❝
       </ToolbarBtn>
-      <span className="w-px h-4 bg-zinc-700 mx-0.5" />
+      <span className="w-px h-4 bg-white/10 mx-1.5" />
       <ToolbarBtn onClick={setLink} active={editor.isActive('link')} title="Link">
         🔗
       </ToolbarBtn>
@@ -165,7 +165,7 @@ function TipTapToolbar({ editor }: { editor: Editor }) {
       <ToolbarBtn onClick={insertTable} title="Insert table">
         ⊞
       </ToolbarBtn>
-      <span className="w-px h-4 bg-zinc-700 mx-0.5" />
+      <span className="w-px h-4 bg-white/10 mx-1.5" />
       <ToolbarBtn onClick={() => editor.chain().focus().unsetAllMarks().clearNodes().run()} title="Clear formatting">
         ✕
       </ToolbarBtn>
@@ -207,7 +207,7 @@ function RichEditor({
     onUpdate: ({ editor: e }) => onChange(e.getHTML()),
     editorProps: {
       attributes: {
-        class: 'prose prose-invert prose-sm max-w-none focus:outline-none px-3 py-2 text-zinc-200',
+        class: 'prose prose-invert prose-sm max-w-none focus:outline-none px-4 py-3 text-zinc-300 font-mono',
         style: `min-height: ${minHeight}`,
         'data-placeholder': placeholder ?? '',
       },
@@ -225,7 +225,7 @@ function RichEditor({
   }, [editor, value]);
 
   return (
-    <div className="rounded-md border border-zinc-700 bg-zinc-800/60 overflow-hidden focus-within:ring-1 focus-within:ring-zinc-500">
+    <div className="rounded-xl border border-white/5 bg-black/40 overflow-hidden focus-within:border-indigo-500/50 focus-within: transition-all">
       {editor && <TipTapToolbar editor={editor} />}
       <EditorContent editor={editor} />
     </div>
@@ -254,39 +254,39 @@ function ParagraphCard({ field, onChange, onDuplicate, onDelete }: ParagraphCard
 
   return (
     <div ref={setNodeRef} style={style}
-      className="rounded-xl border border-zinc-700 bg-zinc-900/80">
+      className="rounded-2xl border border-white/5 bg-[#12121a]/60 backdrop-blur-md shadow-lg transition-colors focus-within:border-indigo-500/30 focus-within:">
       {/* Header */}
-      <div className="flex items-center gap-2 px-4 pt-3 pb-2 border-b border-zinc-800">
+      <div className="flex items-center gap-3 px-5 pt-4 pb-3 border-b border-white/5 bg-black/20 rounded-t-2xl">
         <button {...attributes} {...listeners} type="button"
-          className="cursor-grab active:cursor-grabbing text-zinc-500 hover:text-zinc-300 flex-shrink-0 p-1 -ml-1"
+          className="cursor-grab active:cursor-grabbing text-zinc-500 hover:text-indigo-400 transition-colors flex-shrink-0 p-1.5 -ml-1.5 rounded bg-white/5 hover:bg-indigo-500/10"
           aria-label="Drag to reorder">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="9" cy="5" r="1" fill="currentColor" stroke="none" />
-            <circle cx="9" cy="12" r="1" fill="currentColor" stroke="none" />
-            <circle cx="9" cy="19" r="1" fill="currentColor" stroke="none" />
-            <circle cx="15" cy="5" r="1" fill="currentColor" stroke="none" />
-            <circle cx="15" cy="12" r="1" fill="currentColor" stroke="none" />
-            <circle cx="15" cy="19" r="1" fill="currentColor" stroke="none" />
+            <circle cx="9" cy="5" r="1.5" fill="currentColor" stroke="none" />
+            <circle cx="9" cy="12" r="1.5" fill="currentColor" stroke="none" />
+            <circle cx="9" cy="19" r="1.5" fill="currentColor" stroke="none" />
+            <circle cx="15" cy="5" r="1.5" fill="currentColor" stroke="none" />
+            <circle cx="15" cy="12" r="1.5" fill="currentColor" stroke="none" />
+            <circle cx="15" cy="19" r="1.5" fill="currentColor" stroke="none" />
           </svg>
         </button>
-        <span className="text-xs font-semibold text-zinc-400 uppercase tracking-widest flex-1">Paragraph</span>
-        <span className="text-xs text-zinc-600">Display only — not collected</span>
-        <span className="w-px h-4 bg-zinc-700" />
+        <span className="text-[10px] font-bold text-cyan-400 uppercase tracking-widest flex-1 font-mono">Paragraph Block</span>
+        <span className="text-xs text-zinc-600 font-mono">Display only</span>
+        <span className="w-px h-4 bg-white/10 mx-2" />
         <button type="button" onClick={onDuplicate} title="Duplicate"
-          className="text-zinc-500 hover:text-zinc-200 transition-colors">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          className="text-zinc-500 hover:text-indigo-300 transition-colors bg-white/5 hover:bg-indigo-500/10 p-1.5 rounded">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
           </svg>
         </button>
         <button type="button" onClick={onDelete} title="Delete"
-          className="text-zinc-500 hover:text-red-400 transition-colors">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          className="text-zinc-500 hover:text-red-400 transition-colors bg-white/5 hover:bg-red-500/10 p-1.5 rounded">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14H6L5 6" /><path d="M10 11v6M14 11v6M9 6V4h6v2" />
           </svg>
         </button>
       </div>
       {/* Editor */}
-      <div className="p-3">
+      <div className="p-5">
         <RichEditor
           value={field.content}
           onChange={(html) => onChange({ ...field, content: html })}
@@ -372,42 +372,42 @@ function FieldCard({ field, isDuplicate, autoFocus, onChange, onDuplicate, onDel
 
   return (
     <div ref={setNodeRef} style={style}
-      className={`rounded-xl border bg-zinc-900 transition-colors ${isDuplicate ? 'border-amber-500/40' : 'border-zinc-800'}`}>
-      <div className="flex items-center gap-2 px-4 pt-4 pb-3 border-b border-zinc-800">
+      className={`rounded-2xl border bg-[#12121a]/60 backdrop-blur-md shadow-lg transition-colors focus-within:border-indigo-500/30 focus-within: ${isDuplicate ? 'border-amber-500/40 ' : 'border-white/5'}`}>
+      <div className="flex items-center gap-3 px-5 pt-4 pb-3 border-b border-white/5 bg-black/20 rounded-t-2xl">
         <button {...attributes} {...listeners} type="button"
-          className="cursor-grab active:cursor-grabbing text-zinc-300 hover:text-white transition-colors flex-shrink-0 p-1 -ml-1"
+          className="cursor-grab active:cursor-grabbing text-zinc-500 hover:text-indigo-400 transition-colors flex-shrink-0 p-1.5 -ml-1.5 rounded bg-white/5 hover:bg-indigo-500/10"
           aria-label="Drag to reorder">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="9" cy="5" r="1" fill="currentColor" stroke="none" />
-            <circle cx="9" cy="12" r="1" fill="currentColor" stroke="none" />
-            <circle cx="9" cy="19" r="1" fill="currentColor" stroke="none" />
-            <circle cx="15" cy="5" r="1" fill="currentColor" stroke="none" />
-            <circle cx="15" cy="12" r="1" fill="currentColor" stroke="none" />
-            <circle cx="15" cy="19" r="1" fill="currentColor" stroke="none" />
+            <circle cx="9" cy="5" r="1.5" fill="currentColor" stroke="none" />
+            <circle cx="9" cy="12" r="1.5" fill="currentColor" stroke="none" />
+            <circle cx="9" cy="19" r="1.5" fill="currentColor" stroke="none" />
+            <circle cx="15" cy="5" r="1.5" fill="currentColor" stroke="none" />
+            <circle cx="15" cy="12" r="1.5" fill="currentColor" stroke="none" />
+            <circle cx="15" cy="19" r="1.5" fill="currentColor" stroke="none" />
           </svg>
         </button>
         <input type="text" value={field.label} onChange={(e) => updateLabel(e.target.value)}
-          placeholder="Question" autoFocus={autoFocus}
-          className="flex-1 bg-transparent text-sm font-medium text-white placeholder:text-zinc-600 focus:outline-none min-w-0" />
+          placeholder="Question Label" autoFocus={autoFocus}
+          className="flex-1 bg-transparent text-lg font-bold text-white placeholder:text-zinc-600 focus:outline-none min-w-0" style={{ fontFamily: 'var(--font-display), "Space Grotesk", sans-serif' }} />
         <select value={field.type} onChange={(e) => changeType(e.target.value as FormFieldType)}
-          className="bg-zinc-800 border border-zinc-700 rounded-md px-2 py-1.5 text-xs text-zinc-300 focus:outline-none focus:ring-1 focus:ring-zinc-600 flex-shrink-0 cursor-pointer">
+          className="bg-black/60 border border-white/10 rounded-lg px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-zinc-300 focus:outline-none focus:border-indigo-500/50 flex-shrink-0 cursor-pointer font-mono">
           {ALL_TYPES.map((t) => (
             <option key={t} value={t}>{FIELD_TYPE_LABELS[t]}</option>
           ))}
         </select>
       </div>
       {(field.type === 'dropdown' || field.type === 'checkbox') && (
-        <div className="px-4 py-3 border-b border-zinc-800 flex flex-col gap-2">
+        <div className="px-5 py-4 border-b border-white/5 flex flex-col gap-3 bg-[#07060a]/20">
           {(field as DropdownField | CheckboxField).options.map((opt, i) => (
-            <div key={i} className="flex items-center gap-2">
-              <span className="text-xs text-zinc-600 w-4 text-right flex-shrink-0">{i + 1}.</span>
+            <div key={i} className="flex items-center gap-3 group">
+              <span className="text-[10px] text-zinc-600 font-mono w-4 text-right flex-shrink-0">{i + 1}.</span>
               <input type="text" value={opt} placeholder={`Option ${i + 1}`}
                 onChange={(e) => updateOption(i, e.target.value)}
-                className="flex-1 bg-zinc-800 border border-zinc-700 rounded px-2 py-1.5 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600" />
+                className="flex-1 bg-black/40 border border-white/5 rounded-lg px-4 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-indigo-500/50 focus:bg-[#12121a] transition-all font-mono" />
               {(field as DropdownField | CheckboxField).options.length > 1 && (
                 <button type="button" onClick={() => removeOption(i)}
-                  className="text-zinc-600 hover:text-red-400 transition-colors flex-shrink-0">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  className="text-zinc-600 hover:text-red-400 transition-colors flex-shrink-0 opacity-0 group-hover:opacity-100 bg-white/5 hover:bg-red-500/10 p-2 rounded-lg">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
                   </svg>
                 </button>
@@ -415,7 +415,7 @@ function FieldCard({ field, isDuplicate, autoFocus, onChange, onDuplicate, onDel
             </div>
           ))}
           <button type="button" onClick={addOption}
-            className="self-start flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-300 transition-colors mt-1">
+            className="self-start flex items-center gap-2 px-3 py-2 mt-2 text-[10px] font-bold uppercase tracking-widest text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 rounded-lg hover:bg-indigo-500/20 hover:text-indigo-300 transition-all font-mono ml-7">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
             </svg>
@@ -423,26 +423,26 @@ function FieldCard({ field, isDuplicate, autoFocus, onChange, onDuplicate, onDel
           </button>
         </div>
       )}
-      <div className="flex items-center justify-between px-4 py-2.5">
-        {isDuplicate && <span className="text-xs text-amber-500 mr-auto">Duplicate label</span>}
+      <div className="flex items-center justify-between px-5 py-3 bg-black/20 rounded-b-2xl">
+        {isDuplicate && <span className="text-[10px] font-bold text-amber-500 uppercase tracking-widest mr-auto font-mono bg-amber-500/10 px-2 py-1 rounded border border-amber-500/20">Duplicate label</span>}
         <div className="flex items-center gap-4 ml-auto">
-          <label className="flex items-center gap-2 cursor-pointer select-none group">
-            <span className="text-xs text-zinc-500 group-hover:text-zinc-300 transition-colors">Required</span>
+          <label className="flex items-center gap-3 cursor-pointer select-none group">
+            <span className="text-[10px] font-bold text-zinc-500 group-hover:text-zinc-300 transition-colors uppercase tracking-widest font-mono">Required</span>
             <button type="button" role="switch" aria-checked={field.required} onClick={toggleRequired}
-              className={`relative w-9 h-5 rounded-full transition-colors flex-shrink-0 focus:outline-none ${field.required ? 'bg-white' : 'bg-zinc-700'}`}>
-              <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full transition-transform ${field.required ? 'translate-x-4 bg-zinc-900' : 'translate-x-0 bg-zinc-400'}`} />
+              className={`relative w-10 h-5 rounded-full transition-colors flex-shrink-0 focus:outline-none border ${field.required ? 'bg-indigo-500/20 border-indigo-500/50 ' : 'bg-black/60 border-white/10'}`}>
+              <span className={`absolute top-[2px] left-[2px] w-4 h-4 rounded-full transition-transform ${field.required ? 'translate-x-5 bg-indigo-400 ' : 'translate-x-0 bg-zinc-600'}`} />
             </button>
           </label>
-          <span className="w-px h-4 bg-zinc-700" />
+          <span className="w-px h-5 bg-white/10 mx-2" />
           <button type="button" onClick={onDuplicate} title="Duplicate"
-            className="text-zinc-500 hover:text-zinc-200 transition-colors">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            className="text-zinc-500 hover:text-indigo-300 transition-colors bg-white/5 hover:bg-indigo-500/10 p-2 rounded-lg">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
             </svg>
           </button>
           <button type="button" onClick={onDelete} title="Delete"
-            className="text-zinc-500 hover:text-red-400 transition-colors">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            className="text-zinc-500 hover:text-red-400 transition-colors bg-white/5 hover:bg-red-500/10 p-2 rounded-lg">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14H6L5 6" /><path d="M10 11v6M14 11v6M9 6V4h6v2" />
             </svg>
           </button>
@@ -457,16 +457,16 @@ function FieldCard({ field, isDuplicate, autoFocus, onChange, onDuplicate, onDel
 
 function DefaultFieldRow({ label, required, tag = 'input' }: { label: string; required?: boolean; tag?: 'input' | 'select' }) {
   return (
-    <div className="flex items-center gap-2">
-      <div className="flex-1 flex items-center gap-1.5 rounded-md bg-zinc-800 border border-zinc-700/60 px-2.5 py-1.5 opacity-60 pointer-events-none select-none">
-        <span className="text-xs text-zinc-400 flex-1">{label}</span>
+    <div className="flex items-center gap-3">
+      <div className="flex-1 flex items-center gap-2 rounded-lg bg-black/40 border border-white/5 px-3 py-2 opacity-70 pointer-events-none select-none">
+        <span className="text-xs text-zinc-400 flex-1 font-mono">{label}</span>
         {tag === 'select' && (
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-zinc-600">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-zinc-600">
             <polyline points="6 9 12 15 18 9" />
           </svg>
         )}
       </div>
-      {required && <span className="text-xs text-red-500 flex-shrink-0">*</span>}
+      {required && <span className="text-lg font-black text-red-500 flex-shrink-0 drop-">*</span>}
     </div>
   );
 }
@@ -475,20 +475,20 @@ function DefaultFieldRow({ label, required, tag = 'input' }: { label: string; re
 
 function AddFieldButtons({ onAdd }: { onAdd: (type: FormFieldType) => void }) {
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap gap-3">
       <button type="button" onClick={() => onAdd('text')}
-        className="flex items-center gap-2 px-3 py-2 rounded-lg border border-dashed border-zinc-700 text-xs text-zinc-400 hover:border-zinc-500 hover:text-zinc-200 hover:bg-zinc-900/60 transition-all">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-dashed border-indigo-500/30 text-[10px] font-bold uppercase tracking-widest text-indigo-400 bg-indigo-500/5 hover:bg-indigo-500/10 hover:border-indigo-500/50 hover: transition-all font-mono">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
           <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
         </svg>
-        Add question
+        Add Field
       </button>
       <button type="button" onClick={() => onAdd('paragraph')}
-        className="flex items-center gap-2 px-3 py-2 rounded-lg border border-dashed border-cyan-800/60 text-xs text-cyan-600 hover:border-cyan-600 hover:text-cyan-400 hover:bg-cyan-900/10 transition-all">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-dashed border-cyan-500/30 text-[10px] font-bold uppercase tracking-widest text-cyan-400 bg-cyan-500/5 hover:bg-cyan-500/10 hover:border-cyan-500/50 hover: transition-all font-mono">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
           <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
         </svg>
-        Add paragraph
+        Add Paragraph
       </button>
     </div>
   );
@@ -666,66 +666,75 @@ export default function FormBuilderPage() {
   const thumbSrc = (!thumbError && event.eventThumbnail) ? event.eventThumbnail : '/event-placeholder.jpg';
 
   return (
-    <div className="min-h-full bg-zinc-950">
+    <div className="min-h-full bg-[#07060a]">
+
+
       {/* Sticky top bar */}
-      <div className="sticky top-0 z-20 bg-zinc-950 border-b border-zinc-800 px-6 py-3 flex items-center justify-between gap-4">
-        <div className="flex items-center gap-3 min-w-0">
+      <div className="sticky top-0 z-20 bg-[#07060a]/80 backdrop-blur-xl border-b border-white/5 px-6 py-4 flex items-center justify-between gap-4">
+        <div className="flex items-center gap-4 min-w-0">
           <Link href={`/admin/events/${slug}`} onClick={handleBackClick}
-            className="text-zinc-500 hover:text-zinc-200 transition-colors flex-shrink-0">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-zinc-400 hover:text-white hover:bg-white/10 hover:border-white/20 transition-all flex-shrink-0 ">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M19 12H5M12 5l-7 7 7 7" />
             </svg>
           </Link>
-          <p className="text-xs text-zinc-500 truncate">
-            {event.hasForm ? 'Edit form' : 'Create form'} · {event.eventName}
-          </p>
-          {isDirty && !saveError && <span className="text-xs text-amber-500 flex-shrink-0">Unsaved changes</span>}
-          {saveError && <span className="text-xs text-red-400 flex-shrink-0 max-w-xs truncate" title={saveError}>⚠ {saveError}</span>}
+          <div className="flex flex-col min-w-0">
+            <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest font-mono">
+              {event.hasForm ? 'Edit form' : 'Create form'}
+            </p>
+            <p className="text-sm font-semibold text-white truncate" style={{ fontFamily: 'var(--font-display), "Space Grotesk", sans-serif' }}>
+              {event.eventName}
+            </p>
+          </div>
+          {isDirty && !saveError && <span className="text-[10px] font-bold text-amber-500 bg-amber-500/10 px-2 py-1 rounded border border-amber-500/20 uppercase tracking-widest flex-shrink-0 font-mono ">Unsaved changes</span>}
+          {saveError && <span className="text-[10px] font-bold text-red-400 bg-red-500/10 px-2 py-1 rounded border border-red-500/20 uppercase tracking-widest flex-shrink-0 max-w-xs truncate font-mono " title={saveError}>⚠ {saveError}</span>}
         </div>
         <button onClick={handleSave} disabled={saving || duplicateIds.size > 0 || (!isDirty && !saveError)}
-          className={`flex-shrink-0 flex items-center gap-2 rounded-md px-5 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed ${
+          className={`flex-shrink-0 flex items-center gap-2 rounded-xl px-6 py-3 text-xs font-bold uppercase tracking-widest transition-all  disabled:cursor-not-allowed ${
             !isDirty && !saveError
-              ? 'bg-emerald-600 text-white opacity-90 cursor-default'
-              : 'bg-white text-zinc-900 hover:bg-zinc-200 disabled:opacity-50'
+              ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30  cursor-default'
+              : 'bg-indigo-600 text-white hover:bg-indigo-500 disabled:opacity-50 hover:'
           }`}>
           {!isDirty && !saveError && (
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="20 6 9 17 4 12" className="animate-check" />
             </svg>
           )}
-          {saving ? 'Saving…' : !isDirty && !saveError ? 'Form saved' : 'Save form'}
+          {saving ? 'Saving…' : !isDirty && !saveError ? 'Form saved' : 'Save Form'}
         </button>
       </div>
 
-      <div className="max-w-2xl mx-auto px-4 py-8 flex flex-col gap-5">
+      <div className="max-w-3xl mx-auto px-4 py-10 flex flex-col gap-6 relative z-10">
 
         {/* Event header */}
-        <div className="rounded-xl border border-zinc-800 bg-zinc-900 overflow-hidden">
-          <div className="flex items-start gap-4 p-5">
-            <div className="w-20 h-12 rounded-lg overflow-hidden flex-shrink-0 border border-zinc-700 bg-zinc-800"
+        <div className="rounded-2xl border border-white/5 bg-[#12121a]/60 backdrop-blur-md overflow-hidden shadow-xl">
+          <div className="flex items-start gap-5 p-6 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-transparent opacity-50" />
+            <div className="w-24 h-16 rounded-xl overflow-hidden flex-shrink-0 border-2 border-indigo-500/20 bg-black/60 shadow-lg relative z-10"
               style={{ aspectRatio: EVENT_THUMBNAIL_ASPECT_RATIO }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={thumbSrc} alt={event.eventName} onError={() => setThumbError(true)} className="w-full h-full object-cover" />
             </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-xs text-zinc-500 mb-0.5 uppercase tracking-wide">Event form</p>
-              <p className="text-base font-semibold text-white leading-tight truncate">{event.eventName}</p>
+            <div className="min-w-0 flex-1 relative z-10 pt-1">
+              <p className="text-[10px] font-bold text-indigo-400 mb-1 uppercase tracking-widest font-mono">Event Form Architecture</p>
+              <p className="text-2xl font-black text-white leading-tight truncate" style={{ fontFamily: 'var(--font-display), "Space Grotesk", sans-serif' }}>{event.eventName}</p>
             </div>
           </div>
           {/* Title (plain text) + Description (rich text) + Default fields toggle */}
-          <div className="border-t border-zinc-800 p-5 flex flex-col gap-4">
+          <div className="border-t border-white/5 p-6 flex flex-col gap-6 bg-black/20">
             <div>
-              <label className="text-xs font-medium text-zinc-500 block mb-1.5">Form title</label>
+              <label className="text-[10px] font-bold text-zinc-500 block mb-2 uppercase tracking-widest font-mono">Form Headline</label>
               <input
                 type="text"
                 value={title}
                 onChange={(e) => { setTitle(e.target.value); markDirty(); }}
                 placeholder="Form title"
-                className="bg-transparent text-lg font-semibold text-white placeholder:text-zinc-600 focus:outline-none border-b border-transparent focus:border-zinc-700 pb-1 transition-colors w-full"
+                className="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-3 text-lg font-bold text-white placeholder:text-zinc-600 focus:outline-none focus:border-indigo-500/50 focus: transition-all"
+                style={{ fontFamily: 'var(--font-display), "Space Grotesk", sans-serif' }}
               />
             </div>
             <div>
-              <label className="text-xs font-medium text-zinc-500 block mb-1.5">Form description (rich text)</label>
+              <label className="text-[10px] font-bold text-zinc-500 block mb-2 uppercase tracking-widest font-mono">Form Description (Rich Text)</label>
               <RichEditor
                 value={description}
                 onChange={(html) => { setDesc(html); markDirty(); }}
@@ -735,12 +744,12 @@ export default function FormBuilderPage() {
             </div>
 
             {/* Default fields toggle */}
-            <div className="border-t border-zinc-800 pt-4">
-              <div className="flex items-start justify-between gap-4">
+            <div className="border-t border-white/5 pt-6 mt-2">
+              <div className="flex items-start justify-between gap-6">
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-zinc-200 leading-snug">Include default fields</p>
-                  <p className="text-xs text-zinc-500 mt-0.5 leading-relaxed">
-                    When on, the registration form prepends built-in identity fields (name, roll number, gender, team info) before your custom fields. Leave off if you want to handle those fields yourself or skip them entirely.
+                  <p className="text-sm font-bold text-white leading-snug" style={{ fontFamily: 'var(--font-display), "Space Grotesk", sans-serif' }}>Include Default Identity Fields</p>
+                  <p className="text-xs text-zinc-500 mt-1.5 leading-relaxed font-mono">
+                    When active, the registration form prepends built-in identity fields (name, roll number, gender, team info) before your custom fields. Leave disabled to handle those fields manually.
                   </p>
                 </div>
                 <button
@@ -748,38 +757,38 @@ export default function FormBuilderPage() {
                   role="switch"
                   aria-checked={includeDefaultFields}
                   onClick={() => { setIncludeDefaultFields((p) => !p); markDirty(); }}
-                  className={`relative flex-shrink-0 w-10 h-5 rounded-full transition-colors mt-0.5 focus:outline-none ${includeDefaultFields ? 'bg-white' : 'bg-zinc-700'}`}
+                  className={`relative flex-shrink-0 w-12 h-6 rounded-full transition-colors mt-1 focus:outline-none border ${includeDefaultFields ? 'bg-indigo-500/20 border-indigo-500/50 ' : 'bg-black/60 border-white/10'}`}
                 >
-                  <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full transition-transform ${includeDefaultFields ? 'translate-x-5 bg-zinc-900' : 'translate-x-0 bg-zinc-400'}`} />
+                  <span className={`absolute top-[2px] left-[2px] w-4 h-4 rounded-full transition-transform ${includeDefaultFields ? 'translate-x-6 bg-indigo-400 ' : 'translate-x-0 bg-zinc-600'}`} />
                 </button>
               </div>
 
               {/* Preview panel — only visible when toggle is on */}
               {includeDefaultFields && (
-                <div className="mt-3 rounded-lg border border-zinc-700 bg-zinc-800/40 overflow-hidden">
-                  <div className="flex items-center gap-2 px-3 py-2 border-b border-zinc-700 bg-zinc-800/60">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-zinc-500 flex-shrink-0">
+                <div className="mt-5 rounded-xl border border-indigo-500/30 bg-indigo-500/5 overflow-hidden ">
+                  <div className="flex items-center gap-3 px-4 py-3 border-b border-indigo-500/20 bg-indigo-500/10">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-indigo-400 flex-shrink-0">
                       <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
                     </svg>
-                    <span className="text-xs font-medium text-zinc-400">Default fields shown to participants</span>
-                    <span className="ml-auto text-xs text-zinc-600">read-only preview</span>
+                    <span className="text-[10px] font-bold text-indigo-300 uppercase tracking-widest font-mono">Default fields shown to participants</span>
+                    <span className="ml-auto text-[10px] text-indigo-400/50 uppercase tracking-widest font-mono">read-only preview</span>
                   </div>
-                  <div className="px-4 py-3 flex flex-col gap-2">
+                  <div className="px-5 py-4 flex flex-col gap-3">
                     {event?.isTeamEvent ? (
                       <>
                         <DefaultFieldRow label="Team name" required />
-                        <div className="mt-1 mb-0.5">
-                          <p className="text-xs font-semibold text-zinc-600 uppercase tracking-wider mb-1.5">Leader</p>
-                          <div className="flex flex-col gap-2 pl-2 border-l border-zinc-700">
+                        <div className="mt-2 mb-1">
+                          <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2 font-mono">Leader</p>
+                          <div className="flex flex-col gap-3 pl-3 border-l-2 border-white/5">
                             <DefaultFieldRow label="Leader name" required />
                             <DefaultFieldRow label="Leader roll number" required />
                           </div>
                         </div>
-                        <div>
-                          <p className="text-xs font-semibold text-zinc-600 uppercase tracking-wider mb-1.5">
+                        <div className="mt-2">
+                          <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2 font-mono">
                             Members ({event.minTeamMembers - 1}–{event.maxTeamMembers - 1} additional · {event.minTeamMembers}–{event.maxTeamMembers} total incl. leader)
                           </p>
-                          <div className="flex flex-col gap-2 pl-2 border-l border-zinc-700">
+                          <div className="flex flex-col gap-3 pl-3 border-l-2 border-white/5">
                             <DefaultFieldRow label="Member name" required />
                             <DefaultFieldRow label="Member roll number" required />
                             <DefaultFieldRow label="Member gender" required tag="select" />
@@ -802,14 +811,14 @@ export default function FormBuilderPage() {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 bg-zinc-900 border border-zinc-800 rounded-lg p-1">
+        <div className="flex gap-2 bg-black/40 border border-white/5 rounded-xl p-1.5 backdrop-blur-md">
           <button type="button" onClick={() => setTab('fields')}
-            className={`flex-1 py-2 rounded-md text-sm font-medium transition-colors ${tab === 'fields' ? 'bg-white text-zinc-900' : 'text-zinc-400 hover:text-zinc-200'}`}>
-            Form fields
+            className={`flex-1 py-2.5 rounded-lg text-xs font-bold uppercase tracking-widest transition-all font-mono ${tab === 'fields' ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 ' : 'text-zinc-500 hover:text-zinc-300 border border-transparent hover:bg-white/5'}`}>
+            Form Fields
           </button>
           <button type="button" onClick={() => setTab('afterscreen')}
-            className={`flex-1 py-2 rounded-md text-sm font-medium transition-colors ${tab === 'afterscreen' ? 'bg-white text-zinc-900' : 'text-zinc-400 hover:text-zinc-200'}`}>
-            After submission
+            className={`flex-1 py-2.5 rounded-lg text-xs font-bold uppercase tracking-widest transition-all font-mono ${tab === 'afterscreen' ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 ' : 'text-zinc-500 hover:text-zinc-300 border border-transparent hover:bg-white/5'}`}>
+            After Submission
           </button>
         </div>
 
@@ -818,7 +827,7 @@ export default function FormBuilderPage() {
           <>
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
               <SortableContext items={fields.map((f) => f.id)} strategy={verticalListSortingStrategy}>
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-4">
                   {fields.map((field) => (
                     <FieldCard
                       key={field.id}
@@ -837,15 +846,21 @@ export default function FormBuilderPage() {
             <AddFieldButtons onAdd={addField} />
 
             {fields.length === 0 && (
-              <div className="text-center py-8 text-zinc-600 text-sm">
-                Click &ldquo;Add question&rdquo; to start building your form.
+              <div className="text-center py-12 px-6 rounded-2xl border border-dashed border-white/10 bg-black/20 text-zinc-500 text-sm font-mono flex flex-col items-center gap-3">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="opacity-50">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                  <polyline points="14 2 14 8 20 8" />
+                  <line x1="12" y1="18" x2="12" y2="12" />
+                  <line x1="9" y1="15" x2="15" y2="15" />
+                </svg>
+                Click &ldquo;Add Field&rdquo; to start building your form payload.
               </div>
             )}
 
             {!isDirty && event.hasForm && (
-              <p className="text-center text-xs text-zinc-600">
-                Form saved · {inputFields.length} input field{inputFields.length !== 1 ? 's' : ''} ·{' '}
-                <Link href={`/admin/events/${slug}`} className="underline hover:text-zinc-400 transition-colors">Back to event</Link>
+              <p className="text-center text-[10px] font-bold text-zinc-600 uppercase tracking-widest font-mono">
+                Payload secured · {inputFields.length} input field{inputFields.length !== 1 ? 's' : ''} ·{' '}
+                <Link href={`/admin/events/${slug}`} className="text-indigo-400 hover:text-indigo-300 transition-colors underline decoration-indigo-500/30 underline-offset-4">Return to Event</Link>
               </p>
             )}
           </>
@@ -853,27 +868,28 @@ export default function FormBuilderPage() {
 
         {/* After-submission tab */}
         {tab === 'afterscreen' && (
-          <div className="flex flex-col gap-4">
-            <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5 flex flex-col gap-4">
+          <div className="flex flex-col gap-6">
+            <div className="rounded-2xl border border-white/5 bg-[#12121a]/60 backdrop-blur-md p-6 flex flex-col gap-6 shadow-xl">
               <div>
-                <p className="text-sm font-medium text-zinc-200 mb-1">Confirmation screen</p>
-                <p className="text-xs text-zinc-500 leading-relaxed">
-                  Shown to participants after they successfully register. Leave blank to use the default success message.
-                  You can include WhatsApp group links, next steps, contact info, etc.
+                <p className="text-lg font-black text-white mb-1.5" style={{ fontFamily: 'var(--font-display), "Space Grotesk", sans-serif' }}>Confirmation Screen</p>
+                <p className="text-xs text-zinc-500 leading-relaxed font-mono">
+                  Shown to operatives after they successfully register. Leave blank to use the default success message.
+                  You can include WhatsApp group links, next steps, or contact info.
                 </p>
               </div>
               <div>
-                <label className="text-xs font-medium text-zinc-500 block mb-1.5">Heading</label>
+                <label className="text-[10px] font-bold text-zinc-500 block mb-2 uppercase tracking-widest font-mono">Heading</label>
                 <input
                   type="text"
                   value={afterScreen.heading}
                   onChange={(e) => { setAfterScreen((p) => ({ ...p, heading: e.target.value })); markDirty(); }}
                   placeholder="e.g. You're registered! 🎉"
-                  className="w-full bg-zinc-800 border border-zinc-700 rounded-md px-3 py-2.5 text-sm text-white placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500 transition-colors"
+                  className="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-3 text-lg font-bold text-white placeholder:text-zinc-600 focus:outline-none focus:border-indigo-500/50 focus: transition-all"
+                  style={{ fontFamily: 'var(--font-display), "Space Grotesk", sans-serif' }}
                 />
               </div>
               <div>
-                <label className="text-xs font-medium text-zinc-500 block mb-1.5">Body (rich text)</label>
+                <label className="text-[10px] font-bold text-zinc-500 block mb-2 uppercase tracking-widest font-mono">Body (Rich Text)</label>
                 <RichEditor
                   value={afterScreen.body}
                   onChange={(html) => { setAfterScreen((p) => ({ ...p, body: html })); markDirty(); }}
@@ -885,20 +901,23 @@ export default function FormBuilderPage() {
 
             {/* Preview hint */}
             {(afterScreen.heading || afterScreen.body) && (
-              <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-5">
-                <p className="text-xs font-semibold text-emerald-400 uppercase tracking-widest mb-3">Preview</p>
-                <div className="flex flex-col items-center text-center gap-3 py-4">
-                  <div className="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-400">
+              <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-6 ">
+                <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest mb-4 font-mono flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 " />
+                  Live Preview
+                </p>
+                <div className="flex flex-col items-center text-center gap-4 py-6 px-4 bg-[#12121a]/80 backdrop-blur-md rounded-xl border border-white/5">
+                  <div className="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center ">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-400">
                       <polyline points="20 6 9 17 4 12" />
                     </svg>
                   </div>
                   {afterScreen.heading && (
-                    <p className="text-lg font-semibold text-white">{afterScreen.heading}</p>
+                    <p className="text-2xl font-black text-white tracking-tight" style={{ fontFamily: 'var(--font-display), "Space Grotesk", sans-serif' }}>{afterScreen.heading}</p>
                   )}
                   {afterScreen.body && (
                     <div
-                      className="prose prose-invert prose-sm max-w-none text-zinc-300"
+                      className="prose prose-invert prose-sm max-w-none text-zinc-300 font-mono text-center"
                       dangerouslySetInnerHTML={{ __html: afterScreen.body }}
                     />
                   )}

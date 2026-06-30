@@ -3,18 +3,20 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import UserMenu from './UserMenu';
 import styles from './Navbar.module.css';
 
 /* ============================================================
    NAV SECTIONS — Each section is a "scene" in the production
    ============================================================ */
 const NAV_SECTIONS = [
-  { label: 'Hero',     scene: 'SC.01', section: 'hero',     href: '/#hero' },
-  { label: 'About',    scene: 'SC.02', section: 'about',    href: '/#about' },
-  { label: 'Events',   scene: 'SC.03', section: 'events',   href: '/events' },
-  { label: 'Projects', scene: 'SC.04', section: 'projects', href: '/projects' },
-  { label: 'Team',     scene: 'SC.05', section: 'team',     href: '/#team' },
+  { label: 'Hero',        scene: 'SC.01', section: 'hero',        href: '/#hero' },
+  { label: 'About',       scene: 'SC.02', section: 'about',       href: '/#about' },
+  { label: 'Events',      scene: 'SC.03', section: 'events',      href: '/events' },
+  { label: 'Leaderboard', scene: 'SC.04', section: 'leaderboard', href: '/leaderboard' },
+  { label: 'Projects',    scene: 'SC.05', section: 'projects',    href: '/projects' },
+  { label: 'Team',        scene: 'SC.06', section: 'team',        href: '/#team' },
 ];
 
 /* ============================================================
@@ -23,11 +25,15 @@ const NAV_SECTIONS = [
    the timecode scrambles through random digits before settling.
    ============================================================ */
 const SECTION_TIMECODES: Record<string, string> = {
-  hero:     '00:00:01',
-  about:    '00:02:18',
-  events:   '00:04:32',
-  projects: '00:06:45',
-  team:     '00:08:57',
+  hero:        '00:00:01',
+  about:       '00:02:18',
+  events:      '00:04:32',
+  leaderboard: '00:05:40',
+  projects:    '00:06:45',
+  team:        '00:08:57',
+  profile:     '00:10:12',
+  admin:       '00:11:42',
+  unknown:     '00:00:00',
 };
 
 /** Linearly interpolate between a and b */
@@ -62,6 +68,7 @@ function lerp(a: number, b: number, t: number) {
 
 export default function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [isScrolled, setIsScrolled] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [reducedMotion, setReducedMotion] = useState(false);
@@ -97,27 +104,62 @@ export default function Navbar() {
   const plateRef = useRef<HTMLDivElement>(null);
   const navItemRefs = useRef<(HTMLElement | null)[]>([]);
   const prevSectionRef = useRef<string>('hero');
+  const pendingScrollRef = useRef<string | null>(null);
 
-  // Global navigation handler for cinematic transitions (preserved)
-  const handleNavClick = useCallback((e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>, href: string, section: string) => {
-    e.preventDefault();
-    
-    // If it's a hash link on current page, smooth scroll
-    if (href.startsWith('/#')) {
-      const targetEl = document.querySelector(`[data-nav-section="${section}"]`);
-      if (targetEl) {
-        targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        setIsMobileStripOpen(false);
-        setIsExpanded(false);
+  // --- Cross-page hash navigation: scroll after pathname changes to '/' ---
+  useEffect(() => {
+    if (pathname === '/' && pendingScrollRef.current) {
+      const targetSection = pendingScrollRef.current;
+      pendingScrollRef.current = null;
+
+      // For hero, just scroll to top
+      if (targetSection === 'hero') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
       }
+
+      // Poll for the target element (sections may not be rendered yet)
+      let attempts = 0;
+      const maxAttempts = 50; // ~2.5s max wait
+      const checkAndScroll = () => {
+        const targetEl = document.querySelector(`[data-nav-section="${targetSection}"]`);
+        if (targetEl) {
+          targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else if (attempts < maxAttempts) {
+          attempts++;
+          requestAnimationFrame(checkAndScroll);
+        }
+      };
+      // Give the page a moment to render
+      setTimeout(checkAndScroll, 300);
+    }
+  }, [pathname]);
+
+  // Global navigation handler for cinematic transitions
+  const handleNavClick = useCallback((e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>, href: string, section: string) => {
+    // If it's a hash link on the current home page, smooth scroll
+    if (pathname === '/' && href.startsWith('/#')) {
+      e.preventDefault();
+      if (section === 'hero') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        const targetEl = document.querySelector(`[data-nav-section="${section}"]`);
+        if (targetEl) {
+          targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
+    }
+    // If it's a hash link but we're NOT on the home page, navigate to / then scroll
+    else if (pathname !== '/' && href.startsWith('/#')) {
+      e.preventDefault();
+      pendingScrollRef.current = section;
+      router.push('/');
     }
     
-    // Otherwise dispatch event for page transitions
-    window.dispatchEvent(new CustomEvent('nav-route-clicked', { detail: href }));
+    // For cross-page navigation, we let Next.js <Link> handle the default behavior.
     setIsMobileStripOpen(false);
     setIsExpanded(false);
-  }, []);
+  }, [pathname, router]);
 
   // --- Reduced motion detection (preserved) ---
   useEffect(() => {
@@ -144,7 +186,15 @@ export default function Navbar() {
   // --- Scroll-based section detection (replaces IntersectionObserver) ---
   // Picks whichever section's top edge is closest to the viewport top.
   useEffect(() => {
-    if (pathname !== '/') return;
+    if (pathname !== '/') {
+      if (pathname.startsWith('/events')) setActiveSection('events');
+      else if (pathname.startsWith('/leaderboard')) setActiveSection('leaderboard');
+      else if (pathname.startsWith('/projects')) setActiveSection('projects');
+      else if (pathname.startsWith('/profile')) setActiveSection('profile');
+      else if (pathname.startsWith('/admin')) setActiveSection('admin');
+      else setActiveSection('unknown');
+      return;
+    }
 
     const detectSection = () => {
       const sections = document.querySelectorAll('[data-nav-section]');
@@ -404,7 +454,7 @@ export default function Navbar() {
 
   // Section name for display
   const activeSectionData = NAV_SECTIONS.find(s => s.section === displaySection);
-  const sectionLabel = activeSectionData?.label?.toUpperCase() || 'HERO';
+  const sectionLabel = activeSectionData?.label?.toUpperCase() || (displaySection === 'hero' ? 'HERO' : displaySection.toUpperCase());
 
   // Section transition class
   const sectionNameClass = sectionTransitionState === 'exit'
@@ -480,9 +530,10 @@ export default function Navbar() {
         </Link>
 
         {/* ============================================================
-            RIGHT: NOW SHOWING Plate — Cinematic scene indicator
+            RIGHT: NOW SHOWING Plate & User Menu
             ============================================================ */}
-        <div className={styles.plateWrapper}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div className={styles.plateWrapper}>
           <div
             ref={plateRef}
           className={`${styles.plate} ${isExpanded ? styles.expanded : ''} ${
@@ -548,7 +599,7 @@ export default function Navbar() {
             {NAV_SECTIONS.map((item, i) => {
               const isActive = item.section === activeSection;
               return (
-                <a
+                <Link
                   key={item.section}
                   href={item.href}
                   ref={(el) => { navItemRefs.current[i] = el; }}
@@ -567,33 +618,46 @@ export default function Navbar() {
                     <span className={`${styles.hoverDustMote} ${styles.hoverDustMote2}`} />
                     <span className={`${styles.hoverDustMote} ${styles.hoverDustMote3}`} />
                   </span>
-                </a>
+                </Link>
               );
             })}
             {/* Join Us — last item */}
-            <a
+            <Link
               href="/join"
               className={`${styles.navItem} ${styles.navItemJoin}`}
               ref={(el) => { navItemRefs.current[NAV_SECTIONS.length] = el; }}
               onMouseEnter={() => setHoverIndex(NAV_SECTIONS.length)}
               onMouseLeave={() => setHoverIndex(null)}
               onClick={(e) => {
-                e.preventDefault();
-                window.dispatchEvent(new CustomEvent('nav-route-clicked', { detail: '/join' }));
+                if (pathname === '/') {
+                  e.preventDefault();
+                  window.dispatchEvent(new CustomEvent('nav-route-clicked', { detail: '/join' }));
+                }
                 setIsExpanded(false);
               }}
             >
               <span className={styles.navItemScene}>&nbsp;</span>
               <span className={styles.navItemLabel}>Join Us</span>
-            </a>
+
+              {/* Hover dust */}
+              <span className={styles.hoverDustField} aria-hidden="true">
+                <span className={`${styles.hoverDustMote} ${styles.hoverDustMote1}`} />
+                <span className={`${styles.hoverDustMote} ${styles.hoverDustMote2}`} />
+                <span className={`${styles.hoverDustMote} ${styles.hoverDustMote3}`} />
+              </span>
+            </Link>
           </div>
         </div>
 
-        {/* Hover hint — positioned absolutely below plate */}
-        <span className={styles.hoverHint} aria-hidden="true">
-          hover to navigate
-        </span>
-      </div>
+          {/* Hover hint — positioned absolutely below plate */}
+          <span className={styles.hoverHint} aria-hidden="true">
+            hover to navigate
+          </span>
+        </div>
+
+          {/* FAR RIGHT: User Avatar */}
+          <UserMenu />
+        </div>
 
         {/* ============================================================
             MOBILE: Horizontal scrollable scene strip

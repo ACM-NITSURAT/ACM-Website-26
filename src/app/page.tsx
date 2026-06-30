@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from "react";
+import { useRouter } from 'next/navigation';
 import CinemaLoader from "@/components/loading/CinemaLoader";
 import HeroSection from "@/components/sections/HeroSection";
 import ProjectorTransition from "@/components/transitions/ProjectorTransition";
@@ -27,6 +28,7 @@ export default function Home() {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isLoaderComplete, setIsLoaderComplete] = useState(false);
   const timersRef = useRef<NodeJS.Timeout[]>([]);
+  const router = useRouter();
 
   // Keep track of latest state for the event listener without causing re-renders
   const stateRef = useRef(transitionState);
@@ -44,12 +46,25 @@ export default function Home() {
   // Listen for loader completion
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      if (sessionStorage.getItem('cinema-loaded') === '1') {
+      const handleLoaderComplete = () => {
         setIsLoaderComplete(true);
+        // Scroll to hash if present after loading
+        if (window.location.hash) {
+          const id = window.location.hash.substring(1);
+          setTimeout(() => {
+            const targetEl = document.querySelector(`[data-nav-section="${id}"]`) || document.getElementById(id);
+            if (targetEl) {
+              targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          }, 100);
+        }
+      };
+
+      if (sessionStorage.getItem('cinema-loaded') === '1') {
+        handleLoaderComplete();
       }
-      const handleComplete = () => setIsLoaderComplete(true);
-      window.addEventListener('cinema-loader-complete', handleComplete);
-      return () => window.removeEventListener('cinema-loader-complete', handleComplete);
+      window.addEventListener('cinema-loader-complete', handleLoaderComplete);
+      return () => window.removeEventListener('cinema-loader-complete', handleLoaderComplete);
     }
   }, []);
 
@@ -116,7 +131,7 @@ export default function Home() {
   useEffect(() => {
     const handleNavRouteClicked = (e: Event) => {
       const customEvent = e as CustomEvent<string>;
-      // const targetHref = customEvent.detail;
+      const targetHref = customEvent.detail;
       
       // If we are currently in the reel experience, trigger the reverse flash first
       if (stateRef.current === 'intro') {
@@ -126,13 +141,19 @@ export default function Home() {
         
         // Wait for the reverse flash to finish (500ms) before pretending to scroll
         setTimeout(() => {
-          // In a full implementation, we would scroll to the section here.
-          // For now, we return to hero.
-          window.scrollTo({ top: 0, behavior: 'smooth' });
+          if (targetHref) {
+            router.push(targetHref);
+          } else {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }
         }, 550);
       } else {
         // If already on Hero, just scroll
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        if (targetHref) {
+          router.push(targetHref);
+        } else {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
       }
     };
 
