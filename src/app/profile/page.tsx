@@ -246,6 +246,10 @@ export default function ProfilePage() {
               <h3 className="font-mono text-[10px] text-zinc-500 uppercase tracking-widest mb-4">SVNIT Student Info</h3>
               <div className="grid grid-cols-2 gap-4">
                 <div className={styles.inputGroup}>
+                  <span className={styles.inputLabel}>Role</span>
+                  <div className={`${styles.readonlyValue} uppercase text-amber-500 font-bold`}>{dbUser.role || 'MEMBER'}</div>
+                </div>
+                <div className={styles.inputGroup}>
                   <span className={styles.inputLabel}>Roll Number</span>
                   <div className={styles.readonlyValue}>{dbUser.rollNumber || '—'}</div>
                 </div>
@@ -257,7 +261,7 @@ export default function ProfilePage() {
                   <span className={styles.inputLabel}>Graduation Year</span>
                   <div className={styles.readonlyValue}>{dbUser.graduationBatch || '—'}</div>
                 </div>
-                <div className={styles.inputGroup}>
+                <div className={`${styles.inputGroup} col-span-2`}>
                   <span className={styles.inputLabel}>Email Address</span>
                   <div className={styles.readonlyValue}>{dbUser.email}</div>
                 </div>
@@ -265,7 +269,7 @@ export default function ProfilePage() {
             </div>
 
             {/* Direct Link to public profile dashboard */}
-            {dbUser.leaderboardSlug && (
+            {dbUser.leaderboardSlug && (dbUser.leetcodeUsername || dbUser.codeforcesHandle || dbUser.codechefUsername || dbUser.githubUsername) && (
               <div className="pt-4 border-t border-zinc-800/40">
                 <Link
                   href={`/leaderboard/student/${dbUser.leaderboardSlug}`}

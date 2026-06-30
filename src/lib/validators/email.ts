@@ -24,4 +24,4 @@ export function isValidSvnitEmail(email: string, devMode: boolean): boolean {
 }
 
 export const SVNIT_EMAIL_ERROR =
-  'Only SVNIT institutional emails are allowed (e.g. u24ai091.aid@svnit.ac.in).';
+  'Only SVNIT institutional emails are allowed (e.g. u24ai091@aid.svnit.ac.in).';
