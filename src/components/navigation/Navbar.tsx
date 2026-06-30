@@ -31,6 +31,9 @@ const SECTION_TIMECODES: Record<string, string> = {
   leaderboard: '00:05:40',
   projects:    '00:06:45',
   team:        '00:08:57',
+  profile:     '00:10:12',
+  admin:       '00:11:42',
+  unknown:     '00:00:00',
 };
 
 /** Linearly interpolate between a and b */
@@ -104,32 +107,19 @@ export default function Navbar() {
 
   // Global navigation handler for cinematic transitions
   const handleNavClick = useCallback((e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>, href: string, section: string) => {
-    e.preventDefault();
-    
-    // If we are not on the home page, or it's not a hash link
-    if (pathname !== '/' || !href.startsWith('/#')) {
-      router.push(href);
-      setIsMobileStripOpen(false);
-      setIsExpanded(false);
-      return;
-    }
-    
     // If it's a hash link on the current home page, smooth scroll
-    if (href.startsWith('/#')) {
+    if (pathname === '/' && href.startsWith('/#')) {
+      e.preventDefault();
       const targetEl = document.querySelector(`[data-nav-section="${section}"]`);
       if (targetEl) {
         targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        setIsMobileStripOpen(false);
-        setIsExpanded(false);
-        return;
       }
     }
     
-    // Otherwise dispatch event for page transitions (legacy)
-    window.dispatchEvent(new CustomEvent('nav-route-clicked', { detail: href }));
+    // For cross-page navigation, we let Next.js <Link> handle the default behavior.
     setIsMobileStripOpen(false);
     setIsExpanded(false);
-  }, [pathname, router]);
+  }, [pathname]);
 
   // --- Reduced motion detection (preserved) ---
   useEffect(() => {
@@ -156,7 +146,15 @@ export default function Navbar() {
   // --- Scroll-based section detection (replaces IntersectionObserver) ---
   // Picks whichever section's top edge is closest to the viewport top.
   useEffect(() => {
-    if (pathname !== '/') return;
+    if (pathname !== '/') {
+      if (pathname.startsWith('/events')) setActiveSection('events');
+      else if (pathname.startsWith('/leaderboard')) setActiveSection('leaderboard');
+      else if (pathname.startsWith('/projects')) setActiveSection('projects');
+      else if (pathname.startsWith('/profile')) setActiveSection('profile');
+      else if (pathname.startsWith('/admin')) setActiveSection('admin');
+      else setActiveSection('unknown');
+      return;
+    }
 
     const detectSection = () => {
       const sections = document.querySelectorAll('[data-nav-section]');
@@ -416,7 +414,7 @@ export default function Navbar() {
 
   // Section name for display
   const activeSectionData = NAV_SECTIONS.find(s => s.section === displaySection);
-  const sectionLabel = activeSectionData?.label?.toUpperCase() || 'HERO';
+  const sectionLabel = activeSectionData?.label?.toUpperCase() || (displaySection === 'hero' ? 'HERO' : displaySection.toUpperCase());
 
   // Section transition class
   const sectionNameClass = sectionTransitionState === 'exit'
@@ -561,7 +559,7 @@ export default function Navbar() {
             {NAV_SECTIONS.map((item, i) => {
               const isActive = item.section === activeSection;
               return (
-                <a
+                <Link
                   key={item.section}
                   href={item.href}
                   ref={(el) => { navItemRefs.current[i] = el; }}
@@ -580,25 +578,34 @@ export default function Navbar() {
                     <span className={`${styles.hoverDustMote} ${styles.hoverDustMote2}`} />
                     <span className={`${styles.hoverDustMote} ${styles.hoverDustMote3}`} />
                   </span>
-                </a>
+                </Link>
               );
             })}
             {/* Join Us — last item */}
-            <a
+            <Link
               href="/join"
               className={`${styles.navItem} ${styles.navItemJoin}`}
               ref={(el) => { navItemRefs.current[NAV_SECTIONS.length] = el; }}
               onMouseEnter={() => setHoverIndex(NAV_SECTIONS.length)}
               onMouseLeave={() => setHoverIndex(null)}
               onClick={(e) => {
-                e.preventDefault();
-                window.dispatchEvent(new CustomEvent('nav-route-clicked', { detail: '/join' }));
+                if (pathname === '/') {
+                  e.preventDefault();
+                  window.dispatchEvent(new CustomEvent('nav-route-clicked', { detail: '/join' }));
+                }
                 setIsExpanded(false);
               }}
             >
               <span className={styles.navItemScene}>&nbsp;</span>
               <span className={styles.navItemLabel}>Join Us</span>
-            </a>
+
+              {/* Hover dust */}
+              <span className={styles.hoverDustField} aria-hidden="true">
+                <span className={`${styles.hoverDustMote} ${styles.hoverDustMote1}`} />
+                <span className={`${styles.hoverDustMote} ${styles.hoverDustMote2}`} />
+                <span className={`${styles.hoverDustMote} ${styles.hoverDustMote3}`} />
+              </span>
+            </Link>
           </div>
         </div>
 

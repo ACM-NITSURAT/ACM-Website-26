@@ -1,0 +1,497 @@
+/* ============================================================
+   EVENTS PAGE — Cinematic Redesign
+   
+   Adopts the technical blueprint & film aesthetics from the 
+   About and Hero sections. 
+   0 GPU COST: Built entirely with CSS gradients, static SVG noise,
+   and simple transform transitions.
+   ============================================================ */
+
+.wrapper {
+  position: relative;
+  min-height: 100vh;
+  padding-top: 74px;
+  background-color: transparent;
+  z-index: 10;
+}
+
+.inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 64px 24px;
+  position: relative;
+  z-index: 2;
+}
+
+/* ============================================================
+   BACKGROUND ATMOSPHERE
+   ============================================================ */
+.bgAtmosphere {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  background: #020104;
+}
+
+/* Base grid identical to AboutSection */
+.bgGrid {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(139, 92, 246, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(139, 92, 246, 0.03) 1px, transparent 1px);
+  background-size: 64px 64px;
+  background-position: center center;
+}
+
+/* ============================================================
+   HEADER STYLES
+   ============================================================ */
+.headerBlock {
+  margin-bottom: 48px;
+  max-width: 640px;
+  background: rgba(7, 6, 10, 0.6);
+  backdrop-filter: blur(8px);
+  padding: 32px;
+  border-radius: 4px;
+  border: 1px solid rgba(139, 92, 246, 0.1);
+}
+
+.eyebrow {
+  font-family: var(--font-geist-mono), 'Courier New', monospace;
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: rgba(139, 92, 246, 0.8);
+  margin: 0 0 16px;
+}
+
+.heading {
+  font-family: var(--font-display), 'Space Grotesk', sans-serif;
+  font-size: clamp(36px, 5vw, 64px);
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+  margin: 0 0 24px;
+  line-height: 1.1;
+  text-shadow: 0 0 40px rgba(139, 92, 246, 0.15);
+}
+
+.description {
+  font-family: var(--font-display), 'Space Grotesk', sans-serif;
+  font-size: clamp(16px, 2vw, 20px);
+  font-weight: 300;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+}
+
+/* ============================================================
+   FILTER TABS (Cinematic Segment Control)
+   ============================================================ */
+.filterContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 48px;
+  position: relative;
+  z-index: 2;
+  background: rgba(7, 6, 10, 0.6);
+  backdrop-filter: blur(8px);
+  padding: 16px;
+  border-radius: 4px;
+  border: 1px solid rgba(139, 92, 246, 0.1);
+}
+
+.filterTab {
+  background: rgba(139, 92, 246, 0.05);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  color: rgba(255, 255, 255, 0.5);
+  padding: 8px 20px;
+  border-radius: 2px;
+  font-family: var(--font-geist-mono), 'Courier New', monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.filterTab:hover {
+  background: rgba(139, 92, 246, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+  border-color: rgba(139, 92, 246, 0.4);
+}
+
+.filterTabActive {
+  background: rgba(139, 92, 246, 0.15);
+  color: #ffffff;
+  border-color: rgba(139, 92, 246, 0.8);
+  box-shadow: 
+    0 0 20px rgba(139, 92, 246, 0.15),
+    inset 0 0 10px rgba(139, 92, 246, 0.1);
+}
+
+.filterTabActive::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 2px;
+  height: 100%;
+  background: #8b5cf6;
+  box-shadow: 0 0 10px #8b5cf6;
+}
+
+/* ============================================================
+   EVENTS GRID
+   ============================================================ */
+.eventsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 32px;
+  position: relative;
+  z-index: 2;
+}
+
+/* ============================================================
+   FILM-FRAME CARD
+   ============================================================ */
+.eventCard {
+  background: #07060a;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(139, 92, 246, 0.15);
+  border-radius: 2px;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  cursor: pointer;
+  height: 100%;
+}
+
+.eventCard:hover {
+  border-color: rgba(139, 92, 246, 0.5);
+  box-shadow:
+    0 0 0 1px rgba(139, 92, 246, 0.3),
+    0 20px 40px -10px rgba(139, 92, 246, 0.15);
+  transform: translateY(-4px);
+}
+
+/* Corner registration marks */
+.eventCard::before {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  z-index: 5;
+  pointer-events: none;
+  background:
+    linear-gradient(rgba(139, 92, 246, 0.6), rgba(139, 92, 246, 0.6)) top left,
+    linear-gradient(rgba(139, 92, 246, 0.6), rgba(139, 92, 246, 0.6)) top left,
+    linear-gradient(rgba(139, 92, 246, 0.6), rgba(139, 92, 246, 0.6)) top right,
+    linear-gradient(rgba(139, 92, 246, 0.6), rgba(139, 92, 246, 0.6)) top right,
+    linear-gradient(rgba(139, 92, 246, 0.6), rgba(139, 92, 246, 0.6)) bottom left,
+    linear-gradient(rgba(139, 92, 246, 0.6), rgba(139, 92, 246, 0.6)) bottom left,
+    linear-gradient(rgba(139, 92, 246, 0.6), rgba(139, 92, 246, 0.6)) bottom right,
+    linear-gradient(rgba(139, 92, 246, 0.6), rgba(139, 92, 246, 0.6)) bottom right;
+  background-size:
+    12px 2px, 2px 12px,
+    12px 2px, 2px 12px,
+    12px 2px, 2px 12px,
+    12px 2px, 2px 12px;
+  background-repeat: no-repeat;
+  transition: opacity 0.3s ease;
+}
+
+.eventCard:hover::before {
+  background:
+    linear-gradient(rgba(139, 92, 246, 0.9), rgba(139, 92, 246, 0.9)) top left,
+    linear-gradient(rgba(139, 92, 246, 0.9), rgba(139, 92, 246, 0.9)) top left,
+    linear-gradient(rgba(139, 92, 246, 0.9), rgba(139, 92, 246, 0.9)) top right,
+    linear-gradient(rgba(139, 92, 246, 0.9), rgba(139, 92, 246, 0.9)) top right,
+    linear-gradient(rgba(139, 92, 246, 0.9), rgba(139, 92, 246, 0.9)) bottom left,
+    linear-gradient(rgba(139, 92, 246, 0.9), rgba(139, 92, 246, 0.9)) bottom left,
+    linear-gradient(rgba(139, 92, 246, 0.9), rgba(139, 92, 246, 0.9)) bottom right,
+    linear-gradient(rgba(139, 92, 246, 0.9), rgba(139, 92, 246, 0.9)) bottom right;
+  background-size:
+    12px 2px, 2px 12px,
+    12px 2px, 2px 12px,
+    12px 2px, 2px 12px,
+    12px 2px, 2px 12px;
+  background-repeat: no-repeat;
+}
+
+/* Interior noise texture */
+.eventCard::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  opacity: 0.15;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Scan Line Sweep on Hover */
+.scanLine {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.8), transparent);
+  box-shadow: 0 0 12px rgba(139, 92, 246, 0.5);
+  z-index: 4;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.eventCard:hover .scanLine {
+  opacity: 1;
+  animation: scanSweep 1.5s linear infinite;
+}
+
+@keyframes scanSweep {
+  0% { transform: translateY(0); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(200px); opacity: 0; }
+}
+
+/* ============================================================
+   CARD CONTENT
+   ============================================================ */
+.cardImageWrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #020104;
+  overflow: hidden;
+  z-index: 2;
+  border-bottom: 1px solid rgba(139, 92, 246, 0.1);
+}
+
+.cardImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1), filter 0.5s ease;
+  filter: saturate(0.8) contrast(1.1);
+}
+
+.eventCard:hover .cardImage {
+  transform: scale(1.05);
+  filter: saturate(1.2) contrast(1.1);
+}
+
+.cardImageGrayscale {
+  filter: grayscale(1) opacity(0.5);
+}
+
+.eventCard:hover .cardImageGrayscale {
+  filter: grayscale(0.8) opacity(0.8);
+}
+
+.cardBody {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  position: relative;
+  z-index: 2;
+  gap: 12px;
+}
+
+.cardDate {
+  font-family: var(--font-geist-mono), 'Courier New', monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: rgba(139, 92, 246, 0.8);
+  text-transform: uppercase;
+}
+
+.cardTitle {
+  font-family: var(--font-display), 'Space Grotesk', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.95);
+  line-height: 1.2;
+  margin: 0;
+  transition: color 0.3s ease;
+}
+
+.eventCard:hover .cardTitle {
+  color: #ffffff;
+  text-shadow: 0 0 16px rgba(139, 92, 246, 0.3);
+}
+
+.cardDesc {
+  font-family: var(--font-display), 'Space Grotesk', sans-serif;
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+  flex: 1;
+}
+
+.cardTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: auto;
+  padding-top: 16px;
+}
+
+.cardTag {
+  font-family: var(--font-geist-mono), 'Courier New', monospace;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  padding: 4px 8px;
+  background: rgba(139, 92, 246, 0.05);
+  border: 1px solid rgba(139, 92, 246, 0.15);
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  border-radius: 2px;
+}
+
+/* ============================================================
+   BADGES (Overlaid on Image)
+   ============================================================ */
+.badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  font-family: var(--font-geist-mono), 'Courier New', monospace;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  padding: 4px 10px;
+  text-transform: uppercase;
+  backdrop-filter: blur(8px);
+  border-radius: 2px;
+  z-index: 10;
+}
+
+/* Status Badges */
+.badgeStatus {
+  right: 12px;
+  left: auto;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Type Badges */
+.badgeTypeHackathon {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.2);
+}
+
+.badgeTypeWorkshop {
+  background: rgba(59, 130, 246, 0.15);
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  color: #93c5fd;
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.2);
+}
+
+.badgeTypeContest {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  color: #fcd34d;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.2);
+}
+
+.badgeTypeMeetup {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: #6ee7b7;
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.2);
+}
+
+/* ============================================================
+   SKELETON CARDS
+   ============================================================ */
+.skeletonCard {
+  background: #07060a;
+  border: 1px solid rgba(139, 92, 246, 0.1);
+  border-radius: 2px;
+  position: relative;
+  overflow: hidden;
+}
+
+.skeletonImage {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: rgba(139, 92, 246, 0.05);
+}
+
+.skeletonBody {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.skeletonLine {
+  height: 12px;
+  background: rgba(139, 92, 246, 0.05);
+  border-radius: 2px;
+}
+
+.skeletonLine:nth-child(1) { width: 40%; }
+.skeletonLine:nth-child(2) { width: 80%; height: 24px; }
+.skeletonLine:nth-child(3) { width: 100%; }
+.skeletonLine:nth-child(4) { width: 60%; }
+
+.skeletonPulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .5; }
+}
+
+/* ============================================================
+   CTA BUTTON
+   ============================================================ */
+.registerBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px;
+  background: rgba(139, 92, 246, 0.1);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  border-radius: 2px;
+  color: #fff;
+  font-family: var(--font-geist-mono), 'Courier New', monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.registerBtn:hover {
+  background: rgba(139, 92, 246, 0.2);
+  border-color: rgba(139, 92, 246, 0.5);
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.2);
+}
+
+.registerIcon {
+  transition: transform 0.3s ease;
+}
+
+.registerBtn:hover .registerIcon {
+  transform: translateX(4px);
+}

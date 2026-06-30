@@ -46,6 +46,16 @@
   gap: 24px;
 }
 
+/* Theme variable overrides for different sections */
+.themeAbout { --theme-main: 245, 158, 11; --theme-light: 251, 191, 36; --theme-glow: 252, 211, 77; }
+.themeEvents { --theme-main: 139, 92, 246; --theme-light: 167, 139, 250; --theme-glow: 196, 181, 253; }
+.themeLeaderboard { --theme-main: 16, 185, 129; --theme-light: 52, 211, 153; --theme-glow: 110, 231, 183; }
+.themeProjects { --theme-main: 244, 63, 94; --theme-light: 251, 113, 133; --theme-glow: 253, 164, 175; }
+.themeTeam { --theme-main: 59, 130, 246; --theme-light: 96, 165, 250; --theme-glow: 147, 197, 253; }
+.themeProfile { --theme-main: 168, 85, 247; --theme-light: 192, 132, 252; --theme-glow: 216, 180, 254; }
+.themeAdmin { --theme-main: 239, 68, 68; --theme-light: 248, 113, 113; --theme-glow: 252, 165, 165; }
+
+
 /* ============================================================
    BRAND BLOCK — Always visible. The studio mark.
    Left side. Never hidden. Never animated away.
