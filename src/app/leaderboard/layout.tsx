@@ -92,28 +92,29 @@ export default function LeaderboardLayout({
       <div className={styles.globalNavBg} aria-hidden="true" />
 
       {/* Header */}
-      <header className={styles.header}>
-        <div className={styles.headerContent}>
-          <div className={styles.titleRow}>
-            <h1 className={styles.title}>
-              <span className={styles.titleAccent}>ACM</span> Leaderboard
-            </h1>
-            <p className={styles.subtitle}>
-              Coding profiles & rankings for SVNIT students
-            </p>
+      {!isSubPage && (
+        <header className={styles.header}>
+          <div className={styles.headerContent}>
+            <div className={styles.titleRow}>
+              <h1 className={styles.title}>
+                <span className={styles.titleAccent}>ACM</span> Leaderboard
+              </h1>
+              <p className={styles.subtitle}>
+                Coding profiles & rankings for SVNIT students
+              </p>
+            </div>
+
+            {user && !hasLinkedProfiles && (
+              <Link href="/leaderboard/link-profiles" className={styles.linkProfilesCta}>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                </svg>
+                Link Profiles
+              </Link>
+            )}
           </div>
-
-          {user && !hasLinkedProfiles && (
-            <Link href="/leaderboard/link-profiles" className={styles.linkProfilesCta}>
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-              </svg>
-              Link Profiles
-            </Link>
-          )}
-        </div>
-
-      </header>
+        </header>
+      )}
 
       {/* Tab navigation */}
       {!isSubPage && (

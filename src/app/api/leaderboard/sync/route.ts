@@ -13,7 +13,7 @@ import { requirePermission } from '@/server/guard';
 
 export const maxDuration = 300; // 5 minutes — Vercel Pro limit
 
-export async function POST(request: Request) {
+export async function GET(request: Request) {
   // Allow if valid CRON_SECRET
   const authHeader = request.headers.get('authorization');
   const cronSecret = process.env.CRON_SECRET;
@@ -47,3 +47,5 @@ export async function POST(request: Request) {
     );
   }
 }
+
+export const POST = GET;

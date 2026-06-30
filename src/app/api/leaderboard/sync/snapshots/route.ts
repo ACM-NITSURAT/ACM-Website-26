@@ -8,7 +8,7 @@
 import { NextResponse } from 'next/server';
 import { takeWeeklySnapshots } from '@/server/leaderboard/snapshot.service';
 
-export async function POST(request: Request) {
+export async function GET(request: Request) {
   const authHeader = request.headers.get('authorization');
   const cronSecret = process.env.CRON_SECRET;
 
@@ -27,3 +27,5 @@ export async function POST(request: Request) {
     );
   }
 }
+
+export const POST = GET;
