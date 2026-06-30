@@ -3271,4 +3271,49 @@
   .beamBlurWrapper {
     filter: blur(12px);
   }
+
+  /* ---- SCENE 2 MOBILE STABILITY FIXES ---- */
+
+  /* Kill the infinite CSS grid scroll animations — they run on their own
+     timer independently of the JS scroll progress, causing the grid to
+     visually "fight" the scroll-driven transforms and appear to fluctuate */
+  .bgGridFloor,
+  .bgGridCeiling {
+    animation: none !important;
+  }
+
+  /* The diagonal streaks layer uses inset: -10% and width: 120% which
+     causes repaints when combined with transforms on mobile */
+  .bgStreaks {
+    display: none;
+  }
+
+  /* Reduce the far-field repeating gradient — subtle on desktop,
+     causes shimmer on mobile during scroll interpolation */
+  .bgFar {
+    opacity: 0.25;
+  }
+
+  /* Simplify the bgGlow radial gradients to reduce GPU overdraw */
+  .bgGlow {
+    opacity: 0.4;
+  }
+
+  /* The bgParallax container uses inset: -15% causing oversized layers.
+     Tighten it to reduce the area the GPU has to composite */
+  .bgParallax {
+    inset: -5%;
+  }
+
+  /* Reduce the blurred background image filter complexity */
+  .bgImageWrapper {
+    filter: blur(30px) saturate(120%) brightness(0.6);
+  }
+
+  /* Prevent the scene2 scale transform from causing subpixel rendering jitter */
+  .scene2 {
+    will-change: opacity;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
 }

@@ -578,8 +578,8 @@ export default function WalkThroughReel({ isVisible, onBack }: WalkThroughReelPr
       const currentY = e.touches[0].clientY;
       const delta = touchStartY - currentY;
 
-      // Dead-zone: ignore sub-pixel jitter from touch sensors
-      if (Math.abs(delta) < 2) return;
+      // Dead-zone: ignore sub-pixel jitter from touch sensors (raised for mobile stability)
+      if (Math.abs(delta) < 4) return;
 
       const prev = scrollAccumulator.current;
       /* P5: Same reverse resistance for touch */
@@ -598,12 +598,18 @@ export default function WalkThroughReel({ isVisible, onBack }: WalkThroughReelPr
       const sceneLerp =
         rawProgress >= SCENE3_START ? 0.22 : rawProgress >= SCENE2_START ? 0.22 : LERP_FACTOR;
 
-      displayProgress.current += (rawProgress - displayProgress.current) * sceneLerp;
+      const diff = rawProgress - displayProgress.current;
+      // Snap to target when within sub-pixel threshold to prevent micro-oscillation
+      if (Math.abs(diff) < 0.0005) {
+        displayProgress.current = rawProgress;
+      } else {
+        displayProgress.current += diff * sceneLerp;
+      }
       const progress =
         rawProgress >= SCENE3_START
           ? clamp01(displayProgress.current * 0.3 + rawProgress * 0.7)
           : rawProgress >= SCENE2_START
-            ? clamp01(displayProgress.current * 0.32 + rawProgress * 0.68)
+            ? clamp01(displayProgress.current * 0.15 + rawProgress * 0.85)
             : clamp01(displayProgress.current * 0.55 + rawProgress * 0.45);
 
       const trailerT =
@@ -1012,10 +1018,10 @@ export default function WalkThroughReel({ isVisible, onBack }: WalkThroughReelPr
       }
 
       /* --- Scene 2: The Deep Space Monoliths --- */
+      const isMobileDevice = window.innerWidth < 860;
+
       if (scene2Ref.current) {
         const enterE = scene2Blend;
-        const scale = 1.18 - enterE * 0.18;
-        const pushY = (1 - enterE) * 8;
         const exitFade =
           rawProgress > SCENE2_END - 0.03
             ? clamp01((rawProgress - (SCENE2_END - 0.03)) / 0.06)
@@ -1024,7 +1030,14 @@ export default function WalkThroughReel({ isVisible, onBack }: WalkThroughReelPr
         scene2Ref.current.style.visibility =
           enterE > 0.01 && scene3Blend < 0.98 ? 'visible' : 'hidden';
         scene2Ref.current.style.opacity = String(enterE * (1 - exitFade) * (1 - scene3Blend));
-        scene2Ref.current.style.transform = `scale(${scale}) translateY(${pushY}vh)`;
+        // On mobile, skip the container-level scale/translate to prevent subpixel jitter
+        if (!isMobileDevice) {
+          const scale = 1.18 - enterE * 0.18;
+          const pushY = (1 - enterE) * 8;
+          scene2Ref.current.style.transform = `scale(${scale}) translateY(${pushY}vh)`;
+        } else {
+          scene2Ref.current.style.transform = 'none';
+        }
         scene2Ref.current.style.pointerEvents = enterE > 0.12 ? 'auto' : 'none';
       }
 
