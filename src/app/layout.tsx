@@ -54,9 +54,10 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${spaceGrotesk.variable} ${inter.variable} ${caveat.variable} ${crampsFont.variable} ${progressFont.variable} h-full antialiased`}
+      className={`dark ${geistSans.variable} ${geistMono.variable} ${spaceGrotesk.variable} ${inter.variable} ${caveat.variable} ${crampsFont.variable} ${progressFont.variable} h-full antialiased`}
+      style={{ backgroundColor: '#050508' }}
     >
-      <body className="min-h-full flex flex-col relative">
+      <body className="min-h-full flex flex-col relative" style={{ backgroundColor: '#050508' }}>
         <div className="cinemaGrainOverlay" aria-hidden="true" />
         <Navbar />
         {children}

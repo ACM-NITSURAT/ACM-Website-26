@@ -4,6 +4,7 @@
   align-items: center;
   z-index: 100;
   pointer-events: auto;
+  flex-shrink: 0; /* Never let the avatar area get compressed */
 }
 
 .placeholder {
@@ -169,4 +170,51 @@
 
 .logoutBtn:hover {
   background-color: #450a0a; /* red-950 */
+}
+
+/* ── Mobile responsive ── */
+@media (max-width: 768px) {
+  .avatarImg {
+    width: 30px !important;
+    height: 30px !important;
+  }
+
+  .avatarFallback {
+    width: 30px;
+    height: 30px;
+    font-size: 0.75rem;
+  }
+
+  .placeholder {
+    width: 30px;
+    height: 30px;
+  }
+
+  .dropdown {
+    width: 220px;
+    right: -8px;
+  }
+
+  .loginBtn {
+    font-size: 0.75rem;
+    padding: 5px 10px;
+  }
+}
+
+@media (max-width: 420px) {
+  .avatarImg {
+    width: 28px !important;
+    height: 28px !important;
+  }
+
+  .avatarFallback {
+    width: 28px;
+    height: 28px;
+    font-size: 0.7rem;
+  }
+
+  .placeholder {
+    width: 28px;
+    height: 28px;
+  }
 }

@@ -1126,30 +1126,37 @@
    ============================================================ */
 @media (max-width: 768px) {
   .nav {
-    padding: 0 16px;
+    padding: 0 12px;
+    gap: 8px;
+  }
+
+  .brandBlock {
+    padding: 6px 12px 6px 8px;
+    gap: 6px;
   }
 
   .brandLogo {
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
   }
 
   .header.scrolled .brandLogo {
-    width: 28px;
-    height: 28px;
+    width: 26px;
+    height: 26px;
   }
 
   /* Hide the text part of the logo on mobile to prevent horizontal overflow */
   .brandText {
     display: none;
   }
-  
-  .brandBlock {
-    gap: 8px;
+
+  /* Hide SVNIT divider + logo on mobile to save space */
+  .brandDivider {
+    display: none;
   }
 
-  .brandDivider {
-    margin: 0 8px;
+  .brandLogoSvnit {
+    display: none;
   }
 
   /* Hide desktop expanded nav items on mobile */
@@ -1157,13 +1164,16 @@
     display: none !important;
   }
 
-  /* Plate: slightly narrower */
+  /* Plate: compact for mobile */
   .plate {
-    height: 40px;
+    height: 36px;
+    flex-shrink: 1;
+    min-width: 0;
+    max-width: 180px;
   }
 
   .plateContent {
-    padding: 0 16px;
+    padding: 0 12px;
   }
 
   .nowShowingLabel {
@@ -1180,6 +1190,22 @@
 
   .sceneNumber {
     margin-right: 6px;
+    font-size: 7px;
+  }
+
+  .sectionName {
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Disable dust/sweep animations on mobile for performance */
+  .plateDustField,
+  .plateAmbientSweep,
+  .projectionSweep,
+  .hoverCone {
+    display: none !important;
   }
 
   /* Mobile scene strip - converted to vertical dropdown */
@@ -1286,23 +1312,26 @@
 }
 
 @media (max-width: 420px) {
-  .brandName { font-size: 14px; }
-  .brandSubtitle { font-size: 7px; letter-spacing: 2.5px; }
-  .brandLogo { width: 28px; height: 28px; }
-  .header.scrolled .brandLogo { width: 26px; height: 26px; }
+  .brandBlock {
+    padding: 5px 8px 5px 6px;
+  }
+
+  .brandLogo { width: 24px; height: 24px; }
+  .header.scrolled .brandLogo { width: 22px; height: 22px; }
+
+  .plate {
+    max-width: 140px;
+    height: 34px;
+  }
 
   .sceneNumber {
-    font-size: 7px;
-    margin-right: 8px;
+    font-size: 6px;
+    margin-right: 4px;
   }
 
   .sectionName {
-    font-size: 10px;
-    letter-spacing: 2px;
-  }
-
-  .timecode {
-    font-size: 6.5px;
+    font-size: 8px;
+    letter-spacing: 1px;
   }
 }
 
