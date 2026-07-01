@@ -65,7 +65,7 @@ export default function StudentProfilePage() {
         <div className="absolute bottom-[12%] -right-[8%] w-[500px] h-[500px] rounded-full animate-pulse opacity-60" style={{ background: 'radial-gradient(circle, rgba(14, 165, 233, 0.1) 0%, transparent 70%)', animationDuration: '5s' }} />
       </div>
 
-      <div className="relative z-10 max-w-5xl mx-auto px-4 pt-8">
+      <div className="relative z-10 max-w-[1400px] mx-auto px-4 pt-8">
         {/* Back link */}
         <Link href="/leaderboard" className="inline-flex items-center text-sm text-[#38bdf8] hover:text-white transition-colors mb-6 font-mono uppercase tracking-widest group" style={{ fontFamily: 'var(--font-geist-mono), "Courier New", monospace' }}>
           <span className="mr-2 group-hover:-translate-x-1 transition-transform">←</span> Back to Leaderboard
@@ -191,7 +191,7 @@ export default function StudentProfilePage() {
         <h2 className="text-xl font-bold text-white mb-6 uppercase tracking-widest" style={{ fontFamily: 'var(--font-display), "Space Grotesk", sans-serif' }}>
           Platform Analytics
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
           {ALL_PLATFORMS.map((platform) => (
             <PlatformCard key={platform} platform={platform} entry={entry} />
           ))}
@@ -326,8 +326,8 @@ function ProfileSkeleton() {
       <div className="w-32 h-32 rounded-full bg-white/5 animate-pulse mb-8" />
       <div className="w-64 h-8 bg-white/5 rounded animate-pulse mb-4" />
       <div className="w-48 h-4 bg-white/5 rounded animate-pulse mb-12" />
-      <div className="w-full max-w-5xl h-40 bg-white/5 rounded-2xl animate-pulse mb-12" />
-      <div className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="w-full max-w-[1400px] h-40 bg-white/5 rounded-2xl animate-pulse mb-12" />
+      <div className="w-full max-w-[1400px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="h-64 bg-white/5 rounded-2xl animate-pulse" />
         <div className="h-64 bg-white/5 rounded-2xl animate-pulse" />
         <div className="h-64 bg-white/5 rounded-2xl animate-pulse" />
