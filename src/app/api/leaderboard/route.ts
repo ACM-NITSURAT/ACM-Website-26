@@ -96,6 +96,11 @@ export async function GET(request: NextRequest) {
     const offset = (page - 1) * limit;
     const paginatedEntries = entries.slice(offset, offset + limit);
 
+    // Fetch config for metadata
+    const configSnap = await adminDb.doc(FIRESTORE_PATHS.configDoc).get();
+    const configData = configSnap.data() as any;
+    const lastGlobalSync = configData?.lastGlobalSync || null;
+
     return NextResponse.json({
       data: paginatedEntries,
       pagination: {
@@ -104,6 +109,9 @@ export async function GET(request: NextRequest) {
         total,
         totalPages,
       },
+      meta: {
+        lastGlobalSync
+      }
     });
   } catch (err) {
     console.error('[GET /api/leaderboard]', err);

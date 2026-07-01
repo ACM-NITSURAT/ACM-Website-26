@@ -96,6 +96,16 @@ export async function runFullSync(): Promise<SyncSummary> {
       console.error('[sync] Failed to recalculate ACM scores:', err);
     }
   }
+  
+  // Update the global last sync timestamp
+  try {
+    await adminDb.doc(FIRESTORE_PATHS.configDoc).set(
+      { lastGlobalSync: new Date().toISOString() },
+      { merge: true }
+    );
+  } catch (err) {
+    console.error('[sync] Failed to update global sync timestamp:', err);
+  }
 
   return summary;
 }

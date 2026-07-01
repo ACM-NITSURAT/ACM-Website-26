@@ -221,6 +221,8 @@ export interface LeaderboardConfig {
   enabledPlatforms: Platform[];
   /** Current season identifier. null = lifetime only. */
   currentSeason: string | null;
+  /** ISO string of the last time the global cron job ran successfully */
+  lastGlobalSync?: string | null;
 }
 
 // ── Snapshot Record ───────────────────────────────────────────────────────────

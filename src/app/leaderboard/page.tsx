@@ -19,6 +19,7 @@ import styles from './page.module.css';
 
 export default function OverallLeaderboardPage() {
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
+  const [lastGlobalSync, setLastGlobalSync] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
@@ -48,6 +49,7 @@ export default function OverallLeaderboardPage() {
       const json = await res.json();
       setEntries(json.data ?? []);
       setTotalPages(json.pagination?.totalPages ?? 1);
+      setLastGlobalSync(json.meta?.lastGlobalSync || null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong');
     } finally {
@@ -126,11 +128,18 @@ export default function OverallLeaderboardPage() {
     <div className={styles.page}>
       {/* Controls */}
       <div className={styles.controls}>
-        <LeaderboardSearch onSearch={handleSearch} />
-        <LeaderboardFilters
-          filters={filters}
-          onFilterChange={setFilters}
-        />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '12px' }}>
+            <LeaderboardSearch onSearch={handleSearch} />
+            <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)', fontFamily: 'var(--font-geist-mono)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              Last Synced: <span style={{ color: 'rgba(14, 165, 233, 0.8)', fontWeight: 600 }}>{lastGlobalSync ? new Date(lastGlobalSync).toLocaleString() : 'Never'}</span>
+            </div>
+          </div>
+          <LeaderboardFilters
+            filters={filters}
+            onFilterChange={setFilters}
+          />
+        </div>
       </div>
 
       {/* Error state */}

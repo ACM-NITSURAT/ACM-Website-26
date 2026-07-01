@@ -56,7 +56,18 @@ export async function GET(request: Request) {
     // Sort by score descending
     students.sort((a, b) => b.score - a.score);
 
-    return NextResponse.json({ success: true, students });
+    // Fetch config for metadata
+    const configSnap = await adminDb.doc('config/leaderboard').get();
+    const configData = configSnap.data() as any;
+    const lastGlobalSync = configData?.lastGlobalSync || null;
+
+    return NextResponse.json({ 
+      success: true, 
+      students,
+      meta: {
+        lastGlobalSync
+      }
+    });
   } catch (err) {
     console.error('[AdminLeaderboard] GET Failed:', err);
     return NextResponse.json(

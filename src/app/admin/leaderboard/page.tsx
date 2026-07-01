@@ -26,6 +26,7 @@ export default function LeaderboardAdminPage() {
   const router = useRouter();
   
   const [students, setStudents] = useState<AdminStudent[]>([]);
+  const [lastGlobalSync, setLastGlobalSync] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSyncingAll, setIsSyncingAll] = useState(false);
   const [isRecalculating, setIsRecalculating] = useState(false);
@@ -49,6 +50,7 @@ export default function LeaderboardAdminPage() {
       const data = await res.json();
       if (data.success) {
         setStudents(data.students);
+        setLastGlobalSync(data.meta?.lastGlobalSync || null);
       } else {
         alert('Failed to load students: ' + data.error);
       }
@@ -179,6 +181,12 @@ export default function LeaderboardAdminPage() {
           <p className="text-zinc-500 font-mono text-sm tracking-widest uppercase mt-3">
             Manage global ranks & trigger manual syncs
           </p>
+        </div>
+        <div className="text-right">
+          <div className="text-[10px] text-zinc-500 font-mono uppercase tracking-widest mb-1">Last Global Sync</div>
+          <div className="text-sm font-bold text-indigo-400 font-mono">
+            {lastGlobalSync ? new Date(lastGlobalSync).toLocaleString() : 'Never'}
+          </div>
         </div>
       </div>
 
