@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: Trigger User Profile Sync
         run: |
-          curl -X POST https://YOUR_VERCEL_DOMAIN.vercel.app/api/leaderboard/sync \
+          curl -X POST https://acmnitsurat.vercel.app/api/leaderboard/sync \
           -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
           -H "Content-Type: application/json"
           
