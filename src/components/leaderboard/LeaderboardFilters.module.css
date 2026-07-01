@@ -72,10 +72,20 @@
 @media (max-width: 640px) {
   .filterGroup {
     width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
   }
   
   .select {
-    flex: 1;
-    min-width: 100px;
+    width: 100%;
+    padding: 8px 24px 8px 12px;
+    font-size: 11px;
+    background-position: right 8px center;
+  }
+
+  /* Make the third item (All Batches) span both columns if it's alone on the second row */
+  .select:nth-child(3) {
+    grid-column: 1 / -1;
   }
 }

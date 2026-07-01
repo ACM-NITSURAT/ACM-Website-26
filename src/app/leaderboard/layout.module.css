@@ -10,6 +10,10 @@
   z-index: 10;
 }
 
+.scrollHint {
+  display: none;
+}
+
 /* ── Background Atmosphere ─────────────────────────────────────────────────── */
 
 .bgAtmosphere {
@@ -223,7 +227,9 @@
 @media (max-width: 768px) {
   .headerContent {
     flex-direction: column;
-    padding: 16px 16px 0;
+    align-items: stretch; /* Stretch children to full width */
+    padding: 16px 16px 12px; /* Reduce bottom padding */
+    gap: 12px; /* Reduce gap */
   }
 
   .title {
@@ -231,16 +237,46 @@
   }
 
   .linkProfilesCta {
-    align-self: flex-start;
+    width: 100%;
+    justify-content: center; /* Center the text/icon */
+    padding: 10px 16px;
+  }
+
+  .stickyTabsWrapper {
+    position: sticky;
+    top: 74px;
+  }
+  
+  .scrollHint {
+    display: flex;
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 60px;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 12px;
+    background: linear-gradient(to right, transparent, rgba(7, 6, 10, 0.95) 70%);
+    color: rgba(14, 165, 233, 0.8);
+    pointer-events: none;
+    z-index: 10;
+    animation: pulseHint 2s infinite ease-in-out;
+  }
+  
+  @keyframes pulseHint {
+    0%, 100% { transform: translateX(0); opacity: 0.5; }
+    50% { transform: translateX(4px); opacity: 1; }
   }
 
   .tabs {
-    padding: 0 16px;
-    margin-top: 12px;
+    padding: 0 40px 0 16px; /* Add right padding so last item doesn't get hidden under the gradient */
+    margin-top: 0; /* Remove extra margin that caused the huge gap */
+    scroll-padding-right: 40px; /* Helps scroll snapping */
   }
 
   .tab {
-    padding: 10px 14px;
+    padding: 12px 14px;
     font-size: 10px;
   }
 
