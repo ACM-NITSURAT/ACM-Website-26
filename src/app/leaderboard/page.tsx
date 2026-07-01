@@ -131,9 +131,6 @@ export default function OverallLeaderboardPage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '12px' }}>
             <LeaderboardSearch onSearch={handleSearch} />
-            <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)', fontFamily: 'var(--font-geist-mono)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              Last Synced: <span style={{ color: 'rgba(14, 165, 233, 0.8)', fontWeight: 600 }}>{lastGlobalSync ? new Date(lastGlobalSync).toLocaleString() : 'Never'}</span>
-            </div>
           </div>
           <LeaderboardFilters
             filters={filters}

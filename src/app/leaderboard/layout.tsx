@@ -34,6 +34,19 @@ export default function LeaderboardLayout({
   const pathname = usePathname();
   const { user } = useAuth();
   const [hasLinkedProfiles, setHasLinkedProfiles] = React.useState(false);
+  const [lastGlobalSync, setLastGlobalSync] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    // Fetch last global sync time
+    fetch('/api/leaderboard/meta')
+      .then(res => res.json())
+      .then(data => {
+        if (data.lastGlobalSync) {
+          setLastGlobalSync(data.lastGlobalSync);
+        }
+      })
+      .catch(err => console.error('Failed to fetch last sync time', err));
+  }, []);
 
   React.useEffect(() => {
     if (!user) return;
@@ -104,14 +117,19 @@ export default function LeaderboardLayout({
               </p>
             </div>
 
-            {user && !hasLinkedProfiles && (
-              <Link href="/leaderboard/link-profiles" className={styles.linkProfilesCta}>
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-                </svg>
-                Link Profiles
-              </Link>
-            )}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px', minWidth: 'fit-content' }}>
+              {user && !hasLinkedProfiles && (
+                <Link href="/leaderboard/link-profiles" className={styles.linkProfilesCta}>
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                  </svg>
+                  Link Profiles
+                </Link>
+              )}
+              <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)', fontFamily: 'var(--font-geist-mono)', textTransform: 'uppercase', letterSpacing: '0.05em' }} className={styles.syncHint}>
+                Last Synced: <span style={{ color: 'rgba(14, 165, 233, 0.8)', fontWeight: 600 }}>{lastGlobalSync ? new Date(lastGlobalSync).toLocaleString() : 'Never'}</span>
+              </div>
+            </div>
           </div>
         </header>
       )}
