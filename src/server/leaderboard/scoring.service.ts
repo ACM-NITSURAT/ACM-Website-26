@@ -174,25 +174,30 @@ export async function recalculateAllScores(): Promise<{ updated: number }> {
 
   const ranks = computeRanks(rankEntries);
 
-  // Batch write scores + ranks
-  const batch = adminDb.batch();
+  // Batch write scores + ranks in chunks of 400 (Firestore limit is 500)
+  const CHUNK_SIZE = 400;
   const now = new Date().toISOString();
 
-  for (const { uid, score } of entries) {
-    const rank = ranks.get(uid);
-    const acm: AcmScore = {
-      score,
-      overallRank: rank?.overallRank ?? 0,
-      branchRank: rank?.branchRank ?? 0,
-      yearRank: rank?.yearRank ?? 0,
-      lastCalculated: now,
-    };
+  for (let i = 0; i < entries.length; i += CHUNK_SIZE) {
+    const batch = adminDb.batch();
+    const chunk = entries.slice(i, i + CHUNK_SIZE);
 
-    const ref = adminDb.doc(FIRESTORE_PATHS.leaderboardDoc(uid));
-    batch.update(ref, { acm });
+    for (const { uid, score } of chunk) {
+      const rank = ranks.get(uid);
+      const acm: AcmScore = {
+        score,
+        overallRank: rank?.overallRank ?? 0,
+        branchRank: rank?.branchRank ?? 0,
+        yearRank: rank?.yearRank ?? 0,
+        lastCalculated: now,
+      };
+
+      const ref = adminDb.doc(FIRESTORE_PATHS.leaderboardDoc(uid));
+      batch.update(ref, { acm });
+    }
+
+    await batch.commit();
   }
-
-  await batch.commit();
 
   return { updated: entries.length };
 }

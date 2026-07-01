@@ -228,7 +228,17 @@ export async function syncUserByUid(uid: string): Promise<{ uid: string; status:
   const user = buildUserWithPlatforms(uid, userData);
 
   if (Object.keys(user.platforms).length === 0) {
-    return { uid, status: 'skipped', errors: ['No platforms linked'] };
+    // User unlinked all platforms. Remove them from the leaderboard entirely.
+    await adminDb.doc(FIRESTORE_PATHS.leaderboardDoc(uid)).delete();
+    
+    // Recalculate ranks for everyone else since a user was removed
+    try {
+      await recalculateAllScores();
+    } catch (err) {
+      console.error('[syncUserByUid] Failed to recalculate score:', err);
+    }
+    
+    return { uid, status: 'synced', errors: [] };
   }
 
   const result = await syncSingleUser(user, true);
