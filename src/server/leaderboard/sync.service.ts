@@ -128,7 +128,7 @@ export async function syncSingleUser(
     const username = user.platforms[platform];
     if (!username) {
       platformStatus[platform] = 'not_linked';
-      platformData[platform] = existing?.[platform] ?? null;
+      platformData[platform] = null; // User unlinked this platform, clear stats
       continue;
     }
 
