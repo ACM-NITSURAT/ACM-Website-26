@@ -1,12 +1,2 @@
 {
-  "crons": [
-    {
-      "path": "/api/leaderboard/sync",
-      "schedule": "0 0 * * *"
-    },
-    {
-      "path": "/api/leaderboard/contests/sync",
-      "schedule": "0 1 * * *"
-    }
-  ]
 }
